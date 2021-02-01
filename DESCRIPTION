@@ -1,0 +1,22 @@
+Package: ppseq
+Title: Conduct sequential posterior probablity monitoring
+Version: 0.0.0.9000
+Authors@R: 
+  c(person(given = "Emily C.",
+          family = "Zabor",
+          role = c("aut", "cre"),
+          email = "zabore2@ccf.org",
+          comment = c(ORCID = "0000-0002-1402-4498")),
+    person(given = "Brian P.", 
+          family = "Hobbs",
+          role = "aut"),
+    person(given = "Alex",
+          family = "Kaizer",
+          role = "aut")
+          )
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
