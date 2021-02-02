@@ -1,0 +1,173 @@
+
+#-----------------------------------------------------
+#  Beta distribution comparison 
+# Prob beta(c,d) < beta(a,b)
+#-----------------------------------------------------
+
+#### Posterior Design #####
+
+ # prob y1 < y0 | Data #
+ posterior_y0.gt.y1 <- function(y, n0, n1, delta=0, prior=c(0.5,0.5)){ ## y0 standard     y1 experimental
+  SAMP <- 5000
+  out <- sum( rbeta(SAMP, prior[1] + y[1], prior[2] + n0 - y[1]) > ( rbeta(SAMP, prior[1] + y[2], prior[2] + n1 - y[2]) + delta ) ) / SAMP
+  return(out)
+ }
+
+ # pred y1 < y0 | Data #
+ # d = y0,y1,n0,n1
+ pred_y0.gt.y1 <- function(d, N0, N1, theta=0.95, delta=0, prior=c(0.5,0.5)){
+
+  samp.Trial <- function(p, n){ return( rbinom( 1, n, p) ) }
+
+  SAMP <- 5000
+  p0 <- rbeta(SAMP, prior[1] + d[1], prior[2] + d[3] - d[1])
+  p1 <- rbeta(SAMP, prior[1] + d[2], prior[2] + d[4] - d[2])
+
+  if( d[3] < N0 ){ Y0 <- d[1] + sapply(p0, FUN=samp.Trial, n=N0-d[3])  
+  } else{ Y0 <- rep(d[1], SAMP); N0 <- d[3] }
+  if( d[4] < N1 ){ Y1 <- d[2] + sapply(p1, FUN=samp.Trial, n=N1-d[4])
+  } else{ Y1 <- rep(d[2], SAMP); N1 <- d[4] }
+
+  y <- cbind(Y0,Y1)
+  
+  post <- apply( y, MARGIN=1, FUN=posterior_y0.gt.y1, n0=N0, n1=N1, delta=0, prior=c(0.5,0.5) )
+  return( sum( as.numeric( post > theta  ) )/SAMP )
+ }
+
+
+ sim.pp.Trial <- function(n, p, N, theta, delta, prior){
+
+  sim.pp.Trial.1 <- function(p0, p1, n0, n1, N0, N1, theta, delta, prior){
+
+   rbinom. <- function(size, n=1, prob){ return( rbinom(n=n,size=size,prob=prob) ) }
+
+   y0 <- rbinom.(size=n0, prob=p0 ) 
+   y1 <- rbinom.(size=n1, prob=p1 ) 
+   for(i in 2:length(n0)){
+    y0 <- c(y0, y0[length(y0)] + rbinom.(size=n0[i]-n0[i-1], prob=p0 ) )
+    y1 <- c(y1, y1[length(y1)] + rbinom.(size=n1[i]-n1[i-1], prob=p1 ) )
+   }
+
+   return( apply( cbind(y0,y1,n0,n1), MARGIN=1, FUN=pred_y0.gt.y1, N0=N0, N1=N1, theta=theta, delta=delta, prior=prior ) )
+  }
+
+  N.trials <- 5000
+
+  out <- foreach::foreach( j = 1:N.trials,
+                           .multicombine = TRUE, .combine="rbind", .packages = c("stats"),
+                           .export = c("posterior_y0.gt.y1","pred_y0.gt.y1","n","p","N","theta","delta","prior") 
+                  )  %dopar% sim.pp.Trial.1(p0=p[1], p1=p[2], n0=n[,1], n1=n[,2], N0=N[1], N1=N[2], theta=theta, delta=delta, prior=prior)
+
+  colnames(out) <- paste( n[,1], "..", n[,2])
+
+  return(out)
+ }
+
+ run.pp.sims <- function(Looks, p, N, theta, delta, prior ){
+  
+  run.sim <- function(k, runIndex, Looks, p, N, theta, delta, prior){
+   return( sim.pp.Trial(n=Looks[[ runIndex[k,1] ]], p=p[[ runIndex[k,2] ]], N=N, theta=theta, delta=delta, prior=prior ) ) }
+
+  runIndex <- expand.grid( list( 1:length(Looks), 1:length(p) ) )
+  colnames(runIndex) <- c("interim.Looks","Hypothesis")
+  
+  out <- lapply(1:nrow(runIndex), FUN=run.sim, runIndex=runIndex, Looks=Looks, p=p, N=N, theta=theta, delta=delta, prior=prior )
+  names(out) <- paste0( names(p)[ runIndex[,2] ], "..", names(Looks)[ runIndex[,1] ] )
+ 
+  return(out)
+ }
+
+##########################################################
+
+library(parallel)
+library(foreach)
+library(doParallel)
+
+###### Paralllel Computing Setup #########################
+ no_cores <- min(detectCores() - 1, 90)
+
+ if( grepl("Windows", sessionInfo()[4]$running) ){ 
+  cl <- makeCluster(no_cores); registerDoParallel(cl) 
+ } else{
+  library(doMC)
+  registerDoMC(no_cores)
+ }
+
+Looks <- list( 
+ cbind( seq(100,1000,100), seq(100,1000,100) ),
+ cbind( seq(150,1500,150), seq(50,500,50) ),
+ cbind( seq(50,500,50),    seq(150,1500,150) ) )
+ names(Looks) <- c("50.50","75.25","25.75")
+
+p <- list( c(0.15,0.15), c(0.15,0.1) )
+ names(p) <- c("Null","Alt")
+
+R <- run.pp.sims(Looks, p, N=c(1000,1000), theta=0.9516, delta=0, prior=c(0.1,0.9) )
+ saveRDS(R,"pp-sims.rds")
+
+cStop <- function(r,t){
+ out <- 0
+ u <- which( as.numeric(r>t)==1 )
+ if(length(u)>0){ out <- min(u) }
+ return(out)
+}
+
+cRej <- function(r, omega){
+ out <- sum( apply(X=r, MARGIN=1, FUN=function(X,t) as.numeric( cStop(X,t)!=0 ), t=omega))/nrow(r)
+ return(out)
+}
+
+cMeanSS <- function(r, omega){
+ n <- c(NA,NA)
+ for(i in 1:ncol(r)){
+  n. <- c( as.numeric( str_sub(colnames(r)[i],start=1, end=str_locate(colnames(r)[i], " \\.\\. ")[1]-1) ),
+           as.numeric( str_sub(colnames(r)[i],start=str_locate(colnames(r)[i], " \\.\\. ")[2]+1, end=str_length(colnames(r)[i])) ) )
+  n <- rbind(n,n.)
+ }
+ n <- n[-1,]
+ out <- sum( apply(X=r, MARGIN=1, 
+  FUN=function(X,t,n){ 
+   SS = sum( n[nrow(n),] )
+   s = cStop(X,t)
+   if(s>0){ SS = sum( n[s,] ) } 
+   return(SS) 
+  }, t=omega, n=n) )/nrow(r)
+ return(out)
+}
+
+omega <- 0.9925
+unlist( lapply(R, FUN=cRej, omega=omega) )
+unlist( lapply(R, FUN=cMeanSS, omega=omega) )
+
+
+
+#R.0 <- sim.pp.Trial(n=cbind(Looks,Looks), p=c(0.10, 0.1), N=c(1000,1000), theta=0.9516, delta=0, prior=c(0.1,0.9) )
+#R.1 <- sim.pp.Trial(n=cbind(Looks,Looks), p=c(0.15, 0.1), N=c(1000,1000), theta=0.9516, delta=0, prior=c(0.1,0.9) )
+#R.1 <- sim.pp.Trial(n=cbind(Looks,Looks), p=c(0.15, 0.1), N=c(1000,1000), theta=0.9516, delta=0, prior=c(0.1,0.9) )
+
+#find.Boundary <- function(j, theta, Tab, delta=0, prior=c(0.5,0.5) ){
+#
+# Y=Tab$n1[j]; STOP <- FALSE
+# temp <- posterior_y0.gt.y1( n0=Tab$n0[j], n1=Tab$n1[j], y0=Tab$y0[j], y1=Y, delta=delta, prior=prior )
+# if( is.na(temp) ){ temp <- 0; print(paste0("NA - ",Tab[j,])) }
+# if( temp > theta ){ STOP <- TRUE }
+# while( !STOP ){
+#  Y <- Y - 1
+#  temp <- posterior_y0.gt.y1( n0=Tab$n0[j], n1=Tab$n1[j], y0=Tab$y0[j], y1=Y, delta=delta, prior=prior )
+#  if( is.na(temp) ){ temp <- 0 }
+#  if( Y == 0 ){ STOP <- TRUE }
+#  if( temp > theta ){ STOP <- TRUE }
+# }
+#
+# if( temp > theta ){ out <- Y 
+# } else{ out <- NA }
+#
+# return( c(j, out) )
+#}
+
+
+
+
+
+
+
