@@ -26,6 +26,8 @@ two-sample case; integer of total sample size for one-sample case}
 if interest is in p(y1 < y0). For one-sample case, "greater" if interest is
 in p(y1 > p) and "less" if interest is in p(y1 < p)}
 
+\item{p}{The target value to compare to in the one-sample case}
+
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 (default).}
 

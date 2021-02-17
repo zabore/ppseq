@@ -18,6 +18,7 @@
 #' @param direction "greater" (default) if interest is in p(y1 > y0) and "less" 
 #' if interest is in p(y1 < y0). For one-sample case, "greater" if interest is 
 #' in p(y1 > p) and "less" if interest is in p(y1 < p)
+#' @param p The target value to compare to in the one-sample case
 #' @param delta clinically meaningful difference between groups. 
 #' Typically 0 (default).
 #' @param prior hyperparameters of beta distribution, Beta(0.5, 0.5) is default
@@ -55,8 +56,8 @@ calc_posterior <- function(y, n, direction = "greater", p = NULL,
   
   if(length(y) == 2) {
     
-    rb0 <- rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
-    rb1 <- rbeta(S, prior[1] + y[2], prior[2] + n[2] - y[2]) 
+    rb0 <- stats::rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
+    rb1 <- stats::rbeta(S, prior[1] + y[2], prior[2] + n[2] - y[2]) 
     
     out <- ifelse(direction == "greater", 
                   mean(rb1 > rb0 + delta), 
@@ -65,7 +66,7 @@ calc_posterior <- function(y, n, direction = "greater", p = NULL,
     
   } else if(length(y) == 1) {
     
-    rb1 <- rbeta(S, prior[1] + y, prior[2] + n - y) 
+    rb1 <- stats::rbeta(S, prior[1] + y, prior[2] + n - y) 
     
     out <- ifelse(direction == "greater", mean(rb1 > p), mean(rb1 < p))
   }

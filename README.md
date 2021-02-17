@@ -3,9 +3,11 @@
 
 <!-- badges: start -->
 
-[![codecov](https://codecov.io/gh/zabore/ppseq/branch/master/graph/badge.svg)](https://codecov.io/gh/zabore/ppseq)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Build
+Status](https://travis-ci.com/zabore/ppseq.svg?branch=master)](https://travis-ci.com/zabore/ppseq)
+[![codecov](https://codecov.io/gh/zabore/ppseq/branch/master/graph/badge.svg)](https://codecov.io/gh/zabore/ppseq)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/ppseq)](https://CRAN.R-project.org/package=ppseq)
 <!-- badges: end -->
