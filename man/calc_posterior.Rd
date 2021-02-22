@@ -12,7 +12,7 @@ calc_posterior(
   delta = 0,
   prior = c(0.5, 0.5),
   S = 5000,
-  seed = 1
+  seed = NULL
 )
 }
 \arguments{
@@ -55,9 +55,9 @@ y1 is greater than (or less than) p given the data.
 \examples{
 
 # Two-sample case
-calc_posterior(y = c(15, 23), n = c(100, 100))
+calc_posterior(y = c(14, 23), n = c(100, 100), seed = 1)
 
 # One-sample case
-calc_posterior(y = 24, n = 100, direction = "greater", p = 0.2, delta = NULL)
+calc_posterior(y = 27, n = 100, p = 0.2, delta = NULL, seed = 1)
 
 }

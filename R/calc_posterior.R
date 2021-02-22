@@ -30,16 +30,16 @@
 #' @examples
 #'
 #' # Two-sample case
-#' calc_posterior(y = c(15, 23), n = c(100, 100))
+#' calc_posterior(y = c(14, 23), n = c(100, 100), seed = 1)
 #' 
 #' # One-sample case
-#' calc_posterior(y = 24, n = 100, direction = "greater", p = 0.2, delta = NULL)
+#' calc_posterior(y = 27, n = 100, p = 0.2, delta = NULL, seed = 1)
 #'
 #' @export
 
 calc_posterior <- function(y, n, direction = "greater", p = NULL, 
-                           delta = 0, prior = c(0.5,0.5), S = 5000,
-                           seed = 1) { 
+                           delta = 0, prior = c(0.5,0.5), S = 5000, 
+                           seed = NULL) { 
   
   if(length(y) != length(n)) 
     stop("y and n must be the same length")
@@ -53,6 +53,11 @@ calc_posterior <- function(y, n, direction = "greater", p = NULL,
   
   if(length(y) == 1 & is.null(p))
     stop("p must be specified for the one-sample case")
+  
+  if(length(y) == 2 & is.null(delta))
+    stop("delta must be specified for the two-sample case")
+  
+  set.seed(seed)
   
   if(length(y) == 2) {
     
