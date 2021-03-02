@@ -92,14 +92,30 @@
 
     
     
+<div id="introduction" class="section level1">
+<h1 class="hasAnchor">
+<a href="#introduction" class="anchor"></a>Introduction</h1>
+<p>The goal of this article is to provide a tutorial on the use of the <code><a href="../reference/calc_posterior.html">calc_posterior()</a></code> and <code><a href="../reference/calc_predictive.html">calc_predictive()</a></code> functions in the context of a one-sample expansion cohort. It is becoming increasingly common for expansion cohorts to be included at the end of phase I trials. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D) that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. Since one goal of expansion cohorts is to conserve the limited available resources for clinical studies, early stopping for futility is an important consideration. In this article we demonstrate the use of sequential posterior probability monitoring for futility in the context of a one-sample study.</p>
+</div>
+<div id="setup" class="section level1">
+<h1 class="hasAnchor">
+<a href="#setup" class="anchor"></a>Setup</h1>
+<p>To execute the code in this tutorial, you first need to install and load the {ppseq} package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ppseq</span><span class="op">)</span></code></pre></div>
-<p>This is the start of the first vignette</p>
+<code class="sourceCode R"><span class="co"># remotes::install_github("zabore/ppseq")</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ppseq</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="methods" class="section level1">
+<h1 class="hasAnchor">
+<a href="#methods" class="anchor"></a>Methods</h1>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

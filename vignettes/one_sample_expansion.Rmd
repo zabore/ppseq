@@ -15,8 +15,20 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+# Introduction
+
+The goal of this article is to provide a tutorial on the use of the `calc_posterior()` and `calc_predictive()` functions in the context of a one-sample expansion cohort. It is becoming increasingly common for expansion cohorts to be included at the end of phase I trials. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D) that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. Since one goal of expansion cohorts is to conserve the limited available resources for clinical studies, early stopping for futility is an important consideration. In this article we demonstrate the use of sequential posterior probability monitoring for futility in the context of a one-sample study.
+
+
+# Setup
+
+To execute the code in this tutorial, you first need to install and load the {ppseq} package.
+
 ```{r setup}
+# remotes::install_github("zabore/ppseq")
 library(ppseq)
 ```
 
-This is the start of the first vignette
+
+# Methods
