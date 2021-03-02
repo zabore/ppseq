@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//index.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/calc_posterior.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/calc_predictive.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/ppseq-package.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//articles/one_sample_expansion.html</loc>
+  </url>
+</urlset>
