@@ -2,3 +2,4 @@
 
 export(calc_posterior)
 export(calc_predictive)
+export(sim_single_trial)

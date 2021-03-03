@@ -1,5 +1,6 @@
 ---
 title: "One-sample expansion cohort"
+author: "Emily C. Zabor"
 date: "Last updated: `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -32,3 +33,36 @@ library(ppseq)
 
 
 # Methods
+
+We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate 0.3. We want to look after every 5 patients, with a maximum sample size of 50.
+
+Let's start by seeing what happens in a single simulated trial. We use the function `sim_single_trial` to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.
+
+We would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.05. 
+
+First let's consider a trial where we achieve our acceptable response rate.
+
+```{r cache = TRUE}
+sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
+                 delta = NULL, prior = c(0.5,0.5), S = 5000, seed = 1, 
+                 N = 50, theta = 0.95)
+```
+
+We see here that the posterior predictive probability, in the column `pp`, never drops below the futility level of 0.05, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100\% predictive probability of having posterior probability exceeding 0.95. If we had set a stopping rule for efficacy, we could have stopped after 20 patients when the posterior predictive probability reached 0.9972, which would exceed an efficacy stopping rule of 0.95.
+
+Now let's consider a trial where we do not achieve our acceptable response rate, but rather see the unacceptable response rate.
+
+```{r cache = TRUE}
+sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", p = 0.1,
+                 delta = NULL, prior = c(0.5,0.5), S = 5000, seed = 1, 
+                 N = 50, theta = 0.95)
+```
+
+We see in this example that we drop below the futility threshold of 0.05 after enrolling just 10 patients, after which we have a posterior predictive probability of 0.0390. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
+
+But when we are designing a trial, what we really want to know is the operating characteristics on average, which requires averaging results over many trials.
+
+```{r}
+
+```
+

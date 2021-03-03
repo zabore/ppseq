@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculate a single posterior predictive value — calc_predictive • ppseq</title>
+<title>Simulate a single trial with posterior probability monitoring — sim_single_trial • ppseq</title>
 
 
 <!-- jquery -->
@@ -39,15 +39,13 @@
 
 
 
-<meta property="og:title" content="Calculate a single posterior predictive value — calc_predictive" />
+<meta property="og:title" content="Simulate a single trial with posterior probability monitoring — sim_single_trial" />
 <meta property="og:description" content="This function is meant to be used in the context of a
 clinical trial with a binary endpoint. Interest is in the response rate.
-The goal is to calculate the posterior predictive probability of success
-at the end of a trial, given the data available at an interim analysis.
-For the two-arm case the number of responses observed at interim analysis,
-the sample size at interim analysis, and the total planned sample size are
-denoted y0, n0, and N0 in the standard-of-care arm and y1, n1, and N1 in the
-experimental arm." />
+The goal is to simulate response counts based on the number of patients at
+accrued at each interim look, and calculate the posterior predictive
+probability of success at the end of a trial, given the data available at
+each interim analysis." />
 
 
 
@@ -131,24 +129,22 @@ experimental arm." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculate a single posterior predictive value</h1>
+    <h1>Simulate a single trial with posterior probability monitoring</h1>
     
-    <div class="hidden name"><code>calc_predictive.Rd</code></div>
+    <div class="hidden name"><code>sim_single_trial.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>This function is meant to be used in the context of a
 clinical trial with a binary endpoint. Interest is in the response rate.
-The goal is to calculate the posterior predictive probability of success
-at the end of a trial, given the data available at an interim analysis.
-For the two-arm case the number of responses observed at interim analysis,
-the sample size at interim analysis, and the total planned sample size are
-denoted y0, n0, and N0 in the standard-of-care arm and y1, n1, and N1 in the
-experimental arm.</p>
+The goal is to simulate response counts based on the number of patients at
+accrued at each interim look, and calculate the posterior predictive
+probability of success at the end of a trial, given the data available at
+each interim analysis.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calc_predictive</span><span class='op'>(</span>
-  <span class='va'>y</span>,
+    <pre class="usage"><span class='fu'>sim_single_trial</span><span class='op'>(</span>
+  <span class='va'>prob</span>,
   <span class='va'>n</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
   p <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -164,15 +160,17 @@ experimental arm.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>y</th>
-      <td><p>vector of length two containing number of responses observed so far
-c(y0, y1) for two-sample case; integer of number of responses observed so far
-for one-sample case</p></td>
+      <th>prob</th>
+      <td><p>vector of length two containing the probability of response in
+the standard of care and experimental arm c(p0, p1) for the two-sample case;
+vector of response probability for one-sample case</p></td>
     </tr>
     <tr>
       <th>n</th>
-      <td><p>vector of length two containing the sample size so far c(n0, n1)
-for two-sample case; integer of sample size so far for one-sample case</p></td>
+      <td><p>matrix containing the total number of patients accrued so far at
+each interim look in the standard of care (column 1) and experimental
+(column 2) arms for two-sample case; vector of sample size accrued so far
+at each interim look for one-sample case</p></td>
     </tr>
     <tr>
       <th>direction</th>
@@ -181,7 +179,8 @@ if interest is in p(y1 &lt; y0).</p></td>
     </tr>
     <tr>
       <th>p</th>
-      <td><p>The target value to compare to in the one-sample case</p></td>
+      <td><p>The target value to compare to in the one-sample case
+(i.e. the unacceptable response rate)</p></td>
     </tr>
     <tr>
       <th>delta</th>
@@ -220,10 +219,10 @@ for one-sample case</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Two-sample case</span>
-<span class='fu'>calc_predictive</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>7</span>, <span class='fl'>12</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>50</span>, <span class='fl'>50</span><span class='op'>)</span>, seed <span class='op'>=</span> <span class='fl'>1</span>, N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='calc_predictive.html'>calc_predictive</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>7</span>, <span class='fl'>12</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>50</span>, <span class='fl'>50</span><span class='op'>)</span>, seed <span class='op'>=</span> <span class='fl'>1</span>, N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 0.5538</div><div class='input'>
 <span class='co'># One-sample case</span>
-<span class='fu'>calc_predictive</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fl'>14</span>, n <span class='op'>=</span> <span class='fl'>50</span>, p <span class='op'>=</span> <span class='fl'>0.2</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, seed <span class='op'>=</span> <span class='fl'>1</span>, N <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+<span class='fu'><a href='calc_predictive.html'>calc_predictive</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='fl'>14</span>, n <span class='op'>=</span> <span class='fl'>50</span>, p <span class='op'>=</span> <span class='fl'>0.2</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, seed <span class='op'>=</span> <span class='fl'>1</span>, N <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 0.6368</div><div class='input'>
 </div></pre>
   </div>

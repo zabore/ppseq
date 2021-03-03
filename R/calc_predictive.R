@@ -12,11 +12,10 @@
 #' @param y vector of length two containing number of responses observed so far
 #' c(y0, y1) for two-sample case; integer of number of responses observed so far
 #' for one-sample case
-#' @param n vector of length two containing the sample size sor far c(n0, n1) 
+#' @param n vector of length two containing the sample size so far c(n0, n1) 
 #' for two-sample case; integer of sample size so far for one-sample case
 #' @param direction "greater" (default) if interest is in p(y1 > y0) and "less" 
-#' if interest is in p(y1 < y0). For one-sample case, "greater" if interest is 
-#' in p(y1 > p) and "less" if interest is in p(y1 < p)
+#' if interest is in p(y1 < y0). 
 #' @param p The target value to compare to in the one-sample case
 #' @param delta clinically meaningful difference between groups. 
 #' Typically 0 (default).
@@ -24,7 +23,7 @@
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
 #' @param seed set the seed for the random number generation (default NULL)
-#' @param N the total planned sample size at the end of the trial, c(N0, N!)
+#' @param N the total planned sample size at the end of the trial, c(N0, N1)
 #' for two-sample case; integer of total planned sample size at end of trial
 #' for one-sample case
 #' @param theta The target posterior probability, default is 0.95

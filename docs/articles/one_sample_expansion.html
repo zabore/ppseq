@@ -82,8 +82,9 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>One-sample expansion cohort</h1>
+                        <h4 class="author">Emily C. Zabor</h4>
             
-            <h4 class="date">Last updated: 2021-03-02</h4>
+            <h4 class="date">Last updated: 2021-03-03</h4>
       
       
       <div class="hidden name"><code>one_sample_expansion.Rmd</code></div>
@@ -108,6 +109,44 @@
 <div id="methods" class="section level1">
 <h1 class="hasAnchor">
 <a href="#methods" class="anchor"></a>Methods</h1>
+<p>We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate 0.3. We want to look after every 5 patients, with a maximum sample size of 50.</p>
+<p>Let’s start by seeing what happens in a single simulated trial. We use the function <code>sim_single_trial</code> to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.</p>
+<p>We would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.05.</p>
+<p>First let’s consider a trial where we achieve our acceptable response rate.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
+                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, seed <span class="op">=</span> <span class="fl">1</span>, 
+                 N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span>
+<span class="co">#&gt;        y  n     pp</span>
+<span class="co">#&gt;  [1,]  3  5 0.9910</span>
+<span class="co">#&gt;  [2,]  5 10 0.9994</span>
+<span class="co">#&gt;  [3,]  6 15 0.9976</span>
+<span class="co">#&gt;  [4,]  7 20 0.9972</span>
+<span class="co">#&gt;  [5,]  9 25 1.0000</span>
+<span class="co">#&gt;  [6,] 10 30 1.0000</span>
+<span class="co">#&gt;  [7,] 11 35 1.0000</span>
+<span class="co">#&gt;  [8,] 11 40 1.0000</span>
+<span class="co">#&gt;  [9,] 12 45 1.0000</span>
+<span class="co">#&gt; [10,] 13 50 1.0000</span></code></pre></div>
+<p>We see here that the posterior predictive probability, in the column <code>pp</code>, never drops below the futility level of 0.05, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100% predictive probability of having posterior probability exceeding 0.95. If we had set a stopping rule for efficacy, we could have stopped after 20 patients when the posterior predictive probability reached 0.9972, which would exceed an efficacy stopping rule of 0.95.</p>
+<p>Now let’s consider a trial where we do not achieve our acceptable response rate, but rather see the unacceptable response rate.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
+                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, seed <span class="op">=</span> <span class="fl">1</span>, 
+                 N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span>
+<span class="co">#&gt;       y  n     pp</span>
+<span class="co">#&gt;  [1,] 0  5 0.1538</span>
+<span class="co">#&gt;  [2,] 0 10 0.0390</span>
+<span class="co">#&gt;  [3,] 0 15 0.0080</span>
+<span class="co">#&gt;  [4,] 1 20 0.0246</span>
+<span class="co">#&gt;  [5,] 1 25 0.0058</span>
+<span class="co">#&gt;  [6,] 1 30 0.0006</span>
+<span class="co">#&gt;  [7,] 1 35 0.0000</span>
+<span class="co">#&gt;  [8,] 1 40 0.0000</span>
+<span class="co">#&gt;  [9,] 1 45 0.0000</span>
+<span class="co">#&gt; [10,] 2 50 0.0000</span></code></pre></div>
+<p>We see in this example that we drop below the futility threshold of 0.05 after enrolling just 10 patients, after which we have a posterior predictive probability of 0.0390. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.</p>
+<p>But when we are designing a trial, what we really want to know is the operating characteristics on average, which requires averaging results over many trials.</p>
 </div>
   </div>
 
