@@ -42,7 +42,7 @@ We would stop for futility if our posterior predictive probability of exceeding 
 
 First let's consider a trial where we achieve our acceptable response rate.
 
-```{r cache = TRUE}
+```{r}
 sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
                  delta = NULL, prior = c(0.5,0.5), S = 5000, seed = 1, 
                  N = 50, theta = 0.95)
@@ -52,7 +52,7 @@ We see here that the posterior predictive probability, in the column `pp`, never
 
 Now let's consider a trial where we do not achieve our acceptable response rate, but rather see the unacceptable response rate.
 
-```{r cache = TRUE}
+```{r}
 sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", p = 0.1,
                  delta = NULL, prior = c(0.5,0.5), S = 5000, seed = 1, 
                  N = 50, theta = 0.95)

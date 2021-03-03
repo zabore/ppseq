@@ -29,15 +29,8 @@
 #' for one-sample case
 #' @param theta The target posterior probability, default is 0.95
 #' 
-#' @return Returns the posterior predictive probability of interest
-#'
-#' @examples
-#'
-#' # Two-sample case
-#' calc_predictive(y = c(7, 12), n = c(50, 50), seed = 1, N = c(100, 100))
-#' 
-#' # One-sample case
-#' calc_predictive(y = 14, n = 50, p = 0.2, delta = NULL, seed = 1, N = 100)
+#' @return Returns a matrix of number of responses, sample size, and posterior
+#' predictive probability at each interim look for the one-sample case
 #'
 #' @export
 
