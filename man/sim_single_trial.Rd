@@ -8,7 +8,7 @@ sim_single_trial(
   prob,
   n,
   direction = "greater",
-  p = NULL,
+  p0 = NULL,
   delta = 0,
   prior = c(0.5, 0.5),
   S = 5000,
@@ -18,20 +18,20 @@ sim_single_trial(
 )
 }
 \arguments{
-\item{prob}{vector of length two containing the probability of response in
+\item{prob}{vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case;
-vector of response probability for one-sample case}
+integer of event probability for one-sample case}
 
 \item{n}{matrix containing the total number of patients accrued so far at
 each interim look in the standard of care (column 1) and experimental
 (column 2) arms for two-sample case; vector of sample size accrued so far
 at each interim look for one-sample case}
 
-\item{direction}{"greater" (default) if interest is in p(y1 > y0) and "less"
-if interest is in p(y1 < y0).}
+\item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
+if interest is in P(p1 < p0) for two-sample case. For one-sample case,
+"greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).}
 
-\item{p}{The target value to compare to in the one-sample case
-(i.e. the unacceptable response rate)}
+\item{p0}{The target value to compare to in the one-sample case}
 
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 (default).}
@@ -41,23 +41,25 @@ Beta(0.5, 0.5) is default}
 
 \item{S}{number of samples, default is 5000}
 
-\item{seed}{set the seed for the random number generation (default NULL)}
+\item{seed}{set the seed for the random number generation. Default is NULL.}
 
 \item{N}{the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial
+for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case}
 
-\item{theta}{The target posterior probability, default is 0.95}
+\item{theta}{The target posterior probability. e.g. Efficacy decision if
+P(p1 > p0) > theta for the two-sample case with greater direction.
+Default is 0.95.}
 }
 \value{
 Returns a matrix of number of responses, sample size, and posterior
-predictive probability at each interim look for the one-sample case
+predictive probability at each interim look
 }
 \description{
 This function is meant to be used in the context of a
-clinical trial with a binary endpoint. Interest is in the response rate.
-The goal is to simulate response counts based on the number of patients at
+clinical trial with a binary endpoint. The goal is to simulate event counts
+from the binomial distribution based on the number of patients
 accrued at each interim look, and calculate the posterior predictive
-probability of success at the end of a trial, given the data available at
-each interim analysis.
+probability of success (or futility) at the end of a trial,
+given the data available at each interim analysis.
 }

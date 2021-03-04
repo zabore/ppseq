@@ -8,7 +8,7 @@ calc_predictive(
   y,
   n,
   direction = "greater",
-  p = NULL,
+  p0 = NULL,
   delta = 0,
   prior = c(0.5, 0.5),
   S = 5000,
@@ -18,17 +18,18 @@ calc_predictive(
 )
 }
 \arguments{
-\item{y}{vector of length two containing number of responses observed so far
-c(y0, y1) for two-sample case; integer of number of responses observed so far
+\item{y}{vector of length two containing number of events observed so far
+c(y0, y1) for two-sample case; integer of number of events y observed so far
 for one-sample case}
 
 \item{n}{vector of length two containing the sample size so far c(n0, n1)
-for two-sample case; integer of sample size so far for one-sample case}
+for two-sample case; integer of sample size so far n for one-sample case}
 
-\item{direction}{"greater" (default) if interest is in p(y1 > y0) and "less"
-if interest is in p(y1 < y0).}
+\item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
+if interest is in P(p1 < p0) for two-sample case. For one-sample case,
+"greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).}
 
-\item{p}{The target value to compare to in the one-sample case}
+\item{p0}{The target value to compare to in the one-sample case}
 
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 (default).}
@@ -38,26 +39,27 @@ Beta(0.5, 0.5) is default}
 
 \item{S}{number of samples, default is 5000}
 
-\item{seed}{set the seed for the random number generation (default NULL)}
+\item{seed}{set the seed for the random number generation. Default is NULL.}
 
 \item{N}{the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial
+for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case}
 
-\item{theta}{The target posterior probability, default is 0.95}
+\item{theta}{The target posterior probability. e.g. Efficacy decision if
+P(p1 > p0) > theta for the two-sample case with greater direction.
+Default is 0.95.}
 }
 \value{
 Returns the posterior predictive probability of interest
 }
 \description{
 This function is meant to be used in the context of a
-clinical trial with a binary endpoint. Interest is in the response rate.
-The goal is to calculate the posterior predictive probability of success
-at the end of a trial, given the data available at an interim analysis.
-For the two-arm case the number of responses observed at interim analysis,
-the sample size at interim analysis, and the total planned sample size are
-denoted y0, n0, and N0 in the standard-of-care arm and y1, n1, and N1 in the
-experimental arm.
+clinical trial with a binary endpoint. The goal is to calculate the posterior
+predictive probability of success at the end of a trial, given the data
+available at an interim analysis. For the two-arm case the number of events
+observed at interim analysis, the sample size at interim analysis,
+and the total planned sample size are denoted y0, n0, and N0 in
+the standard-of-care arm and y1, n1, and N1 in the experimental arm.
 }
 \examples{
 
@@ -65,6 +67,6 @@ experimental arm.
 calc_predictive(y = c(7, 12), n = c(50, 50), seed = 1, N = c(100, 100))
 
 # One-sample case
-calc_predictive(y = 14, n = 50, p = 0.2, delta = NULL, seed = 1, N = 100)
+calc_predictive(y = 14, n = 50, p0 = 0.2, delta = NULL, seed = 1, N = 100)
 
 }

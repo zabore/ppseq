@@ -60,9 +60,68 @@ sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", p = 0.1,
 
 We see in this example that we drop below the futility threshold of 0.05 after enrolling just 10 patients, after which we have a posterior predictive probability of 0.0390. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
 
-But when we are designing a trial, what we really want to know is the operating characteristics on average, which requires averaging results over many trials.
+But when we are designing a trial, what we want is to know the operating characteristics across many simulated trials.
 
-```{r}
+```{r eval = FALSE}
+# This is just me trying to figure out Brian's code from the Covid trial!
+# Still not sure what comes next.
 
+ # prob y1 < y0
+ posterior_y0.gt.y1 <- function(n0, n1, y0, y1, delta=0, prior=c(0.5,0.5)){ ## y0 standard     y1 experimental
+  SAMP <- 10000
+  out <- sum( rbeta(SAMP, prior[1] + y0, prior[2] + n0 - y0) > ( rbeta(SAMP, prior[1] + y1, prior[2] + n1 - y1) + delta ) ) / SAMP
+  return(out)
+ }
+
+find.Boundary <- function(j, theta, Tab, delta=0, prior=c(0.5,0.5) ){
+
+ Y=Tab$n1[j]; STOP <- FALSE
+ temp <- posterior_y0.gt.y1( n0=Tab$n0[j], n1=Tab$n1[j], y0=Tab$y0[j], y1=Y, delta=delta, prior=prior )
+ if( is.na(temp) ){ temp <- 0; print(paste0("NA - ",Tab[j,])) }
+ if( temp > theta ){ STOP <- TRUE }
+ while( !STOP ){
+  Y <- Y - 1
+  temp <- posterior_y0.gt.y1( n0=Tab$n0[j], n1=Tab$n1[j], y0=Tab$y0[j], y1=Y, delta=delta, prior=prior )
+  if( is.na(temp) ){ temp <- 0 }
+  if( Y == 0 ){ STOP <- TRUE }
+  if( temp > theta ){ STOP <- TRUE }
+ }
+
+ if( temp > theta ){ out <- Y 
+ } else{ out <- NA }
+
+ return( c(j = j, out = out) )
+}
+
+Max <- 2000
+N.tab <- expand.grid( list( seq(100,1500,100), seq(100,1500,100) ) )
+N.tab <- N.tab[-which( rowSums(N.tab) > Max ), ]
+
+Tab <- as.data.frame( list(n0=NA, n1=NA, y0=NA) ) 
+for(i in 1:nrow(N.tab)){
+
+ s <- 0:N.tab[i,1]
+ temp <- as.data.frame( list(n0=rep(N.tab[i,1],length(s)),
+                             n1=rep(N.tab[i,2],length(s)),
+                             y0=s) )
+ Tab <- rbind(Tab, temp)
+}
+Tab <- Tab[-1,]
+ 
+
+ prior <- c(0.1,0.9)
+ delta <- 0
+ theta <- 0.9516
+
+Tab2 <- Tab[1:101, ]
+
+temp <- 
+  1:nrow(Tab2) %>% 
+  map_df(~find.Boundary(j = .x, theta = 0.9516, Tab = Tab2, delta = 0, 
+                     prior = c(0.1,0.9)))
+
+ ### Merge Boundaries ###
+ Tab2$y1.stop <- rep(NA, nrow(Tab2) )
+ Tab2$y1.stop[ temp[[1]] ] <- temp[[2]]
 ```
 
