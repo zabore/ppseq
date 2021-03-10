@@ -40,6 +40,8 @@ Let's start by seeing what happens in a single simulated trial. We use the funct
 
 We would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.05. 
 
+(Question: how do people usually determine these futility/efficacy stopping rules? Are they typically calibrated in some way, or just "arbitrary"?)
+
 First let's consider a trial where we achieve our acceptable response rate of 0.3.
 
 ```{r}
@@ -71,26 +73,16 @@ To accomplish the first goal, we simulate many trials under the null and searchi
 
 To accomplish the second goal, we simulate many trials under the alternative and using the identified threshold and we average the posterior predictive probabilities to assess the probability of stopping for futility.
 
-```{r eval = FALSE}
-c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 
-  0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1) %>% 
-  purrr::map(
-    ~sim_single_trial(prob = 0.1, n = 50, direction = "greater", 
-                      p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 500, 
-                      N = 50, theta = .x)
-  )
-```
+We generate response counts based on the null response rate of 0.1 for a sample size of 50 for 5000 independent trials. For each resulting response count, we then calculate the posterior probability Pr(p1 > p0) using the function `calc_posterior()`. We compare the resulting posterior probabilities to the thresholds of interest and calculate the type I error rate as the average number of trials in which the posterior probability exceeded the threshhold. 
 
+(Note to self: turn the below into a function)
 
 ```{r}
 library(dplyr)
 
-# But the above returns Pr(Pr(p1 > p0) > theta)
-# I think we just want Pr(p1 > p0) and then if that's > theta it's a false positive?
-# The below returns 10 trial posterior probabilities of Pr(p1 > p0)
-# We can then compare each of these to each of the thresholds to determine if there would be a type I error or not at that threshold
-# Let's generate 5000 
-set.seed(20210310)
+# Note: we don't want to set a seed within the calc_posterior() function in this case as that would return the same results every time and the goal is to return a variety of results, so we want to set an overall seed instead
+set.seed(20210310) 
+
 posts <-
   purrr::map_dbl(1:5000, 
           ~stats::rbinom(n = 1, size = 50, prob = 0.1) %>% 
@@ -112,6 +104,30 @@ typeIerr_tbl <-
 
 knitr::kable(typeIerr_tbl, digits = c(5, 3))
 ```
+
+Based on these results, we would select a threshold of 0.96 to control the type I error at 0.048. 
+
+(Question: do people usually refine this more to try to directly target 0.05? There could be a second grid search between 0.95 and 0.96 to refine it if so)
+
+Now that we have our target threshold, we will identify the probability of stopping early for futility averaged over many trials.
+
+```{r eval = FALSE}
+set.seed(20210309)
+pps <-
+  purrr::map(
+    1:10,
+    ~sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", 
+                      p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 500, 
+                      seed = NULL, N = 50, theta = 0.96)
+    )
+```
+
+
+```{r}
+knitr::knit_exit()
+```
+
+
 
 
 ```{r eval = FALSE}
