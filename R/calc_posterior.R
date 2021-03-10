@@ -12,8 +12,8 @@
 #'
 #' @param y vector of length two containing total responses c(y0, y1) for 
 #' two-sample case; integer of total responses y for one-sample case
-#' @param n vector of length two containing total sample size c(n0, n1) for 
-#' two-sample case; integer of total sample size n for one-sample case
+#' @param n vector of length two containing the sample size so far c(n0, n1) 
+#' for two-sample case; integer of sample size so far n for one-sample case
 #' @param direction "greater" (default) if interest is in p(p1 > p0) and "less" 
 #' if interest is in p(p1 < p0) for two-sample case. For one-sample case, 
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).

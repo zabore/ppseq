@@ -41,13 +41,12 @@
 
 <meta property="og:title" content="Calculate a single posterior predictive value — calc_predictive" />
 <meta property="og:description" content="This function is meant to be used in the context of a
-clinical trial with a binary endpoint. Interest is in the response rate.
-The goal is to calculate the posterior predictive probability of success
-at the end of a trial, given the data available at an interim analysis.
-For the two-arm case the number of responses observed at interim analysis,
-the sample size at interim analysis, and the total planned sample size are
-denoted y0, n0, and N0 in the standard-of-care arm and y1, n1, and N1 in the
-experimental arm." />
+clinical trial with a binary endpoint. The goal is to calculate the posterior
+predictive probability of success at the end of a trial, given the data
+available at an interim analysis. For the two-arm case the number of events
+observed at interim analysis, the sample size at interim analysis,
+and the total planned sample size are denoted y0, n0, and N0 in
+the standard-of-care arm and y1, n1, and N1 in the experimental arm." />
 
 
 
@@ -138,20 +137,19 @@ experimental arm." />
 
     <div class="ref-description">
     <p>This function is meant to be used in the context of a
-clinical trial with a binary endpoint. Interest is in the response rate.
-The goal is to calculate the posterior predictive probability of success
-at the end of a trial, given the data available at an interim analysis.
-For the two-arm case the number of responses observed at interim analysis,
-the sample size at interim analysis, and the total planned sample size are
-denoted y0, n0, and N0 in the standard-of-care arm and y1, n1, and N1 in the
-experimental arm.</p>
+clinical trial with a binary endpoint. The goal is to calculate the posterior
+predictive probability of success at the end of a trial, given the data
+available at an interim analysis. For the two-arm case the number of events
+observed at interim analysis, the sample size at interim analysis,
+and the total planned sample size are denoted y0, n0, and N0 in
+the standard-of-care arm and y1, n1, and N1 in the experimental arm.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calc_predictive</span><span class='op'>(</span>
   <span class='va'>y</span>,
   <span class='va'>n</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  p <span class='op'>=</span> <span class='cn'>NULL</span>,
+  p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
   delta <span class='op'>=</span> <span class='fl'>0</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>,
@@ -165,22 +163,23 @@ experimental arm.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>y</th>
-      <td><p>vector of length two containing number of responses observed so far
-c(y0, y1) for two-sample case; integer of number of responses observed so far
+      <td><p>vector of length two containing number of events observed so far
+c(y0, y1) for two-sample case; integer of number of events y observed so far
 for one-sample case</p></td>
     </tr>
     <tr>
       <th>n</th>
       <td><p>vector of length two containing the sample size so far c(n0, n1)
-for two-sample case; integer of sample size so far for one-sample case</p></td>
+for two-sample case; integer of sample size so far n for one-sample case</p></td>
     </tr>
     <tr>
       <th>direction</th>
-      <td><p>"greater" (default) if interest is in p(y1 &gt; y0) and "less"
-if interest is in p(y1 &lt; y0).</p></td>
+      <td><p>"greater" (default) if interest is in P(p1 &gt; p0) and "less"
+if interest is in P(p1 &lt; p0) for two-sample case. For one-sample case,
+"greater" if interest is in P(p &gt; p0) and "less" if interest is in P(p &lt; p0).</p></td>
     </tr>
     <tr>
-      <th>p</th>
+      <th>p0</th>
       <td><p>The target value to compare to in the one-sample case</p></td>
     </tr>
     <tr>
@@ -199,17 +198,19 @@ Beta(0.5, 0.5) is default</p></td>
     </tr>
     <tr>
       <th>seed</th>
-      <td><p>set the seed for the random number generation (default NULL)</p></td>
+      <td><p>set the seed for the random number generation. Default is NULL.</p></td>
     </tr>
     <tr>
       <th>N</th>
       <td><p>the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial
+for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case</p></td>
     </tr>
     <tr>
       <th>theta</th>
-      <td><p>The target posterior probability, default is 0.95</p></td>
+      <td><p>The target posterior probability. e.g. Efficacy decision if
+P(p1 &gt; p0) &gt; theta for the two-sample case with greater direction.
+Default is 0.95.</p></td>
     </tr>
     </table>
 
@@ -223,7 +224,7 @@ for one-sample case</p></td>
 <span class='fu'>calc_predictive</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>7</span>, <span class='fl'>12</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>50</span>, <span class='fl'>50</span><span class='op'>)</span>, seed <span class='op'>=</span> <span class='fl'>1</span>, N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 0.5538</div><div class='input'>
 <span class='co'># One-sample case</span>
-<span class='fu'>calc_predictive</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fl'>14</span>, n <span class='op'>=</span> <span class='fl'>50</span>, p <span class='op'>=</span> <span class='fl'>0.2</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, seed <span class='op'>=</span> <span class='fl'>1</span>, N <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
+<span class='fu'>calc_predictive</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fl'>14</span>, n <span class='op'>=</span> <span class='fl'>50</span>, p0 <span class='op'>=</span> <span class='fl'>0.2</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, seed <span class='op'>=</span> <span class='fl'>1</span>, N <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 0.6368</div><div class='input'>
 </div></pre>
   </div>

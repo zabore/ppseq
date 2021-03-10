@@ -25,7 +25,9 @@ integer of event probability for one-sample case}
 \item{n}{matrix containing the total number of patients accrued so far at
 each interim look in the standard of care (column 1) and experimental
 (column 2) arms for two-sample case; vector of sample size accrued so far
-at each interim look for one-sample case}
+at each interim look for one-sample case. If only a single look will be done
+at the end of the trial, this can be an integer specifying the total sample
+size at the end of the trial N.}
 
 \item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
 if interest is in P(p1 < p0) for two-sample case. For one-sample case,

@@ -13,7 +13,9 @@
 #' @param n matrix containing the total number of patients accrued so far at 
 #' each interim look in the standard of care (column 1) and experimental 
 #' (column 2) arms for two-sample case; vector of sample size accrued so far 
-#' at each interim look for one-sample case
+#' at each interim look for one-sample case. If only a single look will be done
+#' at the end of the trial, this can be an integer specifying the total sample
+#' size at the end of the trial N.
 #' @param direction "greater" (default) if interest is in P(p1 > p0) and "less" 
 #' if interest is in P(p1 < p0) for two-sample case. For one-sample case, 
 #' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
@@ -61,14 +63,16 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
     y0 <- stats::rbinom(n = 1, size = n[1, 1], prob = prob[1]) 
     y1 <- stats::rbinom(n = 1, size = n[1, 2], prob = prob[2]) 
     
-    for(i in 2:nrow(n)) { 
-      
-      y0 <- c(y0, y0[length(y0)] + stats::rbinom(n = 1, 
-                                                 size = n[i, 1] - n[i - 1, 1], 
-                                                 prob = prob[1])) 
-      y1 <- c(y1, y1[length(y1)] + stats::rbinom(n = 1, 
-                                                 size = n[i, 2] - n[i - 1, 2], 
-                                                 prob = prob[2])) 
+    if(length(n) > 1) {
+      for(i in 2:nrow(n)) { 
+        
+        y0 <- c(y0, y0[length(y0)] + stats::rbinom(n = 1, 
+                                                   size = n[i, 1] - n[i - 1, 1], 
+                                                   prob = prob[1])) 
+        y1 <- c(y1, y1[length(y1)] + stats::rbinom(n = 1, 
+                                                   size = n[i, 2] - n[i - 1, 2], 
+                                                   prob = prob[2])) 
+      }
     }
     
     pp <- purrr::pmap_dbl(list(y0, y1, n[, 1], n[, 2]), 
@@ -84,13 +88,17 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
   } else if(length(prob) == 1) {
     
     y1 <- stats::rbinom(n = 1, size = n[1], prob = prob) 
-    
-    for(i in 2:length(n)) { 
-      
-      y1 <- c(y1, y1[length(y1)] + stats::rbinom(n = 1, 
-                                                 size = n[i] - n[i - 1], 
-                                                 prob = prob)) 
+
+    if(length(n) > 1) {
+      for(i in 2:length(n)) { 
+        
+        y1 <- c(y1, y1[length(y1)] + stats::rbinom(n = 1, 
+                                                   size = n[i] - n[i - 1], 
+                                                   prob = prob)) 
+      }
     }
+    
+      
     
     pp <- purrr::map2_dbl(y1, n, 
                           ~calc_predictive(

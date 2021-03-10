@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The goal of this article is to provide a tutorial on the use of the `calc_posterior()` and `calc_predictive()` functions in the context of a one-sample expansion cohort. It is becoming increasingly common for expansion cohorts to be included at the end of phase I trials. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D) that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. Since one goal of expansion cohorts is to conserve the limited available resources for clinical studies, early stopping for futility is an important consideration. In this article we demonstrate the use of sequential posterior probability monitoring for futility in the context of a one-sample study.
+The goal of this article is to provide a tutorial on the use of the `calc_posterior()` and `calc_predictive()` functions in the context of a one-sample expansion cohort. It is becoming increasingly common for expansion cohorts to be included at the end of phase I trials. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D) that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. Since one goal of expansion cohorts is to conserve the limited available resources for clinical studies, early stopping for futility is an important consideration. In this article we demonstrate the use of sequential posterior probability monitoring for futility in the context of a one-sample expansion cohort.
 
 
 # Setup
@@ -40,7 +40,7 @@ Let's start by seeing what happens in a single simulated trial. We use the funct
 
 We would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.05. 
 
-First let's consider a trial where we achieve our acceptable response rate.
+First let's consider a trial where we achieve our acceptable response rate of 0.3.
 
 ```{r}
 sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
@@ -48,9 +48,9 @@ sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
                  N = 50, theta = 0.95)
 ```
 
-We see here that the posterior predictive probability, in the column `pp`, never drops below the futility level of 0.05, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100\% predictive probability of having posterior probability exceeding 0.95. If we had set a stopping rule for efficacy, we could have stopped after 20 patients when the posterior predictive probability reached 0.9972, which would exceed an efficacy stopping rule of 0.95.
+We see here that the posterior predictive probability, in the column `pp`, never drops below the futility level of 0.05, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100\% predictive probability of having posterior probability exceeding 0.95. 
 
-Now let's consider a trial where we do not achieve our acceptable response rate, but rather see the unacceptable response rate.
+Now let's consider a trial where we do not achieve our acceptable response rate of 0.3, but rather observe the unacceptable response rate of 0.1.
 
 ```{r}
 sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", p = 0.1,
@@ -58,13 +58,64 @@ sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", p = 0.1,
                  N = 50, theta = 0.95)
 ```
 
-We see in this example that we drop below the futility threshold of 0.05 after enrolling just 10 patients, after which we have a posterior predictive probability of 0.0390. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
+We see in this example that we drop below the futility threshold of 0.05 after enrolling just 10 patients, at which point we have a posterior predictive probability of 0.0390. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
 
-But when we are designing a trial, what we want is to know the operating characteristics across many simulated trials.
+But when we are designing a trial, what we want is to know the operating characteristics across many simulated trials. There are two goals:
+
+1. Determine the posterior probability threshold that maintains a pre-determined overall type I error rate. For simplicity in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.
+2. Once the posterior probability threshold is established, we want to simulate many trials to determine the average probability of stopping early for futility. 
+
+To accomplish the first goal, we simulate many trials under the null and searching over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.
+
+(Note to self: since in this example we only have futility monitoring, we only have to consider rejection of the null hypothesis at the end of the trial. So if at the end of the trial P(p1 > p0) exceeds the threshold under consideration, that would be a type I error)
+
+To accomplish the second goal, we simulate many trials under the alternative and using the identified threshold and we average the posterior predictive probabilities to assess the probability of stopping for futility.
 
 ```{r eval = FALSE}
-# This is just me trying to figure out Brian's code from the Covid trial!
-# Still not sure what comes next.
+c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 
+  0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1) %>% 
+  purrr::map(
+    ~sim_single_trial(prob = 0.1, n = 50, direction = "greater", 
+                      p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 500, 
+                      N = 50, theta = .x)
+  )
+```
+
+
+```{r}
+library(dplyr)
+
+# But the above returns Pr(Pr(p1 > p0) > theta)
+# I think we just want Pr(p1 > p0) and then if that's > theta it's a false positive?
+# The below returns 10 trial posterior probabilities of Pr(p1 > p0)
+# We can then compare each of these to each of the thresholds to determine if there would be a type I error or not at that threshold
+# Let's generate 5000 
+set.seed(20210310)
+posts <-
+  purrr::map_dbl(1:5000, 
+          ~stats::rbinom(n = 1, size = 50, prob = 0.1) %>% 
+            purrr::map_dbl(
+              ~calc_posterior(y = .x, n = 50, direction = "greater", p0 = 0.1,
+                              delta = NULL, prior = c(0.5,0.5), S = 5000, 
+                              seed = NULL)
+              )
+          )
+
+typeIerr_tbl <-
+  tibble::tibble(
+    theta = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 
+              0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1), 
+    typeIerr = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 
+                 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1) %>% 
+      purrr::map_dbl(~mean(posts > .x))
+    )
+
+knitr::kable(typeIerr_tbl, digits = c(5, 3))
+```
+
+
+```{r eval = FALSE}
+# This is just me trying to figure out Brian's code from the Covid trial
 
  # prob y1 < y0
  posterior_y0.gt.y1 <- function(n0, n1, y0, y1, delta=0, prior=c(0.5,0.5)){ ## y0 standard     y1 experimental
