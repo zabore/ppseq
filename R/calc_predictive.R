@@ -22,7 +22,6 @@
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
-#' @param seed set the seed for the random number generation. Default is NULL.
 #' @param N the total planned sample size at the end of the trial, c(N0, N1)
 #' for two-sample case; integer of total planned sample size at end of trial N
 #' for one-sample case
@@ -33,18 +32,19 @@
 #' @return Returns the posterior predictive probability of interest
 #'
 #' @examples
+#' 
+#' set.seed(123)
 #'
 #' # Two-sample case
-#' calc_predictive(y = c(7, 12), n = c(50, 50), seed = 1, N = c(100, 100))
+#' calc_predictive(y = c(7, 12), n = c(50, 50), N = c(100, 100))
 #' 
 #' # One-sample case
-#' calc_predictive(y = 14, n = 50, p0 = 0.2, delta = NULL, seed = 1, N = 100)
+#' calc_predictive(y = 14, n = 50, p0 = 0.2, delta = NULL, N = 100)
 #'
 #' @export
 
 calc_predictive <- function(y, n, direction = "greater", p0 = NULL, 
                             delta = 0, prior = c(0.5,0.5), S = 5000, 
-                            seed = NULL, 
                             N, theta = 0.95) {
   
   if(length(y) != length(n)) 
@@ -65,9 +65,7 @@ calc_predictive <- function(y, n, direction = "greater", p0 = NULL,
   
   if(length(y) != length(N))
     stop("y and N must be the same length")
-  
-  set.seed(seed)
-  
+
   if(length(y) == 2) {
     
     rb0 <- stats::rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
@@ -89,7 +87,7 @@ calc_predictive <- function(y, n, direction = "greater", p0 = NULL,
     
     post <- purrr::map2_dbl(Y0, Y1, ~calc_posterior(
       y = c(.x, .y), n = N,  direction = direction, p0 = p0, delta = delta, 
-      prior = prior, S = S, seed = seed)
+      prior = prior, S = S)
       )
 
   } else if(length(y) == 1) {
@@ -105,8 +103,7 @@ calc_predictive <- function(y, n, direction = "greater", p0 = NULL,
     
     post <- purrr::map_dbl(Y, calc_posterior, n = N, 
                            direction = direction, p0 = p0, 
-                           delta = delta, prior = prior, S = S, 
-                           seed = seed)
+                           delta = delta, prior = prior, S = S)
     
   }
 

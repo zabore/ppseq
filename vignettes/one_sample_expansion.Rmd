@@ -36,80 +36,196 @@ library(ppseq)
 
 We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate 0.3. We want to look after every 5 patients, with a maximum sample size of 50.
 
-Let's start by seeing what happens in a single simulated trial. We use the function `sim_single_trial` to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.
+Let's start by seeing what happens in a single simulated trial. We use the function `sim_single_trial()` to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.
 
-We would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.05. 
-
-(Question: how do people usually determine these futility/efficacy stopping rules? Are they typically calibrated in some way, or just "arbitrary"?)
+Let's say, for simplicity, that we would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.1. 
 
 First let's consider a trial where we achieve our acceptable response rate of 0.3.
 
 ```{r}
+set.seed(123)
+
 sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
-                 delta = NULL, prior = c(0.5,0.5), S = 5000, seed = 1, 
+                 delta = NULL, prior = c(0.5,0.5), S = 5000, 
                  N = 50, theta = 0.95)
 ```
 
-We see here that the posterior predictive probability, in the column `pp`, never drops below the futility level of 0.05, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100\% predictive probability of having posterior probability exceeding 0.95. 
+We see here that the posterior predictive probability, in the column `ppp`, never drops below the futility level of 0.1, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100\% predictive probability of having posterior probability exceeding 0.95. 
 
 Now let's consider a trial where we do not achieve our acceptable response rate of 0.3, but rather observe the unacceptable response rate of 0.1.
 
 ```{r}
+set.seed(123)
+
 sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", p = 0.1,
-                 delta = NULL, prior = c(0.5,0.5), S = 5000, seed = 1, 
+                 delta = NULL, prior = c(0.5,0.5), S = 5000, 
                  N = 50, theta = 0.95)
 ```
 
-We see in this example that we drop below the futility threshold of 0.05 after enrolling just 10 patients, at which point we have a posterior predictive probability of 0.0390. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
+We see in this example that we drop below the futility threshold of 0.1 after enrolling 15 patients, at which point we have a posterior predictive probability of 0.0960. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
 
-But when we are designing a trial, what we want is to know the operating characteristics across many simulated trials. There are two goals:
+But when we are designing a trial, we want to achieve fixed operating characteristics such as type I error and power. There are several goals:
 
 1. Determine the posterior probability threshold that maintains a pre-determined overall type I error rate. For simplicity in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.
-2. Once the posterior probability threshold is established, we want to simulate many trials to determine the average probability of stopping early for futility. 
+2. Determine the predictive probability threshold to stop for futility.
+3. Using the identified thresholds, simulate many trials to determine the average probability of stopping early for futility. 
+4. Consider different interim monitoring schedules
 
-To accomplish the first goal, we simulate many trials under the null and searching over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.
+To accomplish the first goal, we simulate many trials under the null and search over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.
 
-(Note to self: since in this example we only have futility monitoring, we only have to consider rejection of the null hypothesis at the end of the trial. So if at the end of the trial P(p1 > p0) exceeds the threshold under consideration, that would be a type I error)
+The `calibrate_posterior_threshold()` function can accomplish this at the final sample size only, for the one-sample or two-sample case and any number of thresholds of interest to consider
+
+```{r}
+thresholds <- c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95,
+                0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1)
+
+set.seed(123)
+
+res <- calibrate_posterior_threshold(prob = 0.1, N = 50, direction = "greater", 
+                              p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
+                              S = 5000, theta = thresholds)
+
+knitr::kable(res)
+```
+
+Based on these results, we see that our target type I error falls between a threshold of 0.95 and 0.96. We can refine our target thresholds and recalculate.
+
+```{r}
+thresholds <- seq(0.95, 0.96, 0.001)
+
+set.seed(123)
+
+res <- calibrate_posterior_threshold(prob = 0.1, N = 50, direction = "greater", 
+                              p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
+                              S = 5000, theta = thresholds)
+
+knitr::kable(res)
+```
+
+And we see that a threshold of 0.959 results in a type I error rate of 0.496.
+
+However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold.
+
+```{r}
+set.seed(123)
+
+# posterior probability thresholds to consider
+pp_thresholds <- c(0.95, 0.96)
+
+# posterior predictive probability thresholds to consider
+fut_thresholds <- c(0.05, 0.1)
+eff_thresholds <- c(0.9, 0.95)
+
+# Note that S is currently set to 500 for speed, should be increased for a real example
+# Also note that I'm considering a small number of all thresholds right now for simplicity
+res1 <- 
+  sim_single_trial(prob = 0.1, n = c(25, 50), direction = "greater", p0 = 0.1,
+                   delta = NULL, prior = c(0.5,0.5), S = 500, 
+                   N = 50, theta = pp_thresholds)
+res1
+
+# What's a type I error?
+# Have to consider both futility and efficacy thresholds together
+# If you stop at an interim look, there is no type I error
+# If you make it to the end of the study and the pp is less than the efficacy threshold, there is no type I error
+# If you make it to the end of the study and the pp exceeds the efficacy threshold, that is a type I error
+
+# For each row in the table, if it's an interim look compare ppp to each fut_thresholds and if ppp<fut_thresholds, no type I error and don't keep looking. If ppp>=fut_thresholds keep looking. At the end of the study, compare ppp to each eff_thresholds and if ppp>=eff_thresholds that's a type I error.
+library(dplyr)
+library(tidyr)
+
+res2 <- 
+  res1 %>% 
+  pivot_wider(
+    names_from = n, 
+    values_from = c(y1, pp, ppp)
+  )
+
+
+expand_grid(res2, 
+            fut_threshold = fut_thresholds, 
+            eff_threshold = eff_thresholds) %>% 
+  mutate(
+    type1 = case_when(
+      ppp_25 < fut_threshold ~ FALSE,
+      ppp_25 > fut_threshold & ppp_50 < eff_threshold ~ FALSE,
+      ppp_25 > fut_threshold & ppp_50 > eff_threshold ~ TRUE
+    )
+  )
+
+# The above format is not generalizable - need to work on this and think about reformatting sim_single_trial results 
+# Or loop over pp_thresholds instead of passing them as a vector to sim_single trial, so that we consider them one at a time instead
+```
+
+
+```{r}
+# try to separate this out into a new function that considers things sequentially instead of simulating out the whole trial from the start
+set.seed(123)
+
+prob <- 0.1
+n <- seq(5, 25, 5)
+direction <- "greater"
+p0 <- 0.1
+delta <- NULL
+prior <- c(0.5,0.5)
+S <- 500
+N <- 25
+
+
+# posterior probability thresholds to consider
+pp_thresholds <- c(0.95, 0.96)
+
+# posterior predictive probability thresholds to consider
+fut_thresholds <- c(0.05, 0.1)
+eff_thresholds <- c(0.9, 0.95)
+
+# Generate response counts at each look
+y1 <- stats::rbinom(n = 1, size = n[1], prob = prob) 
+if(length(n) > 1) {
+  for(i in 2:length(n)) { 
+    y1 <- c(y1, y1[length(y1)] + stats::rbinom(n = 1, 
+                                               size = n[i] - n[i - 1], 
+                                               prob = prob)) 
+      }
+    }
+
+# Generate the posterior probability at each look
+pp <- purrr::map2_dbl(y1, n, 
+                      ~calc_posterior(
+                        y = .x, 
+                        n = .y, 
+                        p0 = p0, delta = delta, prior = prior,
+                        S = S)
+                      )
+
+crossargs <- tidyr::expand_grid(pp_thresholds, fut_thresholds, eff_thresholds)
+
+
+check_pos_trial <- function(ppt, futt, efft) {
+  ppp <- NULL
+  for(i in 1:length(y1)) {
+    ppp[i] <- calc_predictive(y = y1[i], 
+                           n = n[i],
+                           p0 = p0, delta = delta, prior = prior, S = S, N = N,
+                           theta = ppt)
+    if(i < length(y1) & ppp[i] < futt) break
+  }
+  return(ppp)
+}
+
+check_pos_trial(pp_thresholds[1], fut_thresholds[1], eff_thresholds[1])
+
+```
+
+
+
+
+
+Now that we have our target threshold, we will identify the probability of stopping early for futility averaged over many trials.
 
 To accomplish the second goal, we simulate many trials under the alternative and using the identified threshold and we average the posterior predictive probabilities to assess the probability of stopping for futility.
 
 We generate response counts based on the null response rate of 0.1 for a sample size of 50 for 5000 independent trials. For each resulting response count, we then calculate the posterior probability Pr(p1 > p0) using the function `calc_posterior()`. We compare the resulting posterior probabilities to the thresholds of interest and calculate the type I error rate as the average number of trials in which the posterior probability exceeded the threshhold. 
-
-(Note to self: turn the below into a function)
-
-```{r}
-library(dplyr)
-
-# Note: we don't want to set a seed within the calc_posterior() function in this case as that would return the same results every time and the goal is to return a variety of results, so we want to set an overall seed instead
-set.seed(20210310) 
-
-posts <-
-  purrr::map_dbl(1:5000, 
-          ~stats::rbinom(n = 1, size = 50, prob = 0.1) %>% 
-            purrr::map_dbl(
-              ~calc_posterior(y = .x, n = 50, direction = "greater", p0 = 0.1,
-                              delta = NULL, prior = c(0.5,0.5), S = 5000, 
-                              seed = NULL)
-              )
-          )
-
-typeIerr_tbl <-
-  tibble::tibble(
-    theta = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 
-              0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1), 
-    typeIerr = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 
-                 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1) %>% 
-      purrr::map_dbl(~mean(posts > .x))
-    )
-
-knitr::kable(typeIerr_tbl, digits = c(5, 3))
-```
-
-Based on these results, we would select a threshold of 0.96 to control the type I error at 0.048. 
-
-(Question: do people usually refine this more to try to directly target 0.05? There could be a second grid search between 0.95 and 0.96 to refine it if so)
-
-Now that we have our target threshold, we will identify the probability of stopping early for futility averaged over many trials.
 
 ```{r eval = FALSE}
 set.seed(20210309)

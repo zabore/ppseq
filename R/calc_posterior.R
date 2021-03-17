@@ -23,23 +23,23 @@
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
-#' @param seed set the seed for the random number generation. Default is NULL.
 #' 
 #' @return Returns the posterior probability of interest
 #'
 #' @examples
+#' 
+#' set.seed(123)
 #'
 #' # Two-sample case
-#' calc_posterior(y = c(14, 23), n = c(100, 100), seed = 1)
+#' calc_posterior(y = c(14, 23), n = c(100, 100))
 #' 
 #' # One-sample case
-#' calc_posterior(y = 27, n = 100, p0 = 0.2, delta = NULL, seed = 1)
+#' calc_posterior(y = 27, n = 100, p0 = 0.2, delta = NULL)
 #'
 #' @export
 
 calc_posterior <- function(y, n, direction = "greater", p0 = NULL, 
-                           delta = 0, prior = c(0.5,0.5), S = 5000, 
-                           seed = NULL) { 
+                           delta = 0, prior = c(0.5,0.5), S = 5000) { 
   
   if(length(y) != length(n)) 
     stop("y and n must be the same length")
@@ -56,9 +56,7 @@ calc_posterior <- function(y, n, direction = "greater", p0 = NULL,
   
   if(length(y) == 2 & is.null(delta))
     stop("delta must be specified for the two-sample case")
-  
-  set.seed(seed)
-  
+
   if(length(y) == 2) {
     
     rb0 <- stats::rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])

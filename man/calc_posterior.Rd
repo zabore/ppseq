@@ -11,8 +11,7 @@ calc_posterior(
   p0 = NULL,
   delta = 0,
   prior = c(0.5, 0.5),
-  S = 5000,
-  seed = NULL
+  S = 5000
 )
 }
 \arguments{
@@ -35,8 +34,6 @@ Typically 0 (default).}
 Beta(0.5, 0.5) is default}
 
 \item{S}{number of samples, default is 5000}
-
-\item{seed}{set the seed for the random number generation. Default is NULL.}
 }
 \value{
 Returns the posterior probability of interest
@@ -54,10 +51,12 @@ p is greater than (or less than) p0 given the data.
 }
 \examples{
 
+set.seed(123)
+
 # Two-sample case
-calc_posterior(y = c(14, 23), n = c(100, 100), seed = 1)
+calc_posterior(y = c(14, 23), n = c(100, 100))
 
 # One-sample case
-calc_posterior(y = 27, n = 100, p0 = 0.2, delta = NULL, seed = 1)
+calc_posterior(y = 27, n = 100, p0 = 0.2, delta = NULL)
 
 }

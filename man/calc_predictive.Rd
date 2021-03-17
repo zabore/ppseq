@@ -12,7 +12,6 @@ calc_predictive(
   delta = 0,
   prior = c(0.5, 0.5),
   S = 5000,
-  seed = NULL,
   N,
   theta = 0.95
 )
@@ -39,8 +38,6 @@ Beta(0.5, 0.5) is default}
 
 \item{S}{number of samples, default is 5000}
 
-\item{seed}{set the seed for the random number generation. Default is NULL.}
-
 \item{N}{the total planned sample size at the end of the trial, c(N0, N1)
 for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case}
@@ -63,10 +60,12 @@ the standard-of-care arm and y1, n1, and N1 in the experimental arm.
 }
 \examples{
 
+set.seed(123)
+
 # Two-sample case
-calc_predictive(y = c(7, 12), n = c(50, 50), seed = 1, N = c(100, 100))
+calc_predictive(y = c(7, 12), n = c(50, 50), N = c(100, 100))
 
 # One-sample case
-calc_predictive(y = 14, n = 50, p0 = 0.2, delta = NULL, seed = 1, N = 100)
+calc_predictive(y = 14, n = 50, p0 = 0.2, delta = NULL, N = 100)
 
 }

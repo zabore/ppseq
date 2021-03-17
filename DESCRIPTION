@@ -27,4 +27,5 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Imports: 
-    purrr
+    purrr,
+    tibble

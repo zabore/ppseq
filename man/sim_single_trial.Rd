@@ -12,7 +12,6 @@ sim_single_trial(
   delta = 0,
   prior = c(0.5, 0.5),
   S = 5000,
-  seed = NULL,
   N,
   theta = 0.95
 )
@@ -26,7 +25,9 @@ integer of event probability for one-sample case}
 each interim look in the standard of care (column 1) and experimental
 (column 2) arms for two-sample case; vector of sample size accrued so far
 at each interim look for one-sample case. If only a single look will be done
-at the end of the trial, this can be an integer specifying the total sample
+at the end of the trial, this can be a vector specifying the total sample
+size c(N0, N1) for the two-sample case or an integer specifying the total
+sample size N for the one-sample case
 size at the end of the trial N.}
 
 \item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
@@ -43,8 +44,6 @@ Beta(0.5, 0.5) is default}
 
 \item{S}{number of samples, default is 5000}
 
-\item{seed}{set the seed for the random number generation. Default is NULL.}
-
 \item{N}{the total planned sample size at the end of the trial, c(N0, N1)
 for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case}
@@ -54,8 +53,8 @@ P(p1 > p0) > theta for the two-sample case with greater direction.
 Default is 0.95.}
 }
 \value{
-Returns a matrix of number of responses, sample size, and posterior
-predictive probability at each interim look
+Returns a tibble number of responses, sample size, and posterior
+probability, and posterior predictive probability at each interim look
 }
 \description{
 This function is meant to be used in the context of a
@@ -64,4 +63,18 @@ from the binomial distribution based on the number of patients
 accrued at each interim look, and calculate the posterior predictive
 probability of success (or futility) at the end of a trial,
 given the data available at each interim analysis.
+}
+\examples{
+
+# One-sample case
+set.seed(123)
+sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
+delta = NULL, prior = c(0.5,0.5), S = 5000, N = 50, theta = 0.95)
+
+# Two-sample case
+set.seed(123)
+sim_single_trial(prob = c(0.1, 0.3), n = cbind(seq(5, 50, 5), seq(5, 50, 5)), 
+direction = "greater", p0 = NULL, delta = 0, prior = c(0.5,0.5), S = 5000,
+N = c(50, 50), theta = 0.95)
+
 }
