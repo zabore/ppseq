@@ -114,8 +114,8 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
                              S = S, N = N, theta = ..5)
     )
     
-    res <- arrange(
-      select(
+    res <- dplyr::arrange(
+      dplyr::select(
         tibble::add_column(crossargs, pp = rep(pp, length(theta)), ppp = ppp),
         theta, everything()
       ),
@@ -155,8 +155,8 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
                              S = S, N = N, theta = ..3)
     )
     
-    res <- arrange(
-      select(
+    res <- dplyr::arrange(
+      dplyr::select(
         tibble::add_column(crossargs, pp = rep(pp, length(theta)), ppp = ppp),
         theta, everything()
       ),

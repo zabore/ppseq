@@ -28,4 +28,5 @@ Suggests:
 VignetteBuilder: knitr
 Imports: 
     purrr,
-    tibble
+    tibble,
+    dplyr

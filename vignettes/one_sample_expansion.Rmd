@@ -106,7 +106,8 @@ And we see that a threshold of 0.959 results in a type I error rate of 0.496.
 
 However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold.
 
-```{r}
+
+```{r eval = FALSE}
 set.seed(123)
 
 # posterior probability thresholds to consider
@@ -158,7 +159,7 @@ expand_grid(res2,
 ```
 
 
-```{r}
+```{r eval = FALSE}
 # try to separate this out into a new function that considers things sequentially instead of simulating out the whole trial from the start
 set.seed(123)
 

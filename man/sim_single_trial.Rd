@@ -24,7 +24,9 @@ integer of event probability for one-sample case}
 \item{n}{matrix containing the total number of patients accrued so far at
 each interim look in the standard of care (column 1) and experimental
 (column 2) arms for two-sample case; vector of sample size accrued so far
-at each interim look for one-sample case. If only a single look will be done
+at each interim look for one-sample case. The last value should be equal to
+the total sample size at the end of the trial.
+If only a single look will be done
 at the end of the trial, this can be a vector specifying the total sample
 size c(N0, N1) for the two-sample case or an integer specifying the total
 sample size N for the one-sample case
@@ -50,11 +52,13 @@ for one-sample case}
 
 \item{theta}{The target posterior probability. e.g. Efficacy decision if
 P(p1 > p0) > theta for the two-sample case with greater direction.
-Default is 0.95.}
+Default is 0.95. Can be a vector if interest is in selecting from among a
+variety of thresholds.}
 }
 \value{
-Returns a tibble number of responses, sample size, and posterior
-probability, and posterior predictive probability at each interim look
+Returns a tibble with theta, number of responses, sample size, and
+posterior probability, and posterior predictive probability at each interim
+look
 }
 \description{
 This function is meant to be used in the context of a
