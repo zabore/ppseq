@@ -3,4 +3,5 @@
 export(calc_posterior)
 export(calc_predictive)
 export(calibrate_posterior_threshold)
+export(calibrate_pp_ppp_threshold)
 export(sim_single_trial)

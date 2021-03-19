@@ -84,7 +84,7 @@
       <h1 data-toc-skip>One-sample expansion cohort</h1>
                         <h4 class="author">Emily C. Zabor</h4>
             
-            <h4 class="date">Last updated: 2021-03-10</h4>
+            <h4 class="date">Last updated: 2021-03-19</h4>
       
       
       <div class="hidden name"><code>one_sample_expansion.Rmd</code></div>
@@ -110,185 +110,237 @@
 <h1 class="hasAnchor">
 <a href="#methods" class="anchor"></a>Methods</h1>
 <p>We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate 0.3. We want to look after every 5 patients, with a maximum sample size of 50.</p>
-<p>Let’s start by seeing what happens in a single simulated trial. We use the function <code>sim_single_trial</code> to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.</p>
-<p>We would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.05.</p>
-<p>(Question: how do people usually determine these futility/efficacy stopping rules? Are they typically calibrated in some way, or just “arbitrary”?)</p>
+<p>Let’s start by seeing what happens in a single simulated trial. We use the function <code><a href="../reference/sim_single_trial.html">sim_single_trial()</a></code> to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.</p>
+<p>Let’s say, for simplicity, that we would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.1.</p>
 <p>First let’s consider a trial where we achieve our acceptable response rate of 0.3.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
-                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, seed <span class="op">=</span> <span class="fl">1</span>, 
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
+                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, 
                  N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span>
-<span class="co">#&gt;        y  n     pp</span>
-<span class="co">#&gt;  [1,]  1  5 0.6114</span>
-<span class="co">#&gt;  [2,]  2 10 0.6298</span>
-<span class="co">#&gt;  [3,]  4 15 0.8860</span>
-<span class="co">#&gt;  [4,]  7 20 0.9972</span>
-<span class="co">#&gt;  [5,]  8 25 0.9992</span>
-<span class="co">#&gt;  [6,] 11 30 1.0000</span>
-<span class="co">#&gt;  [7,] 14 35 1.0000</span>
-<span class="co">#&gt;  [8,] 16 40 1.0000</span>
-<span class="co">#&gt;  [9,] 18 45 1.0000</span>
-<span class="co">#&gt; [10,] 18 50 1.0000</span></code></pre></div>
-<p>We see here that the posterior predictive probability, in the column <code>pp</code>, never drops below the futility level of 0.05, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100% predictive probability of having posterior probability exceeding 0.95.</p>
+<span class="co">#&gt; # A tibble: 10 x 5</span>
+<span class="co">#&gt;    theta    y1     n    pp   ppp</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt;  1  0.95     1     5 0.803 0.613</span>
+<span class="co">#&gt;  2  0.95     3    10 0.966 0.888</span>
+<span class="co">#&gt;  3  0.95     4    15 0.970 0.885</span>
+<span class="co">#&gt;  4  0.95     7    20 0.999 0.998</span>
+<span class="co">#&gt;  5  0.95    10    25 1     1    </span>
+<span class="co">#&gt;  6  0.95    10    30 1.00  1    </span>
+<span class="co">#&gt;  7  0.95    11    35 1.00  1    </span>
+<span class="co">#&gt;  8  0.95    14    40 1     1    </span>
+<span class="co">#&gt;  9  0.95    16    45 1     1    </span>
+<span class="co">#&gt; 10  0.95    17    50 1     1</span></code></pre></div>
+<p>We see here that the posterior predictive probability, in the column <code>ppp</code>, never drops below the futility level of 0.1, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100% predictive probability of having posterior probability exceeding 0.95.</p>
 <p>Now let’s consider a trial where we do not achieve our acceptable response rate of 0.3, but rather observe the unacceptable response rate of 0.1.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
-                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, seed <span class="op">=</span> <span class="fl">1</span>, 
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
+                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, 
                  N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span>
-<span class="co">#&gt;       y  n     pp</span>
-<span class="co">#&gt;  [1,] 0  5 0.1538</span>
-<span class="co">#&gt;  [2,] 0 10 0.0390</span>
-<span class="co">#&gt;  [3,] 0 15 0.0080</span>
-<span class="co">#&gt;  [4,] 1 20 0.0246</span>
-<span class="co">#&gt;  [5,] 1 25 0.0058</span>
-<span class="co">#&gt;  [6,] 2 30 0.0104</span>
-<span class="co">#&gt;  [7,] 4 35 0.0632</span>
-<span class="co">#&gt;  [8,] 5 40 0.0510</span>
-<span class="co">#&gt;  [9,] 6 45 0.0308</span>
-<span class="co">#&gt; [10,] 6 50 0.0000</span></code></pre></div>
-<p>We see in this example that we drop below the futility threshold of 0.05 after enrolling just 10 patients, at which point we have a posterior predictive probability of 0.0390. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.</p>
-<p>But when we are designing a trial, what we want is to know the operating characteristics across many simulated trials. There are two goals:</p>
+<span class="co">#&gt; # A tibble: 10 x 5</span>
+<span class="co">#&gt;    theta    y1     n    pp    ppp</span>
+<span class="co">#&gt;    &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt;  1  0.95     0     5 0.293 0.137 </span>
+<span class="co">#&gt;  2  0.95     1    10 0.558 0.275 </span>
+<span class="co">#&gt;  3  0.95     1    15 0.36  0.0968</span>
+<span class="co">#&gt;  4  0.95     2    20 0.531 0.15  </span>
+<span class="co">#&gt;  5  0.95     4    25 0.846 0.430 </span>
+<span class="co">#&gt;  6  0.95     4    30 0.742 0.198 </span>
+<span class="co">#&gt;  7  0.95     4    35 0.639 0.0568</span>
+<span class="co">#&gt;  8  0.95     5    40 0.728 0.053 </span>
+<span class="co">#&gt;  9  0.95     5    45 0.617 0.0022</span>
+<span class="co">#&gt; 10  0.95     5    50 0.515 0</span></code></pre></div>
+<p>We see in this example that we drop below the futility threshold of 0.1 after enrolling 15 patients, at which point we have a posterior predictive probability of 0.0960. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.</p>
+<p>But when we are designing a trial, we want to achieve fixed operating characteristics such as type I error and power. There are several goals:</p>
 <ol style="list-style-type: decimal">
 <li>Determine the posterior probability threshold that maintains a pre-determined overall type I error rate. For simplicity in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.</li>
-<li>Once the posterior probability threshold is established, we want to simulate many trials to determine the average probability of stopping early for futility.</li>
+<li>Determine the predictive probability threshold to stop for futility.</li>
+<li>Using the identified thresholds, simulate many trials to determine the average probability of stopping early for futility.</li>
+<li>Consider different interim monitoring schedules</li>
 </ol>
-<p>To accomplish the first goal, we simulate many trials under the null and searching over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.</p>
-<p>(Note to self: since in this example we only have futility monitoring, we only have to consider rejection of the null hypothesis at the end of the trial. So if at the end of the trial P(p1 &gt; p0) exceeds the threshold under consideration, that would be a type I error)</p>
-<p>To accomplish the second goal, we simulate many trials under the alternative and using the identified threshold and we average the posterior predictive probabilities to assess the probability of stopping for futility.</p>
-<p>We generate response counts based on the null response rate of 0.1 for a sample size of 50 for 5000 independent trials. For each resulting response count, we then calculate the posterior probability Pr(p1 &gt; p0) using the function <code><a href="../reference/calc_posterior.html">calc_posterior()</a></code>. We compare the resulting posterior probabilities to the thresholds of interest and calculate the type I error rate as the average number of trials in which the posterior probability exceeded the threshhold.</p>
-<p>(Note to self: turn the below into a function)</p>
+<p>To accomplish the first goal, we simulate many trials under the null and search over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.</p>
+<p>The <code><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold()</a></code> function can accomplish this at the final sample size only, not considering any interim looks or early stopping, for the one-sample or two-sample case and any number of thresholds of interest to consider</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'dplyr'</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     filter, lag</span>
-<span class="co">#&gt; The following objects are masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
+<code class="sourceCode R"><span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.7</span>, <span class="fl">0.74</span>, <span class="fl">0.78</span>, <span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.9</span>, <span class="fl">0.92</span>, <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>,
+                <span class="fl">0.96</span>, <span class="fl">0.97</span>, <span class="fl">0.98</span>, <span class="fl">0.99</span>, <span class="fl">0.999</span>, <span class="fl">0.9999</span>, <span class="fl">0.99999</span>, <span class="fl">1</span><span class="op">)</span>
 
-<span class="co"># Note: we don't want to set a seed within the calc_posterior() function in this case as that would return the same results every time and the goal is to return a variety of results, so we want to set an overall seed instead</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">20210310</span><span class="op">)</span> 
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
-<span class="va">posts</span> <span class="op">&lt;-</span>
-  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5000</span>, 
-          <span class="op">~</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="fl">50</span>, prob <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-            <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span>
-              <span class="op">~</span><span class="fu"><a href="../reference/calc_posterior.html">calc_posterior</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">.x</span>, n <span class="op">=</span> <span class="fl">50</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
-                              delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, 
-                              seed <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-              <span class="op">)</span>
-          <span class="op">)</span>
+<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">50</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
+                              p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
+                              S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span>
 
-<span class="va">typeIerr_tbl</span> <span class="op">&lt;-</span>
-  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
-    theta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.7</span>, <span class="fl">0.74</span>, <span class="fl">0.78</span>, <span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.9</span>, <span class="fl">0.92</span>, <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>, 
-              <span class="fl">0.96</span>, <span class="fl">0.97</span>, <span class="fl">0.98</span>, <span class="fl">0.99</span>, <span class="fl">0.999</span>, <span class="fl">0.9999</span>, <span class="fl">0.99999</span>, <span class="fl">1</span><span class="op">)</span>, 
-    typeIerr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.7</span>, <span class="fl">0.74</span>, <span class="fl">0.78</span>, <span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.9</span>, <span class="fl">0.92</span>, <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>, 
-                 <span class="fl">0.96</span>, <span class="fl">0.97</span>, <span class="fl">0.98</span>, <span class="fl">0.99</span>, <span class="fl">0.999</span>, <span class="fl">0.9999</span>, <span class="fl">0.99999</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-      <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">posts</span> <span class="op">&gt;</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span>
-    <span class="op">)</span>
-
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">typeIerr_tbl</span>, digits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">theta</th>
-<th align="right">typeIerr</th>
+<th align="right">proportion_positive</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="right">0.00000</td>
-<td align="right">1.000</td>
+<td align="right">0.9998</td>
 </tr>
 <tr class="even">
 <td align="right">0.70000</td>
-<td align="right">0.290</td>
+<td align="right">0.2890</td>
 </tr>
 <tr class="odd">
 <td align="right">0.74000</td>
-<td align="right">0.228</td>
+<td align="right">0.2264</td>
 </tr>
 <tr class="even">
 <td align="right">0.78000</td>
-<td align="right">0.228</td>
+<td align="right">0.2264</td>
 </tr>
 <tr class="odd">
 <td align="right">0.82000</td>
-<td align="right">0.225</td>
+<td align="right">0.2234</td>
 </tr>
 <tr class="even">
 <td align="right">0.86000</td>
-<td align="right">0.123</td>
+<td align="right">0.1158</td>
 </tr>
 <tr class="odd">
 <td align="right">0.90000</td>
-<td align="right">0.123</td>
+<td align="right">0.1158</td>
 </tr>
 <tr class="even">
 <td align="right">0.92000</td>
-<td align="right">0.068</td>
+<td align="right">0.0592</td>
 </tr>
 <tr class="odd">
 <td align="right">0.93000</td>
-<td align="right">0.062</td>
+<td align="right">0.0552</td>
 </tr>
 <tr class="even">
 <td align="right">0.94000</td>
-<td align="right">0.062</td>
+<td align="right">0.0552</td>
 </tr>
 <tr class="odd">
 <td align="right">0.95000</td>
-<td align="right">0.062</td>
+<td align="right">0.0552</td>
 </tr>
 <tr class="even">
 <td align="right">0.96000</td>
-<td align="right">0.052</td>
+<td align="right">0.0458</td>
 </tr>
 <tr class="odd">
 <td align="right">0.97000</td>
-<td align="right">0.025</td>
+<td align="right">0.0232</td>
 </tr>
 <tr class="even">
 <td align="right">0.98000</td>
-<td align="right">0.025</td>
+<td align="right">0.0232</td>
 </tr>
 <tr class="odd">
 <td align="right">0.99000</td>
-<td align="right">0.010</td>
+<td align="right">0.0102</td>
 </tr>
 <tr class="even">
 <td align="right">0.99900</td>
-<td align="right">0.001</td>
+<td align="right">0.0012</td>
 </tr>
 <tr class="odd">
 <td align="right">0.99990</td>
-<td align="right">0.000</td>
+<td align="right">0.0004</td>
 </tr>
 <tr class="even">
 <td align="right">0.99999</td>
-<td align="right">0.000</td>
+<td align="right">0.0004</td>
 </tr>
 <tr class="odd">
 <td align="right">1.00000</td>
-<td align="right">0.000</td>
+<td align="right">0.0000</td>
 </tr>
 </tbody>
 </table>
-<p>Based on these results, we would select a threshold of 0.96 to control the type I error at 0.048.</p>
-<p>(Question: do people usually refine this more to try to directly target 0.05? There could be a second grid search between 0.95 and 0.96 to refine it if so)</p>
-<p>Now that we have our target threshold, we will identify the probability of stopping early for futility averaged over many trials.</p>
+<p>Based on these results, we see that our target type I error falls between a threshold of 0.95 and 0.96. We can refine our target thresholds and recalculate.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">20210309</span><span class="op">)</span>
-<span class="va">pps</span> <span class="op">&lt;-</span>
-  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span>
-    <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,
-    <span class="op">~</span><span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
-                      p <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">500</span>, 
-                      seed <span class="op">=</span> <span class="cn">NULL</span>, N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.96</span><span class="op">)</span>
-    <span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.001</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">50</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
+                              p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
+                              S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span>
+
+<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">theta</th>
+<th align="right">proportion_positive</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.950</td>
+<td align="right">0.0552</td>
+</tr>
+<tr class="even">
+<td align="right">0.951</td>
+<td align="right">0.0552</td>
+</tr>
+<tr class="odd">
+<td align="right">0.952</td>
+<td align="right">0.0552</td>
+</tr>
+<tr class="even">
+<td align="right">0.953</td>
+<td align="right">0.0552</td>
+</tr>
+<tr class="odd">
+<td align="right">0.954</td>
+<td align="right">0.0552</td>
+</tr>
+<tr class="even">
+<td align="right">0.955</td>
+<td align="right">0.0552</td>
+</tr>
+<tr class="odd">
+<td align="right">0.956</td>
+<td align="right">0.0550</td>
+</tr>
+<tr class="even">
+<td align="right">0.957</td>
+<td align="right">0.0536</td>
+</tr>
+<tr class="odd">
+<td align="right">0.958</td>
+<td align="right">0.0522</td>
+</tr>
+<tr class="even">
+<td align="right">0.959</td>
+<td align="right">0.0496</td>
+</tr>
+<tr class="odd">
+<td align="right">0.960</td>
+<td align="right">0.0458</td>
+</tr>
+</tbody>
+</table>
+<p>And we see that a threshold of 0.959 results in a type I error rate of 0.496.</p>
+<p>However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The <code><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold()</a></code> function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.</p>
+<p>Let’s consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the <code>future</code> and <code>furrr</code> packages, it still is quite time consuming. Just a single simulated trial takes about 2 minutes to run. As a result, this code is not evaluated here, but was rather run previously and the saved results are presented.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit_exit.html">knit_exit</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="fu">tic</span><span class="op">(</span><span class="op">)</span>
+<span class="va">type1_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
+                                        direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
+                                        delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
+                                        S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
+                                        pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
+                                        ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>
+<span class="fu">toc</span><span class="op">(</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span><span class="va">type1</span>, file <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"type1_tbl.rda"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"type1_tbl.rda"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">type1</span><span class="op">)</span></code></pre></div>
 </div>
   </div>
 

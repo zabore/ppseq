@@ -151,7 +151,6 @@ given the data available at each interim analysis.</p>
   delta <span class='op'>=</span> <span class='fl'>0</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>,
-  seed <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>N</span>,
   theta <span class='op'>=</span> <span class='fl'>0.95</span>
 <span class='op'>)</span></pre>
@@ -170,9 +169,12 @@ integer of event probability for one-sample case</p></td>
       <td><p>matrix containing the total number of patients accrued so far at
 each interim look in the standard of care (column 1) and experimental
 (column 2) arms for two-sample case; vector of sample size accrued so far
-at each interim look for one-sample case. If only a single look will be done
-at the end of the trial, this can be an integer specifying the total sample
-size at the end of the trial N.</p></td>
+at each interim look for one-sample case. The last value should be equal to
+the total sample size at the end of the trial.
+If only a single look will be done
+at the end of the trial, this can be a vector specifying the total sample
+size c(N0, N1) for the two-sample case or an integer specifying the total
+sample size N for the one-sample case.</p></td>
     </tr>
     <tr>
       <th>direction</th>
@@ -199,10 +201,6 @@ Beta(0.5, 0.5) is default</p></td>
       <td><p>number of samples, default is 5000</p></td>
     </tr>
     <tr>
-      <th>seed</th>
-      <td><p>set the seed for the random number generation. Default is NULL.</p></td>
-    </tr>
-    <tr>
       <th>N</th>
       <td><p>the total planned sample size at the end of the trial, c(N0, N1)
 for two-sample case; integer of total planned sample size at end of trial N
@@ -212,15 +210,55 @@ for one-sample case</p></td>
       <th>theta</th>
       <td><p>The target posterior probability. e.g. Efficacy decision if
 P(p1 &gt; p0) &gt; theta for the two-sample case with greater direction.
-Default is 0.95.</p></td>
+Default is 0.95. Can be a vector if interest is in selecting from among a
+variety of thresholds.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Returns a matrix of number of responses, sample size, and posterior
-predictive probability at each interim look</p>
+    <p>Returns a tibble with theta, number of responses, sample size, and
+posterior probability, and posterior predictive probability at each interim
+look</p>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='co'># One-sample case</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='fu'>sim_single_trial</span><span class='op'>(</span>prob <span class='op'>=</span> <span class='fl'>0.3</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>50</span>, <span class='fl'>5</span><span class='op'>)</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, 
+p <span class='op'>=</span> <span class='fl'>0.1</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>,<span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, N <span class='op'>=</span> <span class='fl'>50</span>, theta <span class='op'>=</span> <span class='fl'>0.95</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 10 x 5</span><span>
+#&gt;    theta    y1     n    pp   ppp
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>  0.95     1     5 0.803 0.613
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>  0.95     3    10 0.966 0.888
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>  0.95     4    15 0.970 0.885
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>  0.95     7    20 0.999 0.998
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>  0.95    10    25 1     1    
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>  0.95    10    30 1.00  1    
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>  0.95    11    35 1.00  1    
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>  0.95    14    40 1     1    
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>  0.95    16    45 1     1    
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span>  0.95    17    50 1     1    </div><div class='input'>
+<span class='co'># Two-sample case</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='fu'>sim_single_trial</span><span class='op'>(</span>prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.3</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>50</span>, <span class='fl'>5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>50</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>, 
+direction <span class='op'>=</span> <span class='st'>"greater"</span>, p0 <span class='op'>=</span> <span class='cn'>NULL</span>, delta <span class='op'>=</span> <span class='fl'>0</span>, prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>,<span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>,
+N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>50</span>, <span class='fl'>50</span><span class='op'>)</span>, theta <span class='op'>=</span> <span class='fl'>0.95</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 10 x 7</span><span>
+#&gt;    theta    y0    y1    n0    n1    pp   ppp
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>  0.95     0     2     5     5 0.945 0.862
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>  0.95     0     5    10    10 0.998 0.989
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>  0.95     2     5    15    15 0.896 0.691
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>  0.95     2     8    20    20 0.988 0.937
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>  0.95     2     9    25    25 0.991 0.963
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>  0.95     4    10    30    30 0.966 0.819
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>  0.95     5    12    35    35 0.974 0.855
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>  0.95     5    15    40    40 0.996 0.992
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>  0.95     5    15    45    45 0.995 0.999
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span>  0.95     5    18    50    50 0.999 1    </div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

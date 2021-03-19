@@ -29,4 +29,6 @@ VignetteBuilder: knitr
 Imports: 
     purrr,
     tibble,
-    dplyr
+    dplyr,
+    future,
+    furrr

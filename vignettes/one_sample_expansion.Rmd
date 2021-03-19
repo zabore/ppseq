@@ -73,7 +73,7 @@ But when we are designing a trial, we want to achieve fixed operating characteri
 
 To accomplish the first goal, we simulate many trials under the null and search over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.
 
-The `calibrate_posterior_threshold()` function can accomplish this at the final sample size only, for the one-sample or two-sample case and any number of thresholds of interest to consider
+The `calibrate_posterior_threshold()` function can accomplish this at the final sample size only, not considering any interim looks or early stopping, for the one-sample or two-sample case and any number of thresholds of interest to consider
 
 ```{r}
 thresholds <- c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95,
@@ -104,208 +104,27 @@ knitr::kable(res)
 
 And we see that a threshold of 0.959 results in a type I error rate of 0.496.
 
-However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold.
+However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The `calibrate_pp_ppp_threshold()` function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.
 
+Let's consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the `future` and `furrr` packages, it still is quite time consuming. Just a single simulated trial takes about 2 minutes to run. As a result, this code is not evaluated here, but was rather run previously and the saved results are presented.
 
 ```{r eval = FALSE}
 set.seed(123)
 
-# posterior probability thresholds to consider
-pp_thresholds <- c(0.95, 0.96)
+tic()
+type1_tbl <- calibrate_pp_ppp_threshold(prob = 0.1, n = seq(5, 25, 5),
+                                        direction = "greater", p0 = 0.1,
+                                        delta = NULL, prior = c(0.5, 0.5),
+                                        S = 5000, N = 25, nsim = 1000,
+                                        pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+                                        ppp_threshold = seq(0.05, 0.2, 0.05))
+toc()
 
-# posterior predictive probability thresholds to consider
-fut_thresholds <- c(0.05, 0.1)
-eff_thresholds <- c(0.9, 0.95)
-
-# Note that S is currently set to 500 for speed, should be increased for a real example
-# Also note that I'm considering a small number of all thresholds right now for simplicity
-res1 <- 
-  sim_single_trial(prob = 0.1, n = c(25, 50), direction = "greater", p0 = 0.1,
-                   delta = NULL, prior = c(0.5,0.5), S = 500, 
-                   N = 50, theta = pp_thresholds)
-res1
-
-# What's a type I error?
-# Have to consider both futility and efficacy thresholds together
-# If you stop at an interim look, there is no type I error
-# If you make it to the end of the study and the pp is less than the efficacy threshold, there is no type I error
-# If you make it to the end of the study and the pp exceeds the efficacy threshold, that is a type I error
-
-# For each row in the table, if it's an interim look compare ppp to each fut_thresholds and if ppp<fut_thresholds, no type I error and don't keep looking. If ppp>=fut_thresholds keep looking. At the end of the study, compare ppp to each eff_thresholds and if ppp>=eff_thresholds that's a type I error.
-library(dplyr)
-library(tidyr)
-
-res2 <- 
-  res1 %>% 
-  pivot_wider(
-    names_from = n, 
-    values_from = c(y1, pp, ppp)
-  )
-
-
-expand_grid(res2, 
-            fut_threshold = fut_thresholds, 
-            eff_threshold = eff_thresholds) %>% 
-  mutate(
-    type1 = case_when(
-      ppp_25 < fut_threshold ~ FALSE,
-      ppp_25 > fut_threshold & ppp_50 < eff_threshold ~ FALSE,
-      ppp_25 > fut_threshold & ppp_50 > eff_threshold ~ TRUE
-    )
-  )
-
-# The above format is not generalizable - need to work on this and think about reformatting sim_single_trial results 
-# Or loop over pp_thresholds instead of passing them as a vector to sim_single trial, so that we consider them one at a time instead
+save(type1, file = here::here("vignettes", "type1_tbl.rda"))
 ```
-
 
 ```{r eval = FALSE}
-# try to separate this out into a new function that considers things sequentially instead of simulating out the whole trial from the start
-set.seed(123)
+load(here::here("vignettes", "type1_tbl.rda"))
 
-prob <- 0.1
-n <- seq(5, 25, 5)
-direction <- "greater"
-p0 <- 0.1
-delta <- NULL
-prior <- c(0.5,0.5)
-S <- 500
-N <- 25
-
-
-# posterior probability thresholds to consider
-pp_thresholds <- c(0.95, 0.96)
-
-# posterior predictive probability thresholds to consider
-fut_thresholds <- c(0.05, 0.1)
-eff_thresholds <- c(0.9, 0.95)
-
-# Generate response counts at each look
-y1 <- stats::rbinom(n = 1, size = n[1], prob = prob) 
-if(length(n) > 1) {
-  for(i in 2:length(n)) { 
-    y1 <- c(y1, y1[length(y1)] + stats::rbinom(n = 1, 
-                                               size = n[i] - n[i - 1], 
-                                               prob = prob)) 
-      }
-    }
-
-# Generate the posterior probability at each look
-pp <- purrr::map2_dbl(y1, n, 
-                      ~calc_posterior(
-                        y = .x, 
-                        n = .y, 
-                        p0 = p0, delta = delta, prior = prior,
-                        S = S)
-                      )
-
-crossargs <- tidyr::expand_grid(pp_thresholds, fut_thresholds, eff_thresholds)
-
-
-check_pos_trial <- function(ppt, futt, efft) {
-  ppp <- NULL
-  for(i in 1:length(y1)) {
-    ppp[i] <- calc_predictive(y = y1[i], 
-                           n = n[i],
-                           p0 = p0, delta = delta, prior = prior, S = S, N = N,
-                           theta = ppt)
-    if(i < length(y1) & ppp[i] < futt) break
-  }
-  return(ppp)
-}
-
-check_pos_trial(pp_thresholds[1], fut_thresholds[1], eff_thresholds[1])
-
+knitr::kable(type1)
 ```
-
-
-
-
-
-Now that we have our target threshold, we will identify the probability of stopping early for futility averaged over many trials.
-
-To accomplish the second goal, we simulate many trials under the alternative and using the identified threshold and we average the posterior predictive probabilities to assess the probability of stopping for futility.
-
-We generate response counts based on the null response rate of 0.1 for a sample size of 50 for 5000 independent trials. For each resulting response count, we then calculate the posterior probability Pr(p1 > p0) using the function `calc_posterior()`. We compare the resulting posterior probabilities to the thresholds of interest and calculate the type I error rate as the average number of trials in which the posterior probability exceeded the threshhold. 
-
-```{r eval = FALSE}
-set.seed(20210309)
-pps <-
-  purrr::map(
-    1:10,
-    ~sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", 
-                      p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 500, 
-                      seed = NULL, N = 50, theta = 0.96)
-    )
-```
-
-
-```{r}
-knitr::knit_exit()
-```
-
-
-
-
-```{r eval = FALSE}
-# This is just me trying to figure out Brian's code from the Covid trial
-
- # prob y1 < y0
- posterior_y0.gt.y1 <- function(n0, n1, y0, y1, delta=0, prior=c(0.5,0.5)){ ## y0 standard     y1 experimental
-  SAMP <- 10000
-  out <- sum( rbeta(SAMP, prior[1] + y0, prior[2] + n0 - y0) > ( rbeta(SAMP, prior[1] + y1, prior[2] + n1 - y1) + delta ) ) / SAMP
-  return(out)
- }
-
-find.Boundary <- function(j, theta, Tab, delta=0, prior=c(0.5,0.5) ){
-
- Y=Tab$n1[j]; STOP <- FALSE
- temp <- posterior_y0.gt.y1( n0=Tab$n0[j], n1=Tab$n1[j], y0=Tab$y0[j], y1=Y, delta=delta, prior=prior )
- if( is.na(temp) ){ temp <- 0; print(paste0("NA - ",Tab[j,])) }
- if( temp > theta ){ STOP <- TRUE }
- while( !STOP ){
-  Y <- Y - 1
-  temp <- posterior_y0.gt.y1( n0=Tab$n0[j], n1=Tab$n1[j], y0=Tab$y0[j], y1=Y, delta=delta, prior=prior )
-  if( is.na(temp) ){ temp <- 0 }
-  if( Y == 0 ){ STOP <- TRUE }
-  if( temp > theta ){ STOP <- TRUE }
- }
-
- if( temp > theta ){ out <- Y 
- } else{ out <- NA }
-
- return( c(j = j, out = out) )
-}
-
-Max <- 2000
-N.tab <- expand.grid( list( seq(100,1500,100), seq(100,1500,100) ) )
-N.tab <- N.tab[-which( rowSums(N.tab) > Max ), ]
-
-Tab <- as.data.frame( list(n0=NA, n1=NA, y0=NA) ) 
-for(i in 1:nrow(N.tab)){
-
- s <- 0:N.tab[i,1]
- temp <- as.data.frame( list(n0=rep(N.tab[i,1],length(s)),
-                             n1=rep(N.tab[i,2],length(s)),
-                             y0=s) )
- Tab <- rbind(Tab, temp)
-}
-Tab <- Tab[-1,]
- 
-
- prior <- c(0.1,0.9)
- delta <- 0
- theta <- 0.9516
-
-Tab2 <- Tab[1:101, ]
-
-temp <- 
-  1:nrow(Tab2) %>% 
-  map_df(~find.Boundary(j = .x, theta = 0.9516, Tab = Tab2, delta = 0, 
-                     prior = c(0.1,0.9)))
-
- ### Merge Boundaries ###
- Tab2$y1.stop <- rep(NA, nrow(Tab2) )
- Tab2$y1.stop[ temp[[1]] ] <- temp[[2]]
-```
-

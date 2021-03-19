@@ -29,8 +29,7 @@ the total sample size at the end of the trial.
 If only a single look will be done
 at the end of the trial, this can be a vector specifying the total sample
 size c(N0, N1) for the two-sample case or an integer specifying the total
-sample size N for the one-sample case
-size at the end of the trial N.}
+sample size N for the one-sample case.}
 
 \item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
 if interest is in P(p1 < p0) for two-sample case. For one-sample case,
@@ -72,8 +71,8 @@ given the data available at each interim analysis.
 
 # One-sample case
 set.seed(123)
-sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
-delta = NULL, prior = c(0.5,0.5), S = 5000, N = 50, theta = 0.95)
+sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", 
+p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 5000, N = 50, theta = 0.95)
 
 # Two-sample case
 set.seed(123)
