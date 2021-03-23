@@ -36,8 +36,9 @@
 #' Default is 0.95. Can be a vector if interest is in selecting from among a 
 #' variety of thresholds.
 #' 
-#' @return Returns a tibble with theta, number of responses, sample size, and 
-#' posterior probability, and posterior predictive probability at each interim 
+#' @return Returns a tibble with pp_threshold (i.e. theta, the target posterior 
+#' probability), number of responses, sample size,  
+#' posterior probability, and posterior predictive probability at each 
 #' look
 #' 
 #' @examples
@@ -103,7 +104,7 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
                                 y1 = rep(y1, length(theta)), 
                                 n0 = rep(n[, 1], length(theta)),
                                 n1 = rep(n[, 2], length(theta)),
-                                theta = rep(theta, each = length(pp)))
+                                pp_threshold = rep(theta, each = length(pp)))
     
     ppp <- purrr::pmap_dbl(crossargs, 
                            ~calc_predictive(
@@ -115,10 +116,11 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
     
     res <- dplyr::arrange(
       dplyr::select(
-        tibble::add_column(crossargs, pp = rep(pp, length(theta)), ppp = ppp),
-        theta, dplyr::everything()
+        tibble::add_column(crossargs, pp = rep(pp, length(theta)), 
+                           ppp = ppp),
+        pp_threshold, dplyr::everything()
       ),
-      theta
+      pp_threshold
     )
     
   } else if(length(prob) == 1) {
@@ -143,8 +145,8 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
     )
     
     crossargs <- tibble::tibble(y1 = rep(y1, length(theta)), 
-                                n = rep(n, length(theta)),
-                                theta = rep(theta, each = length(pp)))
+                                n1 = rep(n, length(theta)),
+                                pp_threshold = rep(theta, each = length(pp)))
     
     ppp <- purrr::pmap_dbl(crossargs, 
                            ~calc_predictive(
@@ -157,9 +159,9 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
     res <- dplyr::arrange(
       dplyr::select(
         tibble::add_column(crossargs, pp = rep(pp, length(theta)), ppp = ppp),
-        theta, dplyr::everything()
+        pp_threshold, dplyr::everything()
       ),
-      theta
+      pp_threshold
     )
   }
   

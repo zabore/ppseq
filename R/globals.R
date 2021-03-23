@@ -1,1 +1,1 @@
-utils::globalVariables(c("n0", "n1", "positive"))
+utils::globalVariables(c("n0", "n1", "positive", "pp_threshold"))

@@ -55,8 +55,9 @@ Default is 0.95. Can be a vector if interest is in selecting from among a
 variety of thresholds.}
 }
 \value{
-Returns a tibble with theta, number of responses, sample size, and
-posterior probability, and posterior predictive probability at each interim
+Returns a tibble with pp_threshold (i.e. theta, the target posterior
+probability), number of responses, sample size,
+posterior probability, and posterior predictive probability at each
 look
 }
 \description{

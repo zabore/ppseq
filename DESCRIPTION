@@ -32,4 +32,5 @@ Imports:
     dplyr,
     future,
     furrr,
-    here
+    here,
+    gt

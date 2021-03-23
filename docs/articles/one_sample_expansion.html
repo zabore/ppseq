@@ -106,365 +106,2175 @@
 <code class="sourceCode R"><span class="co"># remotes::install_github("zabore/ppseq")</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ppseq</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="methods" class="section level1">
+<div id="trial-design" class="section level1">
 <h1 class="hasAnchor">
-<a href="#methods" class="anchor"></a>Methods</h1>
-<p>We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate 0.3. We want to look after every 5 patients, with a maximum sample size of 50.</p>
-<p>Let’s start by seeing what happens in a single simulated trial. We use the function <code><a href="../reference/sim_single_trial.html">sim_single_trial()</a></code> to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.</p>
-<p>Let’s say, for simplicity, that we would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.1.</p>
+<a href="#trial-design" class="anchor"></a>Trial design</h1>
+<p>We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate is 0.3. We plan to check for futility after every 5 patients, with a maximum sample size of 25.</p>
+<div id="single-simulated-trial" class="section level2">
+<h2 class="hasAnchor">
+<a href="#single-simulated-trial" class="anchor"></a>Single simulated trial</h2>
+<p>Let’s start by seeing what happens in a single simulated trial. We use the function <code><a href="../reference/sim_single_trial.html">sim_single_trial()</a></code> to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success at each look. For simplicity, let’s say that we would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.1.</p>
 <p>First let’s consider a trial where we achieve our acceptable response rate of 0.3.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
-                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, 
-                 N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 10 x 5</span>
-<span class="co">#&gt;    theta    y1     n    pp   ppp</span>
-<span class="co">#&gt;    &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt;  1  0.95     1     5 0.803 0.613</span>
-<span class="co">#&gt;  2  0.95     3    10 0.966 0.888</span>
-<span class="co">#&gt;  3  0.95     4    15 0.970 0.885</span>
-<span class="co">#&gt;  4  0.95     7    20 0.999 0.998</span>
-<span class="co">#&gt;  5  0.95    10    25 1     1    </span>
-<span class="co">#&gt;  6  0.95    10    30 1.00  1    </span>
-<span class="co">#&gt;  7  0.95    11    35 1.00  1    </span>
-<span class="co">#&gt;  8  0.95    14    40 1     1    </span>
-<span class="co">#&gt;  9  0.95    16    45 1     1    </span>
-<span class="co">#&gt; 10  0.95    17    50 1     1</span></code></pre></div>
+<span class="va">alt1_tbl</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
+                   p <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, 
+                   N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#uhhygxfsno .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uhhygxfsno .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uhhygxfsno .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#uhhygxfsno .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#uhhygxfsno .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#uhhygxfsno .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#uhhygxfsno .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#uhhygxfsno .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uhhygxfsno .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uhhygxfsno .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#uhhygxfsno .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#uhhygxfsno .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#uhhygxfsno .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#uhhygxfsno .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uhhygxfsno .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uhhygxfsno .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#uhhygxfsno .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uhhygxfsno .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uhhygxfsno .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#uhhygxfsno .gt_left {
+  text-align: left;
+}
+
+#uhhygxfsno .gt_center {
+  text-align: center;
+}
+
+#uhhygxfsno .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uhhygxfsno .gt_font_normal {
+  font-weight: normal;
+}
+
+#uhhygxfsno .gt_font_bold {
+  font-weight: bold;
+}
+
+#uhhygxfsno .gt_font_italic {
+  font-style: italic;
+}
+
+#uhhygxfsno .gt_super {
+  font-size: 65%;
+}
+
+#uhhygxfsno .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="uhhygxfsno" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">y1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">n1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">ppp</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_right">5</td>
+      <td class="gt_row gt_right">0.8026</td>
+      <td class="gt_row gt_right">0.6126</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">3</td>
+      <td class="gt_row gt_right">10</td>
+      <td class="gt_row gt_right">0.9664</td>
+      <td class="gt_row gt_right">0.8876</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">4</td>
+      <td class="gt_row gt_right">15</td>
+      <td class="gt_row gt_right">0.9696</td>
+      <td class="gt_row gt_right">0.8854</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">7</td>
+      <td class="gt_row gt_right">20</td>
+      <td class="gt_row gt_right">0.9994</td>
+      <td class="gt_row gt_right">0.9978</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">10</td>
+      <td class="gt_row gt_right">25</td>
+      <td class="gt_row gt_right">1.0000</td>
+      <td class="gt_row gt_right">1.0000</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">10</td>
+      <td class="gt_row gt_right">30</td>
+      <td class="gt_row gt_right">0.9998</td>
+      <td class="gt_row gt_right">1.0000</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">11</td>
+      <td class="gt_row gt_right">35</td>
+      <td class="gt_row gt_right">0.9998</td>
+      <td class="gt_row gt_right">1.0000</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">14</td>
+      <td class="gt_row gt_right">40</td>
+      <td class="gt_row gt_right">1.0000</td>
+      <td class="gt_row gt_right">1.0000</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">16</td>
+      <td class="gt_row gt_right">45</td>
+      <td class="gt_row gt_right">1.0000</td>
+      <td class="gt_row gt_right">1.0000</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">17</td>
+      <td class="gt_row gt_right">50</td>
+      <td class="gt_row gt_right">1.0000</td>
+      <td class="gt_row gt_right">1.0000</td>
+    </tr>
+</tbody>
+</table></div>
 <p>We see here that the posterior predictive probability, in the column <code>ppp</code>, never drops below the futility level of 0.1, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100% predictive probability of having posterior probability exceeding 0.95.</p>
 <p>Now let’s consider a trial where we do not achieve our acceptable response rate of 0.3, but rather observe the unacceptable response rate of 0.1.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p <span class="op">=</span> <span class="fl">0.1</span>,
-                 delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, 
-                 N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 10 x 5</span>
-<span class="co">#&gt;    theta    y1     n    pp    ppp</span>
-<span class="co">#&gt;    &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt;  1  0.95     0     5 0.293 0.137 </span>
-<span class="co">#&gt;  2  0.95     1    10 0.558 0.275 </span>
-<span class="co">#&gt;  3  0.95     1    15 0.36  0.0968</span>
-<span class="co">#&gt;  4  0.95     2    20 0.531 0.15  </span>
-<span class="co">#&gt;  5  0.95     4    25 0.846 0.430 </span>
-<span class="co">#&gt;  6  0.95     4    30 0.742 0.198 </span>
-<span class="co">#&gt;  7  0.95     4    35 0.639 0.0568</span>
-<span class="co">#&gt;  8  0.95     5    40 0.728 0.053 </span>
-<span class="co">#&gt;  9  0.95     5    45 0.617 0.0022</span>
-<span class="co">#&gt; 10  0.95     5    50 0.515 0</span></code></pre></div>
-<p>We see in this example that we drop below the futility threshold of 0.1 after enrolling 15 patients, at which point we have a posterior predictive probability of 0.0960. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.</p>
+<span class="va">null1_tbl</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/sim_single_trial.html">sim_single_trial</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
+                   p <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, 
+                   N <span class="op">=</span> <span class="fl">50</span>, theta <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#eacqfcopfr .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#eacqfcopfr .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#eacqfcopfr .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#eacqfcopfr .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#eacqfcopfr .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#eacqfcopfr .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#eacqfcopfr .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#eacqfcopfr .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#eacqfcopfr .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#eacqfcopfr .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#eacqfcopfr .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#eacqfcopfr .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#eacqfcopfr .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#eacqfcopfr .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eacqfcopfr .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eacqfcopfr .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#eacqfcopfr .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#eacqfcopfr .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eacqfcopfr .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#eacqfcopfr .gt_left {
+  text-align: left;
+}
+
+#eacqfcopfr .gt_center {
+  text-align: center;
+}
+
+#eacqfcopfr .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#eacqfcopfr .gt_font_normal {
+  font-weight: normal;
+}
+
+#eacqfcopfr .gt_font_bold {
+  font-weight: bold;
+}
+
+#eacqfcopfr .gt_font_italic {
+  font-style: italic;
+}
+
+#eacqfcopfr .gt_super {
+  font-size: 65%;
+}
+
+#eacqfcopfr .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="eacqfcopfr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">y1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">n1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">ppp</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">0</td>
+      <td class="gt_row gt_right">5</td>
+      <td class="gt_row gt_right">0.2934</td>
+      <td class="gt_row gt_right">0.1370</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_right">10</td>
+      <td class="gt_row gt_right">0.5582</td>
+      <td class="gt_row gt_right">0.2750</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">1</td>
+      <td class="gt_row gt_right">15</td>
+      <td class="gt_row gt_right">0.3600</td>
+      <td class="gt_row gt_right">0.0968</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">2</td>
+      <td class="gt_row gt_right">20</td>
+      <td class="gt_row gt_right">0.5312</td>
+      <td class="gt_row gt_right">0.1500</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">4</td>
+      <td class="gt_row gt_right">25</td>
+      <td class="gt_row gt_right">0.8458</td>
+      <td class="gt_row gt_right">0.4304</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">4</td>
+      <td class="gt_row gt_right">30</td>
+      <td class="gt_row gt_right">0.7416</td>
+      <td class="gt_row gt_right">0.1984</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">4</td>
+      <td class="gt_row gt_right">35</td>
+      <td class="gt_row gt_right">0.6388</td>
+      <td class="gt_row gt_right">0.0568</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">5</td>
+      <td class="gt_row gt_right">40</td>
+      <td class="gt_row gt_right">0.7276</td>
+      <td class="gt_row gt_right">0.0530</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">5</td>
+      <td class="gt_row gt_right">45</td>
+      <td class="gt_row gt_right">0.6174</td>
+      <td class="gt_row gt_right">0.0022</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_center">5</td>
+      <td class="gt_row gt_right">50</td>
+      <td class="gt_row gt_right">0.5148</td>
+      <td class="gt_row gt_right">0.0000</td>
+    </tr>
+</tbody>
+</table></div>
+<p>We see in this example that we drop below the futility threshold of 0.1 after enrolling 15 patients, at which point we have a posterior predictive probability of 0.0968. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.</p>
+</div>
+<div id="trial-operating-characteristics" class="section level2">
+<h2 class="hasAnchor">
+<a href="#trial-operating-characteristics" class="anchor"></a>Trial operating characteristics</h2>
 <p>But when we are designing a trial, we want to achieve fixed operating characteristics such as type I error and power. There are several goals:</p>
 <ol style="list-style-type: decimal">
-<li>Determine the posterior probability threshold that maintains a pre-determined overall type I error rate. For simplicity in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.</li>
-<li>Determine the predictive probability threshold to stop for futility.</li>
+<li>Determine the posterior probability threshold to declare the trial positive. For simplicity in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.</li>
+<li>Determine the predictive probability threshold to stop for futility, calibrated to achieve the desired design properties of our trial.</li>
 <li>Using the identified thresholds, simulate many trials to determine the average probability of stopping early for futility.</li>
 <li>Consider different interim monitoring schedules</li>
 </ol>
-<p>To accomplish the first goal, we simulate many trials under the null and search over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.</p>
-<p>The <code><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold()</a></code> function can accomplish this at the final sample size only, not considering any interim looks or early stopping, for the one-sample or two-sample case and any number of thresholds of interest to consider</p>
+<div id="calibrating-posterior-threshold" class="section level3">
+<h3 class="hasAnchor">
+<a href="#calibrating-posterior-threshold" class="anchor"></a>Calibrating posterior threshold</h3>
+<p>To accomplish the first goal, we simulate many trials and search over a range of thresholds to identify the threshold that achieves our desired design properties</p>
+<p>The <code><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold()</a></code> function can accomplish this at the final sample size only, not considering any interim looks or early stopping.</p>
+<p>We can calibrate for type I error by running this simulation in the null setting where both our target and observed response probabilities are set to 0.1. We look over a range of posterior thresholds.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.7</span>, <span class="fl">0.74</span>, <span class="fl">0.78</span>, <span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.9</span>, <span class="fl">0.92</span>, <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>,
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.7</span>, <span class="fl">0.74</span>, <span class="fl">0.78</span>, <span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.9</span>, <span class="fl">0.92</span>, <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>,
                 <span class="fl">0.96</span>, <span class="fl">0.97</span>, <span class="fl">0.98</span>, <span class="fl">0.99</span>, <span class="fl">0.999</span>, <span class="fl">0.9999</span>, <span class="fl">0.99999</span>, <span class="fl">1</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
-
-<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">50</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
-                              p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
-                              S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span>
-
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="right">theta</th>
-<th align="right">proportion_positive</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">0.00000</td>
-<td align="right">0.9998</td>
-</tr>
-<tr class="even">
-<td align="right">0.70000</td>
-<td align="right">0.2890</td>
-</tr>
-<tr class="odd">
-<td align="right">0.74000</td>
-<td align="right">0.2264</td>
-</tr>
-<tr class="even">
-<td align="right">0.78000</td>
-<td align="right">0.2264</td>
-</tr>
-<tr class="odd">
-<td align="right">0.82000</td>
-<td align="right">0.2234</td>
-</tr>
-<tr class="even">
-<td align="right">0.86000</td>
-<td align="right">0.1158</td>
-</tr>
-<tr class="odd">
-<td align="right">0.90000</td>
-<td align="right">0.1158</td>
-</tr>
-<tr class="even">
-<td align="right">0.92000</td>
-<td align="right">0.0592</td>
-</tr>
-<tr class="odd">
-<td align="right">0.93000</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="even">
-<td align="right">0.94000</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="odd">
-<td align="right">0.95000</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="even">
-<td align="right">0.96000</td>
-<td align="right">0.0458</td>
-</tr>
-<tr class="odd">
-<td align="right">0.97000</td>
-<td align="right">0.0232</td>
-</tr>
-<tr class="even">
-<td align="right">0.98000</td>
-<td align="right">0.0232</td>
-</tr>
-<tr class="odd">
-<td align="right">0.99000</td>
-<td align="right">0.0102</td>
-</tr>
-<tr class="even">
-<td align="right">0.99900</td>
-<td align="right">0.0012</td>
-</tr>
-<tr class="odd">
-<td align="right">0.99990</td>
-<td align="right">0.0004</td>
-</tr>
-<tr class="even">
-<td align="right">0.99999</td>
-<td align="right">0.0004</td>
-</tr>
-<tr class="odd">
-<td align="right">1.00000</td>
-<td align="right">0.0000</td>
-</tr>
-</tbody>
-</table>
-<p>Based on these results, we see that our target type I error falls between a threshold of 0.95 and 0.96. We can refine our target thresholds and recalculate.</p>
+<span class="va">post_tbl</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">25</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
+                                p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
+                                S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.001</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="va">post_tbl</span><span class="op">)</span></code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
 
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+#idlkikmpdw .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
 
-<span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">50</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
-                              p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
-                              S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span>
+#idlkikmpdw .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
 
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="right">theta</th>
-<th align="right">proportion_positive</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">0.950</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="even">
-<td align="right">0.951</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="odd">
-<td align="right">0.952</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="even">
-<td align="right">0.953</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="odd">
-<td align="right">0.954</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="even">
-<td align="right">0.955</td>
-<td align="right">0.0552</td>
-</tr>
-<tr class="odd">
-<td align="right">0.956</td>
-<td align="right">0.0550</td>
-</tr>
-<tr class="even">
-<td align="right">0.957</td>
-<td align="right">0.0536</td>
-</tr>
-<tr class="odd">
-<td align="right">0.958</td>
-<td align="right">0.0522</td>
-</tr>
-<tr class="even">
-<td align="right">0.959</td>
-<td align="right">0.0496</td>
-</tr>
-<tr class="odd">
-<td align="right">0.960</td>
-<td align="right">0.0458</td>
-</tr>
+#idlkikmpdw .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#idlkikmpdw .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#idlkikmpdw .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#idlkikmpdw .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#idlkikmpdw .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#idlkikmpdw .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#idlkikmpdw .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#idlkikmpdw .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#idlkikmpdw .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#idlkikmpdw .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#idlkikmpdw .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#idlkikmpdw .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#idlkikmpdw .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#idlkikmpdw .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idlkikmpdw .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idlkikmpdw .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#idlkikmpdw .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#idlkikmpdw .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#idlkikmpdw .gt_left {
+  text-align: left;
+}
+
+#idlkikmpdw .gt_center {
+  text-align: center;
+}
+
+#idlkikmpdw .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#idlkikmpdw .gt_font_normal {
+  font-weight: normal;
+}
+
+#idlkikmpdw .gt_font_bold {
+  font-weight: bold;
+}
+
+#idlkikmpdw .gt_font_italic {
+  font-style: italic;
+}
+
+#idlkikmpdw .gt_super {
+  font-size: 65%;
+}
+
+#idlkikmpdw .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="idlkikmpdw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_right">0.00000</td>
+      <td class="gt_row gt_right">1.0000</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.70000</td>
+      <td class="gt_row gt_right">0.2314</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.74000</td>
+      <td class="gt_row gt_right">0.2314</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.78000</td>
+      <td class="gt_row gt_right">0.2314</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.82000</td>
+      <td class="gt_row gt_right">0.2314</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.86000</td>
+      <td class="gt_row gt_right">0.0942</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.90000</td>
+      <td class="gt_row gt_right">0.0942</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.92000</td>
+      <td class="gt_row gt_right">0.0942</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.93000</td>
+      <td class="gt_row gt_right">0.0940</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.94000</td>
+      <td class="gt_row gt_right">0.0714</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95000</td>
+      <td class="gt_row gt_right">0.0308</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96000</td>
+      <td class="gt_row gt_right">0.0306</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.97000</td>
+      <td class="gt_row gt_right">0.0306</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98000</td>
+      <td class="gt_row gt_right">0.0268</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.99000</td>
+      <td class="gt_row gt_right">0.0102</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.99900</td>
+      <td class="gt_row gt_right">0.0012</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.99990</td>
+      <td class="gt_row gt_right">0.0002</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.99999</td>
+      <td class="gt_row gt_right">0.0002</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">1.00000</td>
+      <td class="gt_row gt_right">0.0000</td>
+    </tr>
 </tbody>
-</table>
-<p>And we see that a threshold of 0.959 results in a type I error rate of 0.496.</p>
-<p>However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The <code><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold()</a></code> function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.</p>
-<p>Let’s consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the <code>future</code> and <code>furrr</code> packages, it still is quite time consuming. On my personal computer this took just under 4 hours to run. As a result, we do not evaluate the below code in real time, but rather have saved the result and loaded it below.</p>
+</table></div>
+<p>The resulting table contains the posterior probability threshold in the column <code>pp_threshold</code> and the proportion of positive trials in the column <code>prop_pos</code>. The proportion of positive trials will be the type I error in a null setting and the power in an alternative setting. In this case, we see that if we are targeting a type I error of 0.1, this falls between a threshold of 0.82 and 0.86. We can further refine our target thresholds and recalculate.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
-<span class="va">type1_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
-                                        direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
-                                        delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
-                                        S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
-                                        pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
-                                        ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>
+<span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.001</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span><span class="va">type1_tbl</span>, file <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"type1_tbl.rda"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">post_tbl</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">25</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
+                                p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
+                                S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"type1_tbl.rda"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="va">post_tbl</span><span class="op">[</span><span class="va">post_tbl</span><span class="op">$</span><span class="va">pp_threshold</span> <span class="op">&lt;=</span> <span class="fl">0.855</span> <span class="op">&amp;</span> 
+                  <span class="va">post_tbl</span><span class="op">$</span><span class="va">pp_threshold</span> <span class="op">&gt;=</span> <span class="fl">0.850</span>, <span class="op">]</span><span class="op">)</span></code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
 
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">type1_tbl</span><span class="op">)</span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="right">pp_threshold</th>
-<th align="right">ppp_threshold</th>
-<th align="right">mean_n1</th>
-<th align="right">prop_pos</th>
-<th align="right">prop_stopped</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">0.90</td>
-<td align="right">0.05</td>
-<td align="right">16.785</td>
-<td align="right">0.080</td>
-<td align="right">0.723</td>
-</tr>
-<tr class="even">
-<td align="right">0.90</td>
-<td align="right">0.10</td>
-<td align="right">16.785</td>
-<td align="right">0.080</td>
-<td align="right">0.723</td>
-</tr>
-<tr class="odd">
-<td align="right">0.90</td>
-<td align="right">0.15</td>
-<td align="right">11.780</td>
-<td align="right">0.069</td>
-<td align="right">0.791</td>
-</tr>
-<tr class="even">
-<td align="right">0.90</td>
-<td align="right">0.20</td>
-<td align="right">11.215</td>
-<td align="right">0.061</td>
-<td align="right">0.812</td>
-</tr>
-<tr class="odd">
-<td align="right">0.95</td>
-<td align="right">0.05</td>
-<td align="right">16.640</td>
-<td align="right">0.023</td>
-<td align="right">0.752</td>
-</tr>
-<tr class="even">
-<td align="right">0.95</td>
-<td align="right">0.10</td>
-<td align="right">10.965</td>
-<td align="right">0.020</td>
-<td align="right">0.896</td>
-</tr>
-<tr class="odd">
-<td align="right">0.95</td>
-<td align="right">0.15</td>
-<td align="right">9.225</td>
-<td align="right">0.017</td>
-<td align="right">0.915</td>
-</tr>
-<tr class="even">
-<td align="right">0.95</td>
-<td align="right">0.20</td>
-<td align="right">9.225</td>
-<td align="right">0.017</td>
-<td align="right">0.915</td>
-</tr>
-<tr class="odd">
-<td align="right">0.96</td>
-<td align="right">0.05</td>
-<td align="right">16.640</td>
-<td align="right">0.022</td>
-<td align="right">0.752</td>
-</tr>
-<tr class="even">
-<td align="right">0.96</td>
-<td align="right">0.10</td>
-<td align="right">10.880</td>
-<td align="right">0.020</td>
-<td align="right">0.896</td>
-</tr>
-<tr class="odd">
-<td align="right">0.96</td>
-<td align="right">0.15</td>
-<td align="right">9.225</td>
-<td align="right">0.017</td>
-<td align="right">0.915</td>
-</tr>
-<tr class="even">
-<td align="right">0.96</td>
-<td align="right">0.20</td>
-<td align="right">9.225</td>
-<td align="right">0.017</td>
-<td align="right">0.915</td>
-</tr>
-<tr class="odd">
-<td align="right">0.98</td>
-<td align="right">0.05</td>
-<td align="right">16.060</td>
-<td align="right">0.006</td>
-<td align="right">0.868</td>
-</tr>
-<tr class="even">
-<td align="right">0.98</td>
-<td align="right">0.10</td>
-<td align="right">10.410</td>
-<td align="right">0.006</td>
-<td align="right">0.905</td>
-</tr>
-<tr class="odd">
-<td align="right">0.98</td>
-<td align="right">0.15</td>
-<td align="right">9.225</td>
-<td align="right">0.006</td>
-<td align="right">0.915</td>
-</tr>
-<tr class="even">
-<td align="right">0.98</td>
-<td align="right">0.20</td>
-<td align="right">9.225</td>
-<td align="right">0.006</td>
-<td align="right">0.915</td>
-</tr>
+#idlkikmpdw .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#idlkikmpdw .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#idlkikmpdw .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#idlkikmpdw .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#idlkikmpdw .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#idlkikmpdw .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#idlkikmpdw .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#idlkikmpdw .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#idlkikmpdw .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#idlkikmpdw .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#idlkikmpdw .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#idlkikmpdw .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#idlkikmpdw .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#idlkikmpdw .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idlkikmpdw .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idlkikmpdw .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#idlkikmpdw .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#idlkikmpdw .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#idlkikmpdw .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#idlkikmpdw .gt_left {
+  text-align: left;
+}
+
+#idlkikmpdw .gt_center {
+  text-align: center;
+}
+
+#idlkikmpdw .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#idlkikmpdw .gt_font_normal {
+  font-weight: normal;
+}
+
+#idlkikmpdw .gt_font_bold {
+  font-weight: bold;
+}
+
+#idlkikmpdw .gt_font_italic {
+  font-style: italic;
+}
+
+#idlkikmpdw .gt_super {
+  font-size: 65%;
+}
+
+#idlkikmpdw .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="idlkikmpdw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_right">0.850</td>
+      <td class="gt_row gt_right">0.1074</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.851</td>
+      <td class="gt_row gt_right">0.1042</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.852</td>
+      <td class="gt_row gt_right">0.1016</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.853</td>
+      <td class="gt_row gt_right">0.0990</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.854</td>
+      <td class="gt_row gt_right">0.0972</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.855</td>
+      <td class="gt_row gt_right">0.0960</td>
+    </tr>
 </tbody>
-</table>
-<p>In this table we have considered 4 different posterior probability thresholds, and 4 different predictive probability thresholds. Since this is a null scenario, the column labeled “prop_pos,” which returns the proportion of simulated trials that resulted in a positive outcome, represents the type I error rate. We see that the type I error rate is below 10% for all combinations of posterior and predictive probability threshold that we have examined. In practice, we would likely want to evaluate a broader range of posterior probabilities in order to be able to target a more specific type I error rate. In this case if interest was in controlling the type I error at 10%, we would select a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, which both control the type I error at 8%. The average sample size of trials under these conditions is 17, and 72% of trials stopped early for futility.</p>
-<p>Most of the time we will want to consider power in addition to type I error when designing a clinical trial with an expansion cohort. To do so, we run the exact same simulation as before only under the alternative scenario rather than the null scenario. This setting took just over 6.5 hours to run on my computer, longer than the null setting since fewer trials stop in the alternative case and so more computations are needed.</p>
+</table></div>
+<p>And we see that a threshold of 0.853 results in a type I error rate of 0.0990, just below our desired target of 0.1. (<em>Note that I have printed only a subset of the resulting table above</em>)</p>
+</div>
+<div id="simulataneously-calibrating-posterior-and-predictive-probabilities" class="section level3">
+<h3 class="hasAnchor">
+<a href="#simulataneously-calibrating-posterior-and-predictive-probabilities" class="anchor"></a>Simulataneously calibrating posterior and predictive probabilities</h3>
+<p>However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The <code><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold()</a></code> function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.</p>
+<p>Let’s consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the <code>future</code> and <code>furrr</code> packages, it is still quite time consuming. On my personal computer this setting took just under 4 hours to run. As a result, we do not evaluate the below code in real time, but rather have saved the result and loaded it below.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+
+<span class="va">type1_tbl</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
+                             direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
+                             delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
+                             S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
+                             pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
+                             ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#fmdshubxmc .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#fmdshubxmc .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#fmdshubxmc .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#fmdshubxmc .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#fmdshubxmc .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#fmdshubxmc .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#fmdshubxmc .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#fmdshubxmc .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#fmdshubxmc .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#fmdshubxmc .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#fmdshubxmc .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#fmdshubxmc .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#fmdshubxmc .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#fmdshubxmc .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fmdshubxmc .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fmdshubxmc .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#fmdshubxmc .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#fmdshubxmc .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#fmdshubxmc .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#fmdshubxmc .gt_left {
+  text-align: left;
+}
+
+#fmdshubxmc .gt_center {
+  text-align: center;
+}
+
+#fmdshubxmc .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#fmdshubxmc .gt_font_normal {
+  font-weight: normal;
+}
+
+#fmdshubxmc .gt_font_bold {
+  font-weight: bold;
+}
+
+#fmdshubxmc .gt_font_italic {
+  font-style: italic;
+}
+
+#fmdshubxmc .gt_super {
+  font-size: 65%;
+}
+
+#fmdshubxmc .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="fmdshubxmc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">ppp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">mean_n1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_stopped</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">11.780</td>
+      <td class="gt_row gt_right">0.069</td>
+      <td class="gt_row gt_right">0.791</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">11.215</td>
+      <td class="gt_row gt_right">0.061</td>
+      <td class="gt_row gt_right">0.812</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">16.640</td>
+      <td class="gt_row gt_right">0.023</td>
+      <td class="gt_row gt_right">0.752</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">10.965</td>
+      <td class="gt_row gt_right">0.020</td>
+      <td class="gt_row gt_right">0.896</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">9.225</td>
+      <td class="gt_row gt_right">0.017</td>
+      <td class="gt_row gt_right">0.915</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">9.225</td>
+      <td class="gt_row gt_right">0.017</td>
+      <td class="gt_row gt_right">0.915</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">16.640</td>
+      <td class="gt_row gt_right">0.022</td>
+      <td class="gt_row gt_right">0.752</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">10.880</td>
+      <td class="gt_row gt_right">0.020</td>
+      <td class="gt_row gt_right">0.896</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">9.225</td>
+      <td class="gt_row gt_right">0.017</td>
+      <td class="gt_row gt_right">0.915</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">9.225</td>
+      <td class="gt_row gt_right">0.017</td>
+      <td class="gt_row gt_right">0.915</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">16.060</td>
+      <td class="gt_row gt_right">0.006</td>
+      <td class="gt_row gt_right">0.868</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">10.410</td>
+      <td class="gt_row gt_right">0.006</td>
+      <td class="gt_row gt_right">0.905</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">9.225</td>
+      <td class="gt_row gt_right">0.006</td>
+      <td class="gt_row gt_right">0.915</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">9.225</td>
+      <td class="gt_row gt_right">0.006</td>
+      <td class="gt_row gt_right">0.915</td>
+    </tr>
+</tbody>
+</table></div>
+<p>In this table we have considered 4 different posterior probability thresholds, and 4 different predictive probability thresholds. Since this is a null scenario, the column labeled <code>prop_pos</code>, which returns the proportion of simulated trials that resulted in a positive outcome, represents the type I error rate. We see that the type I error rate is below 10% for all combinations of posterior and predictive probability threshold that we have examined. In practice, we would likely want to evaluate a broader range of posterior probabilities in order to be able to target a more specific type I error rate. In this case if interest was in controlling the type I error at 10%, we would select a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, which both control the type I error at 8%. The average sample size of trials under these conditions is 17, and 72% of trials stopped early for futility.</p>
+<p>Most of the time we will want to consider power in addition to type I error when designing a clinical trial with an expansion cohort. To do so, we run the exact same simulation as before only under the alternative scenario rather than the null scenario, where the target response probability is 0.1 and the observed response probability is 0.3. This setting took just over 6.5 hours to run on my computer, longer than the null setting since fewer trials stop in the alternative case and so more computations are needed.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">456</span><span class="op">)</span>
 
 <span class="va">power_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
@@ -472,137 +2282,469 @@
                                         delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
                                         S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
                                         pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
-                                        ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>
+                                        ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
 
-<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span><span class="va">power_tbl</span>, file <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"power_tbl.rda"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"power_tbl.rda"</span><span class="op">)</span><span class="op">)</span>
+#mrfuzwexpm .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
 
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">power_tbl</span><span class="op">)</span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="right">pp_threshold</th>
-<th align="right">ppp_threshold</th>
-<th align="right">mean_n1</th>
-<th align="right">prop_pos</th>
-<th align="right">prop_stopped</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">0.90</td>
-<td align="right">0.05</td>
-<td align="right">24.290</td>
-<td align="right">0.891</td>
-<td align="right">0.064</td>
-</tr>
-<tr class="even">
-<td align="right">0.90</td>
-<td align="right">0.10</td>
-<td align="right">24.290</td>
-<td align="right">0.891</td>
-<td align="right">0.064</td>
-</tr>
-<tr class="odd">
-<td align="right">0.90</td>
-<td align="right">0.15</td>
-<td align="right">21.660</td>
-<td align="right">0.789</td>
-<td align="right">0.181</td>
-</tr>
-<tr class="even">
-<td align="right">0.90</td>
-<td align="right">0.20</td>
-<td align="right">21.410</td>
-<td align="right">0.776</td>
-<td align="right">0.198</td>
-</tr>
-<tr class="odd">
-<td align="right">0.95</td>
-<td align="right">0.05</td>
-<td align="right">24.255</td>
-<td align="right">0.793</td>
-<td align="right">0.071</td>
-</tr>
-<tr class="even">
-<td align="right">0.95</td>
-<td align="right">0.10</td>
-<td align="right">21.325</td>
-<td align="right">0.699</td>
-<td align="right">0.227</td>
-</tr>
-<tr class="odd">
-<td align="right">0.95</td>
-<td align="right">0.15</td>
-<td align="right">20.520</td>
-<td align="right">0.673</td>
-<td align="right">0.269</td>
-</tr>
-<tr class="even">
-<td align="right">0.95</td>
-<td align="right">0.20</td>
-<td align="right">20.520</td>
-<td align="right">0.673</td>
-<td align="right">0.269</td>
-</tr>
-<tr class="odd">
-<td align="right">0.96</td>
-<td align="right">0.05</td>
-<td align="right">24.220</td>
-<td align="right">0.791</td>
-<td align="right">0.078</td>
-</tr>
-<tr class="even">
-<td align="right">0.96</td>
-<td align="right">0.10</td>
-<td align="right">21.350</td>
-<td align="right">0.699</td>
-<td align="right">0.224</td>
-</tr>
-<tr class="odd">
-<td align="right">0.96</td>
-<td align="right">0.15</td>
-<td align="right">20.520</td>
-<td align="right">0.673</td>
-<td align="right">0.269</td>
-</tr>
-<tr class="even">
-<td align="right">0.96</td>
-<td align="right">0.20</td>
-<td align="right">20.520</td>
-<td align="right">0.673</td>
-<td align="right">0.269</td>
-</tr>
-<tr class="odd">
-<td align="right">0.98</td>
-<td align="right">0.05</td>
-<td align="right">24.035</td>
-<td align="right">0.656</td>
-<td align="right">0.115</td>
-</tr>
-<tr class="even">
-<td align="right">0.98</td>
-<td align="right">0.10</td>
-<td align="right">21.075</td>
-<td align="right">0.594</td>
-<td align="right">0.243</td>
-</tr>
-<tr class="odd">
-<td align="right">0.98</td>
-<td align="right">0.15</td>
-<td align="right">20.520</td>
-<td align="right">0.586</td>
-<td align="right">0.269</td>
-</tr>
-<tr class="even">
-<td align="right">0.98</td>
-<td align="right">0.20</td>
-<td align="right">20.520</td>
-<td align="right">0.586</td>
-<td align="right">0.269</td>
-</tr>
+#mrfuzwexpm .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#mrfuzwexpm .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#mrfuzwexpm .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#mrfuzwexpm .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#mrfuzwexpm .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#mrfuzwexpm .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#mrfuzwexpm .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#mrfuzwexpm .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#mrfuzwexpm .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#mrfuzwexpm .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#mrfuzwexpm .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#mrfuzwexpm .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#mrfuzwexpm .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#mrfuzwexpm .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mrfuzwexpm .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mrfuzwexpm .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#mrfuzwexpm .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#mrfuzwexpm .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mrfuzwexpm .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#mrfuzwexpm .gt_left {
+  text-align: left;
+}
+
+#mrfuzwexpm .gt_center {
+  text-align: center;
+}
+
+#mrfuzwexpm .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#mrfuzwexpm .gt_font_normal {
+  font-weight: normal;
+}
+
+#mrfuzwexpm .gt_font_bold {
+  font-weight: bold;
+}
+
+#mrfuzwexpm .gt_font_italic {
+  font-style: italic;
+}
+
+#mrfuzwexpm .gt_super {
+  font-size: 65%;
+}
+
+#mrfuzwexpm .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="mrfuzwexpm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
+<thead class="gt_col_headings"><tr>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">ppp_threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">mean_n1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_stopped</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">24.290</td>
+      <td class="gt_row gt_right">0.891</td>
+      <td class="gt_row gt_right">0.064</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">24.290</td>
+      <td class="gt_row gt_right">0.891</td>
+      <td class="gt_row gt_right">0.064</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">21.660</td>
+      <td class="gt_row gt_right">0.789</td>
+      <td class="gt_row gt_right">0.181</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.90</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">21.410</td>
+      <td class="gt_row gt_right">0.776</td>
+      <td class="gt_row gt_right">0.198</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">24.255</td>
+      <td class="gt_row gt_right">0.793</td>
+      <td class="gt_row gt_right">0.071</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">21.325</td>
+      <td class="gt_row gt_right">0.699</td>
+      <td class="gt_row gt_right">0.227</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">20.520</td>
+      <td class="gt_row gt_right">0.673</td>
+      <td class="gt_row gt_right">0.269</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.95</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">20.520</td>
+      <td class="gt_row gt_right">0.673</td>
+      <td class="gt_row gt_right">0.269</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">24.220</td>
+      <td class="gt_row gt_right">0.791</td>
+      <td class="gt_row gt_right">0.078</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">21.350</td>
+      <td class="gt_row gt_right">0.699</td>
+      <td class="gt_row gt_right">0.224</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">20.520</td>
+      <td class="gt_row gt_right">0.673</td>
+      <td class="gt_row gt_right">0.269</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.96</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">20.520</td>
+      <td class="gt_row gt_right">0.673</td>
+      <td class="gt_row gt_right">0.269</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">24.035</td>
+      <td class="gt_row gt_right">0.656</td>
+      <td class="gt_row gt_right">0.115</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">21.075</td>
+      <td class="gt_row gt_right">0.594</td>
+      <td class="gt_row gt_right">0.243</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">20.520</td>
+      <td class="gt_row gt_right">0.586</td>
+      <td class="gt_row gt_right">0.269</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.98</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">20.520</td>
+      <td class="gt_row gt_right">0.586</td>
+      <td class="gt_row gt_right">0.269</td>
+    </tr>
 </tbody>
-</table>
-<p>In this table we have considered the same 4 posterior probability thresholds and 4 predictive probability thresholds. Since this is an alternative scenario, the column labeled “prop_pos,” which returns the proportion of simulated trials that resulted in a positive outcome, represents the power. We see that the power ranges from just under 0.6 to just under 0.9 depending on the combination of thresholds. We see that if we select a similar combination as was of interest in the null scenario, a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, we will have power of 89% to detect a difference. The average sample size of trials under these conditions is 24.3, suggesting that most trials accrue to the maximum sample size of 25, and we see that only 6.4% of trials stopped early for futility.</p>
+</table></div>
+<p>In this table we have considered the same 4 posterior probability thresholds and 4 predictive probability thresholds. Since this is an alternative scenario, the column labeled <code>prop_pos</code>, which returns the proportion of simulated trials that resulted in a positive outcome, represents the power. We see that the power ranges from just under 0.6 to just under 0.9 depending on the combination of thresholds. We see that if we select a similar combination of thresholds as in the null scenario, a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, we will have power of 89% to detect a difference. The average sample size of trials under these conditions is 24.3, suggesting that most trials accrue to the maximum sample size of 25, and we see that only 6.4% of trials stopped early for futility.</p>
+</div>
+</div>
 </div>
   </div>
 

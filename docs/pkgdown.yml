@@ -3,7 +3,7 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   one_sample_expansion: one_sample_expansion.html
-last_built: 2021-03-23T12:58Z
+last_built: 2021-03-23T15:07Z
 urls:
   reference: http://www.emilyzabor.com/ppseq//reference
   article: http://www.emilyzabor.com/ppseq//articles

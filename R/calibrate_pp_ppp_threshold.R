@@ -255,7 +255,9 @@ calibrate_pp_ppp_threshold <- function(prob, n,
                           eval_thresh(x, pp_threshold, ppp_threshold,
                                       direction = direction, p0 = p0, 
                                       delta = delta, prior = prior, 
-                                      S = S, N = N)))
+                                      S = S, N = N), 
+                        .options = furrr::furrr_options(seed = TRUE)), 
+      .options = furrr::furrr_options(seed = TRUE))
   
   res_df <- 
     dplyr::bind_rows(
@@ -265,19 +267,25 @@ calibrate_pp_ppp_threshold <- function(prob, n,
   
   if(length(prob) == 2) {
     res_summary <- 
-      dplyr::summarize(
-        dplyr::group_by(res_df, pp_threshold, ppp_threshold),
-        mean_n0 = mean(n0),
-        mean_n1 = mean(n1),
-        prop_pos = mean(positive),
-        prop_stopped = mean(sum(n0, n1) < sum(N)))
+      dplyr::ungroup(
+        dplyr::summarize(
+          dplyr::group_by(res_df, pp_threshold, ppp_threshold),
+          mean_n0 = mean(n0),
+          mean_n1 = mean(n1),
+          prop_pos = mean(positive),
+          prop_stopped = mean(sum(n0, n1) < sum(N))
+          )
+        )
   } else if(length(prob) == 1) {
     res_summary <- 
-      dplyr::summarize(
-        dplyr::group_by(res_df, pp_threshold, ppp_threshold),
-        mean_n1 = mean(n1),
-        prop_pos = mean(positive),
-        prop_stopped = mean(n1 < N))
+      dplyr::ungroup(
+        dplyr::summarize(
+          dplyr::group_by(res_df, pp_threshold, ppp_threshold),
+          mean_n1 = mean(n1),
+          prop_pos = mean(positive),
+          prop_stopped = mean(n1 < N)
+          )
+        )
   }
   return(res_summary)
 }

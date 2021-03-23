@@ -32,22 +32,28 @@ library(ppseq)
 ```
 
 
-# Methods
+# Trial design
 
-We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate 0.3. We want to look after every 5 patients, with a maximum sample size of 50.
+We want to plan a one-sample study. The unacceptable response rate is 0.1, and the acceptable response rate is 0.3. We plan to check for futility after every 5 patients, with a maximum sample size of 25.
 
-Let's start by seeing what happens in a single simulated trial. We use the function `sim_single_trial()` to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success.
 
-Let's say, for simplicity, that we would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.1. 
+## Single simulated trial
+
+Let's start by seeing what happens in a single simulated trial. We use the function `sim_single_trial()` to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success at each look. For simplicity, let's say that we would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.1. 
 
 First let's consider a trial where we achieve our acceptable response rate of 0.3.
 
 ```{r}
 set.seed(123)
 
-sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", p = 0.1,
-                 delta = NULL, prior = c(0.5,0.5), S = 5000, 
-                 N = 50, theta = 0.95)
+alt1_tbl <-
+  sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", 
+                   p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 5000, 
+                   N = 50, theta = 0.95)
+```
+
+```{r echo = FALSE}
+gt::gt(alt1_tbl)
 ```
 
 We see here that the posterior predictive probability, in the column `ppp`, never drops below the futility level of 0.1, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100\% predictive probability of having posterior probability exceeding 0.95. 
@@ -57,79 +63,105 @@ Now let's consider a trial where we do not achieve our acceptable response rate 
 ```{r}
 set.seed(123)
 
-sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", p = 0.1,
-                 delta = NULL, prior = c(0.5,0.5), S = 5000, 
-                 N = 50, theta = 0.95)
+null1_tbl <- 
+  sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", 
+                   p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 5000, 
+                   N = 50, theta = 0.95)
 ```
 
-We see in this example that we drop below the futility threshold of 0.1 after enrolling 15 patients, at which point we have a posterior predictive probability of 0.0960. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
+```{r echo = FALSE}
+gt::gt(null1_tbl)
+```
+
+We see in this example that we drop below the futility threshold of 0.1 after enrolling 15 patients, at which point we have a posterior predictive probability of 0.0968. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
+
+
+## Trial operating characteristics
 
 But when we are designing a trial, we want to achieve fixed operating characteristics such as type I error and power. There are several goals:
 
-1. Determine the posterior probability threshold that maintains a pre-determined overall type I error rate. For simplicity in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.
-2. Determine the predictive probability threshold to stop for futility.
+1. Determine the posterior probability threshold to declare the trial positive. For simplicity in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.
+2. Determine the predictive probability threshold to stop for futility, calibrated to achieve the desired design properties of our trial.
 3. Using the identified thresholds, simulate many trials to determine the average probability of stopping early for futility. 
 4. Consider different interim monitoring schedules
 
-To accomplish the first goal, we simulate many trials under the null and search over a range of thresholds to identify the threshold that maintains the overall type I error at the desired level.
 
-The `calibrate_posterior_threshold()` function can accomplish this at the final sample size only, not considering any interim looks or early stopping, for the one-sample or two-sample case and any number of thresholds of interest to consider
+### Calibrating posterior threshold
+
+To accomplish the first goal, we simulate many trials and search over a range of thresholds to identify the threshold that achieves our desired design properties
+
+The `calibrate_posterior_threshold()` function can accomplish this at the final sample size only, not considering any interim looks or early stopping.
+
+We can calibrate for type I error by running this simulation in the null setting where both our target and observed response probabilities are set to 0.1. We look over a range of posterior thresholds.
 
 ```{r}
+set.seed(123)
+
 thresholds <- c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95,
                 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1)
 
-set.seed(123)
-
-res <- calibrate_posterior_threshold(prob = 0.1, N = 50, direction = "greater", 
-                              p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
-                              S = 5000, theta = thresholds)
-
-knitr::kable(res)
+post_tbl <- 
+  calibrate_posterior_threshold(prob = 0.1, N = 25, direction = "greater", 
+                                p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
+                                S = 5000, theta = thresholds)
 ```
-
-Based on these results, we see that our target type I error falls between a threshold of 0.95 and 0.96. We can refine our target thresholds and recalculate.
 
 ```{r}
-thresholds <- seq(0.95, 0.96, 0.001)
-
-set.seed(123)
-
-res <- calibrate_posterior_threshold(prob = 0.1, N = 50, direction = "greater", 
-                              p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
-                              S = 5000, theta = thresholds)
-
-knitr::kable(res)
+gt::gt(post_tbl)
 ```
 
-And we see that a threshold of 0.959 results in a type I error rate of 0.496.
+The resulting table contains the posterior probability threshold in the column `pp_threshold` and the proportion of positive trials in the column `prop_pos`. The proportion of positive trials will be the type I error in a null setting and the power in an alternative setting. In this case, we see that if we are targeting a type I error of 0.1, this falls between a threshold of 0.82 and 0.86. We can further refine our target thresholds and recalculate.
+
+```{r}
+set.seed(123)
+
+thresholds <- seq(0.82, 0.86, 0.001)
+
+post_tbl <- 
+  calibrate_posterior_threshold(prob = 0.1, N = 25, direction = "greater", 
+                                p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
+                                S = 5000, theta = thresholds)
+```
+
+```{r}
+gt::gt(post_tbl[post_tbl$pp_threshold <= 0.855 & 
+                  post_tbl$pp_threshold >= 0.850, ])
+```
+
+And we see that a threshold of 0.853 results in a type I error rate of 0.0990, just below our desired target of 0.1. (*Note that I have printed only a subset of the resulting table above*) 
+
+
+### Simulataneously calibrating posterior and predictive probabilities
 
 However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The `calibrate_pp_ppp_threshold()` function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.
 
-Let's consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the `future` and `furrr` packages, it still is quite time consuming. On my personal computer this took just under 4 hours to run. As a result, we do not evaluate the below code in real time, but rather have saved the result and loaded it below.
+Let's consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the `future` and `furrr` packages, it is still quite time consuming. On my personal computer this setting took just under 4 hours to run. As a result, we do not evaluate the below code in real time, but rather have saved the result and loaded it below.
 
 ```{r eval = FALSE}
 set.seed(123)
 
-type1_tbl <- calibrate_pp_ppp_threshold(prob = 0.1, n = seq(5, 25, 5),
-                                        direction = "greater", p0 = 0.1,
-                                        delta = NULL, prior = c(0.5, 0.5),
-                                        S = 5000, N = 25, nsim = 1000,
-                                        pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-                                        ppp_threshold = seq(0.05, 0.2, 0.05))
+type1_tbl <- 
+  calibrate_pp_ppp_threshold(prob = 0.1, n = seq(5, 25, 5),
+                             direction = "greater", p0 = 0.1,
+                             delta = NULL, prior = c(0.5, 0.5),
+                             S = 5000, N = 25, nsim = 1000,
+                             pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+                             ppp_threshold = seq(0.05, 0.2, 0.05))
+```
 
+```{r eval = FALSE, echo = FALSE}
 save(type1_tbl, file = here::here("vignettes", "type1_tbl.rda"))
 ```
 
-```{r}
+```{r echo = FALSE}
 load(here::here("vignettes", "type1_tbl.rda"))
 
-knitr::kable(type1_tbl)
+gt::gt(dplyr::ungroup(type1_tbl))
 ```
 
-In this table we have considered 4 different posterior probability thresholds, and 4 different predictive probability thresholds. Since this is a null scenario, the column labeled "prop_pos," which returns the proportion of simulated trials that resulted in a positive outcome, represents the type I error rate. We see that the type I error rate is below 10\% for all combinations of posterior and predictive probability threshold that we have examined. In practice, we would likely want to evaluate a broader range of posterior probabilities in order to be able to target a more specific type I error rate. In this case if interest was in controlling the type I error at 10\%, we would select a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, which both control the type I error at 8\%. The average sample size of trials under these conditions is 17, and 72\% of trials stopped early for futility.
+In this table we have considered 4 different posterior probability thresholds, and 4 different predictive probability thresholds. Since this is a null scenario, the column labeled `prop_pos`, which returns the proportion of simulated trials that resulted in a positive outcome, represents the type I error rate. We see that the type I error rate is below 10\% for all combinations of posterior and predictive probability threshold that we have examined. In practice, we would likely want to evaluate a broader range of posterior probabilities in order to be able to target a more specific type I error rate. In this case if interest was in controlling the type I error at 10\%, we would select a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, which both control the type I error at 8\%. The average sample size of trials under these conditions is 17, and 72\% of trials stopped early for futility.
 
-Most of the time we will want to consider power in addition to type I error when designing a clinical trial with an expansion cohort. To do so, we run the exact same simulation as before only under the alternative scenario rather than the null scenario. This setting took just over 6.5 hours to run on my computer, longer than the null setting since fewer trials stop in the alternative case and so more computations are needed.
+Most of the time we will want to consider power in addition to type I error when designing a clinical trial with an expansion cohort. To do so, we run the exact same simulation as before only under the alternative scenario rather than the null scenario, where the target response probability is 0.1 and the observed response probability is 0.3. This setting took just over 6.5 hours to run on my computer, longer than the null setting since fewer trials stop in the alternative case and so more computations are needed.
 
 ```{r eval = FALSE}
 set.seed(456)
@@ -140,15 +172,17 @@ power_tbl <- calibrate_pp_ppp_threshold(prob = 0.3, n = seq(5, 25, 5),
                                         S = 5000, N = 25, nsim = 1000,
                                         pp_threshold = c(0.9, 0.95, 0.96, 0.98),
                                         ppp_threshold = seq(0.05, 0.2, 0.05))
+```
 
+```{r eval = FALSE, echo = FALSE}
 save(power_tbl, file = here::here("vignettes", "power_tbl.rda"))
 ```
 
-```{r}
+```{r echo = FALSE}
 load(here::here("vignettes", "power_tbl.rda"))
 
-knitr::kable(power_tbl)
+gt::gt(dplyr::ungroup(power_tbl))
 ```
 
-In this table we have considered the same 4 posterior probability thresholds and 4 predictive probability thresholds. Since this is an alternative scenario, the column labeled "prop_pos," which returns the proportion of simulated trials that resulted in a positive outcome, represents the power. We see that the power ranges from just under 0.6 to just under 0.9 depending on the combination of thresholds. We see that if we select a similar combination as was of interest in the null scenario, a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, we will have power of 89\% to detect a difference. The average sample size of trials under these conditions is 24.3, suggesting that most trials accrue to the maximum sample size of 25, and we see that only 6.4\% of trials stopped early for futility.
+In this table we have considered the same 4 posterior probability thresholds and 4 predictive probability thresholds. Since this is an alternative scenario, the column labeled `prop_pos`, which returns the proportion of simulated trials that resulted in a positive outcome, represents the power. We see that the power ranges from just under 0.6 to just under 0.9 depending on the combination of thresholds. We see that if we select a similar combination of thresholds as in the null scenario, a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, we will have power of 89\% to detect a difference. The average sample size of trials under these conditions is 24.3, suggesting that most trials accrue to the maximum sample size of 25, and we see that only 6.4\% of trials stopped early for futility.
 

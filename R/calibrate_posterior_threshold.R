@@ -26,8 +26,8 @@
 #' @param theta The target posterior probability thresholds to consider. 
 #' Integer or vector.
 #' 
-#' @return Returns a tibble with the threshold(s) and associated proportion of 
-#' positive trials.
+#' @return Returns a tibble with the posterior probability threshold(s) and 
+#' associated proportion of positive trials.
 #' 
 #' @examples 
 #' 
@@ -80,8 +80,8 @@ calibrate_posterior_threshold <- function(prob, N,
   proportion_positive <- purrr::map_dbl(theta, ~mean(posts > .x))
   
   return(tibble::tibble(
-    theta = theta, 
-    proportion_positive = proportion_positive)
+    pp_threshold = theta, 
+    prop_pos = proportion_positive)
   )
   
 }

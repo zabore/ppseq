@@ -42,8 +42,8 @@ trials. Default is 5000}
 Integer or vector.}
 }
 \value{
-Returns a tibble with the threshold(s) and associated proportion of
-positive trials.
+Returns a tibble with the posterior probability threshold(s) and
+associated proportion of positive trials.
 }
 \description{
 This function is meant to be used in the context of a
