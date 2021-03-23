@@ -84,7 +84,7 @@
       <h1 data-toc-skip>One-sample expansion cohort</h1>
                         <h4 class="author">Emily C. Zabor</h4>
             
-            <h4 class="date">Last updated: 2021-03-19</h4>
+            <h4 class="date">Last updated: 2021-03-23</h4>
       
       
       <div class="hidden name"><code>one_sample_expansion.Rmd</code></div>
@@ -323,24 +323,286 @@
 </table>
 <p>And we see that a threshold of 0.959 results in a type I error rate of 0.496.</p>
 <p>However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The <code><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold()</a></code> function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.</p>
-<p>Let’s consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the <code>future</code> and <code>furrr</code> packages, it still is quite time consuming. Just a single simulated trial takes about 2 minutes to run. As a result, this code is not evaluated here, but was rather run previously and the saved results are presented.</p>
+<p>Let’s consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the <code>future</code> and <code>furrr</code> packages, it still is quite time consuming. On my personal computer this took just under 4 hours to run. As a result, we do not evaluate the below code in real time, but rather have saved the result and loaded it below.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
-<span class="fu">tic</span><span class="op">(</span><span class="op">)</span>
 <span class="va">type1_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
                                         direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
                                         delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
                                         S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
                                         pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
                                         ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>
-<span class="fu">toc</span><span class="op">(</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span><span class="va">type1</span>, file <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"type1_tbl.rda"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span><span class="va">type1_tbl</span>, file <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"type1_tbl.rda"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"type1_tbl.rda"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">type1</span><span class="op">)</span></code></pre></div>
+<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">type1_tbl</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">pp_threshold</th>
+<th align="right">ppp_threshold</th>
+<th align="right">mean_n1</th>
+<th align="right">prop_pos</th>
+<th align="right">prop_stopped</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.90</td>
+<td align="right">0.05</td>
+<td align="right">16.785</td>
+<td align="right">0.080</td>
+<td align="right">0.723</td>
+</tr>
+<tr class="even">
+<td align="right">0.90</td>
+<td align="right">0.10</td>
+<td align="right">16.785</td>
+<td align="right">0.080</td>
+<td align="right">0.723</td>
+</tr>
+<tr class="odd">
+<td align="right">0.90</td>
+<td align="right">0.15</td>
+<td align="right">11.780</td>
+<td align="right">0.069</td>
+<td align="right">0.791</td>
+</tr>
+<tr class="even">
+<td align="right">0.90</td>
+<td align="right">0.20</td>
+<td align="right">11.215</td>
+<td align="right">0.061</td>
+<td align="right">0.812</td>
+</tr>
+<tr class="odd">
+<td align="right">0.95</td>
+<td align="right">0.05</td>
+<td align="right">16.640</td>
+<td align="right">0.023</td>
+<td align="right">0.752</td>
+</tr>
+<tr class="even">
+<td align="right">0.95</td>
+<td align="right">0.10</td>
+<td align="right">10.965</td>
+<td align="right">0.020</td>
+<td align="right">0.896</td>
+</tr>
+<tr class="odd">
+<td align="right">0.95</td>
+<td align="right">0.15</td>
+<td align="right">9.225</td>
+<td align="right">0.017</td>
+<td align="right">0.915</td>
+</tr>
+<tr class="even">
+<td align="right">0.95</td>
+<td align="right">0.20</td>
+<td align="right">9.225</td>
+<td align="right">0.017</td>
+<td align="right">0.915</td>
+</tr>
+<tr class="odd">
+<td align="right">0.96</td>
+<td align="right">0.05</td>
+<td align="right">16.640</td>
+<td align="right">0.022</td>
+<td align="right">0.752</td>
+</tr>
+<tr class="even">
+<td align="right">0.96</td>
+<td align="right">0.10</td>
+<td align="right">10.880</td>
+<td align="right">0.020</td>
+<td align="right">0.896</td>
+</tr>
+<tr class="odd">
+<td align="right">0.96</td>
+<td align="right">0.15</td>
+<td align="right">9.225</td>
+<td align="right">0.017</td>
+<td align="right">0.915</td>
+</tr>
+<tr class="even">
+<td align="right">0.96</td>
+<td align="right">0.20</td>
+<td align="right">9.225</td>
+<td align="right">0.017</td>
+<td align="right">0.915</td>
+</tr>
+<tr class="odd">
+<td align="right">0.98</td>
+<td align="right">0.05</td>
+<td align="right">16.060</td>
+<td align="right">0.006</td>
+<td align="right">0.868</td>
+</tr>
+<tr class="even">
+<td align="right">0.98</td>
+<td align="right">0.10</td>
+<td align="right">10.410</td>
+<td align="right">0.006</td>
+<td align="right">0.905</td>
+</tr>
+<tr class="odd">
+<td align="right">0.98</td>
+<td align="right">0.15</td>
+<td align="right">9.225</td>
+<td align="right">0.006</td>
+<td align="right">0.915</td>
+</tr>
+<tr class="even">
+<td align="right">0.98</td>
+<td align="right">0.20</td>
+<td align="right">9.225</td>
+<td align="right">0.006</td>
+<td align="right">0.915</td>
+</tr>
+</tbody>
+</table>
+<p>In this table we have considered 4 different posterior probability thresholds, and 4 different predictive probability thresholds. Since this is a null scenario, the column labeled “prop_pos,” which returns the proportion of simulated trials that resulted in a positive outcome, represents the type I error rate. We see that the type I error rate is below 10% for all combinations of posterior and predictive probability threshold that we have examined. In practice, we would likely want to evaluate a broader range of posterior probabilities in order to be able to target a more specific type I error rate. In this case if interest was in controlling the type I error at 10%, we would select a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, which both control the type I error at 8%. The average sample size of trials under these conditions is 17, and 72% of trials stopped early for futility.</p>
+<p>Most of the time we will want to consider power in addition to type I error when designing a clinical trial with an expansion cohort. To do so, we run the exact same simulation as before only under the alternative scenario rather than the null scenario. This setting took just over 6.5 hours to run on my computer, longer than the null setting since fewer trials stop in the alternative case and so more computations are needed.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">456</span><span class="op">)</span>
+
+<span class="va">power_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
+                                        direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
+                                        delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
+                                        S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
+                                        pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
+                                        ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/save.html">save</a></span><span class="op">(</span><span class="va">power_tbl</span>, file <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"power_tbl.rda"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"power_tbl.rda"</span><span class="op">)</span><span class="op">)</span>
+
+<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">power_tbl</span><span class="op">)</span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="right">pp_threshold</th>
+<th align="right">ppp_threshold</th>
+<th align="right">mean_n1</th>
+<th align="right">prop_pos</th>
+<th align="right">prop_stopped</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.90</td>
+<td align="right">0.05</td>
+<td align="right">24.290</td>
+<td align="right">0.891</td>
+<td align="right">0.064</td>
+</tr>
+<tr class="even">
+<td align="right">0.90</td>
+<td align="right">0.10</td>
+<td align="right">24.290</td>
+<td align="right">0.891</td>
+<td align="right">0.064</td>
+</tr>
+<tr class="odd">
+<td align="right">0.90</td>
+<td align="right">0.15</td>
+<td align="right">21.660</td>
+<td align="right">0.789</td>
+<td align="right">0.181</td>
+</tr>
+<tr class="even">
+<td align="right">0.90</td>
+<td align="right">0.20</td>
+<td align="right">21.410</td>
+<td align="right">0.776</td>
+<td align="right">0.198</td>
+</tr>
+<tr class="odd">
+<td align="right">0.95</td>
+<td align="right">0.05</td>
+<td align="right">24.255</td>
+<td align="right">0.793</td>
+<td align="right">0.071</td>
+</tr>
+<tr class="even">
+<td align="right">0.95</td>
+<td align="right">0.10</td>
+<td align="right">21.325</td>
+<td align="right">0.699</td>
+<td align="right">0.227</td>
+</tr>
+<tr class="odd">
+<td align="right">0.95</td>
+<td align="right">0.15</td>
+<td align="right">20.520</td>
+<td align="right">0.673</td>
+<td align="right">0.269</td>
+</tr>
+<tr class="even">
+<td align="right">0.95</td>
+<td align="right">0.20</td>
+<td align="right">20.520</td>
+<td align="right">0.673</td>
+<td align="right">0.269</td>
+</tr>
+<tr class="odd">
+<td align="right">0.96</td>
+<td align="right">0.05</td>
+<td align="right">24.220</td>
+<td align="right">0.791</td>
+<td align="right">0.078</td>
+</tr>
+<tr class="even">
+<td align="right">0.96</td>
+<td align="right">0.10</td>
+<td align="right">21.350</td>
+<td align="right">0.699</td>
+<td align="right">0.224</td>
+</tr>
+<tr class="odd">
+<td align="right">0.96</td>
+<td align="right">0.15</td>
+<td align="right">20.520</td>
+<td align="right">0.673</td>
+<td align="right">0.269</td>
+</tr>
+<tr class="even">
+<td align="right">0.96</td>
+<td align="right">0.20</td>
+<td align="right">20.520</td>
+<td align="right">0.673</td>
+<td align="right">0.269</td>
+</tr>
+<tr class="odd">
+<td align="right">0.98</td>
+<td align="right">0.05</td>
+<td align="right">24.035</td>
+<td align="right">0.656</td>
+<td align="right">0.115</td>
+</tr>
+<tr class="even">
+<td align="right">0.98</td>
+<td align="right">0.10</td>
+<td align="right">21.075</td>
+<td align="right">0.594</td>
+<td align="right">0.243</td>
+</tr>
+<tr class="odd">
+<td align="right">0.98</td>
+<td align="right">0.15</td>
+<td align="right">20.520</td>
+<td align="right">0.586</td>
+<td align="right">0.269</td>
+</tr>
+<tr class="even">
+<td align="right">0.98</td>
+<td align="right">0.20</td>
+<td align="right">20.520</td>
+<td align="right">0.586</td>
+<td align="right">0.269</td>
+</tr>
+</tbody>
+</table>
+<p>In this table we have considered the same 4 posterior probability thresholds and 4 predictive probability thresholds. Since this is an alternative scenario, the column labeled “prop_pos,” which returns the proportion of simulated trials that resulted in a positive outcome, represents the power. We see that the power ranges from just under 0.6 to just under 0.9 depending on the combination of thresholds. We see that if we select a similar combination as was of interest in the null scenario, a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, we will have power of 89% to detect a difference. The average sample size of trials under these conditions is 24.3, suggesting that most trials accrue to the maximum sample size of 25, and we see that only 6.4% of trials stopped early for futility.</p>
 </div>
   </div>
 
