@@ -179,8 +179,13 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' threshold. In an alternative case, this will result in the power at a given
 #' threshold.
 #'
-#' @param prob vector of length two containing the probability of event in 
-#' the standard of care and experimental arm c(p0, p1) for the two-sample case; 
+#' @param prob_null vector of length two containing the probability of event in 
+#' the standard of care and experimental arm c(p0, p1) for the two-sample case
+#' for the null scenario; 
+#' integer of event probability for one-sample case
+#' @param prob_alt vector of length two containing the probability of event in 
+#' the standard of care and experimental arm c(p0, p1) for the two-sample case
+#' for the alternative scenario; 
 #' integer of event probability for one-sample case
 #' @param n matrix containing the total number of patients accrued so far at 
 #' each interim look in the standard of care (column 1) and experimental 
@@ -222,9 +227,10 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' 
 #' # One-sample case
 #' \dontrun{
-#' calibrate_pp_ppp_threshold(prob = 0.1, n = seq(5, 25, 5),
-#' direction = "greater", p0 = 0.1, delta = NULL, prior = c(0.5, 0.5),
-#' S = 5000, N = 25, nsim = 1000, pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+#' calibrate_pp_ppp_threshold(prob_null = 0.1, prob_alt = 0.3, 
+#' n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL, 
+#' prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000, 
+#' pp_threshold = c(0.9, 0.95, 0.96, 0.98), 
 #' ppp_threshold = seq(0.05, 0.2, 0.05))
 #' }
 #' 
@@ -232,23 +238,26 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #'
 #' @export
 
-calibrate_pp_ppp_threshold <- function(prob, n,
+calibrate_pp_ppp_threshold <- function(prob_null, prob_alt, n,
                                        direction = "greater", p0 = NULL, 
                                        delta = 0, prior = c(0.5, 0.5), 
                                        S = 5000, N, nsim = 1000,
                                        pp_threshold, ppp_threshold) {
   future::plan("future::multisession")
   
-  sim_dat <- 
-    purrr::map(1:nsim, ~sim_dat1(prob = prob, n = n))
+  sim_dat_null <- 
+    purrr::map(1:nsim, ~sim_dat1(prob = prob_null, n = n))
+  
+  sim_dat_alt <- 
+    purrr::map(1:nsim, ~sim_dat1(prob = prob_alt, n = n))
   
   cross_threshold <- 
     purrr::cross_df(list(pp_threshold = pp_threshold, 
                          ppp_threshold = ppp_threshold))
   
-  res_all_data <- 
+  res_null <- 
     furrr::future_map(
-      sim_dat,
+      sim_dat_null,
       function(x) 
         furrr::future_pmap_dfr(cross_threshold,
                         function(pp_threshold, ppp_threshold) 
@@ -257,33 +266,84 @@ calibrate_pp_ppp_threshold <- function(prob, n,
                                       delta = delta, prior = prior, 
                                       S = S, N = N), 
                         .options = furrr::furrr_options(seed = TRUE)), 
-      .options = furrr::furrr_options(seed = TRUE))
+      .options = furrr::furrr_options(seed = TRUE)
+      )
   
-  res_df <- 
+  res_alt <- 
+    furrr::future_map(
+      sim_dat_alt,
+      function(x) 
+        furrr::future_pmap_dfr(cross_threshold,
+                               function(pp_threshold, ppp_threshold) 
+                                 eval_thresh(x, pp_threshold, ppp_threshold,
+                                             direction = direction, p0 = p0, 
+                                             delta = delta, prior = prior, 
+                                             S = S, N = N), 
+                               .options = furrr::furrr_options(seed = TRUE)), 
+      .options = furrr::furrr_options(seed = TRUE)
+    )
+  
+  res_df_null <- 
     dplyr::bind_rows(
-      res_all_data,
+      res_null,
       .id = "sim_num"
     )
   
-  if(length(prob) == 2) {
+  res_df_alt <- 
+    dplyr::bind_rows(
+      res_alt,
+      .id = "sim_num"
+    )
+  
+  
+  if(length(prob_null) == 2) {
+    res_df <- 
+      dplyr::full_join(
+        dplyr::select(
+          dplyr::rename(res_df_null, n0_null = n0, n1_null = n1, 
+                        positive_null = positive),
+          -ppp, -y0, -y1),
+        dplyr::select(
+          dplyr::rename(res_df_alt, n0_alt = n0, n1_alt = n1,
+                        positive_alt = positive),
+          -ppp, -y0, -y1)
+      )
+    
     res_summary <- 
       dplyr::ungroup(
         dplyr::summarize(
           dplyr::group_by(res_df, pp_threshold, ppp_threshold),
-          mean_n0 = mean(n0),
-          mean_n1 = mean(n1),
-          prop_pos = mean(positive),
-          prop_stopped = mean(sum(n0, n1) < sum(N))
+          mean_n0_null = mean(n0_null),
+          mean_n1_null = mean(n1_null),
+          prop_pos_null = mean(positive_null),
+          prop_stopped_null = mean(sum(n0_null, n1_null) < sum(N)),
+          mean_n0_alt = mean(n0_alt),
+          mean_n1_alt = mean(n1_alt),
+          prop_pos_alt = mean(positive_alt),
+          prop_stopped_alt = mean(sum(n0_alt, n1_alt) < sum(N))
           )
         )
-  } else if(length(prob) == 1) {
+  } else if(length(prob_null) == 1) {
+    res_df <- 
+      dplyr::full_join(
+        dplyr::select(
+          dplyr::rename(res_df_null, n1_null = n1, positive_null = positive),
+          -ppp, -y1),
+        dplyr::select(
+          dplyr::rename(res_df_alt, n1_alt = n1, positive_alt = positive),
+          -ppp, -y1)
+      )
+    
     res_summary <- 
       dplyr::ungroup(
         dplyr::summarize(
           dplyr::group_by(res_df, pp_threshold, ppp_threshold),
-          mean_n1 = mean(n1),
-          prop_pos = mean(positive),
-          prop_stopped = mean(n1 < N)
+          mean_n1_null = mean(n1_null),
+          prop_pos_null = mean(positive_null),
+          prop_stopped_null = mean(n1_null < N),
+          mean_n1_alt = mean(n1_alt),
+          prop_pos_alt = mean(positive_alt),
+          prop_stopped_alt = mean(n1_alt < N)
           )
         )
   }

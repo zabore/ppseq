@@ -6,7 +6,8 @@
 probability threshold with interim futility monitoring}
 \usage{
 calibrate_pp_ppp_threshold(
-  prob,
+  prob_null,
+  prob_alt,
   n,
   direction = "greater",
   p0 = NULL,
@@ -20,8 +21,14 @@ calibrate_pp_ppp_threshold(
 )
 }
 \arguments{
-\item{prob}{vector of length two containing the probability of event in
-the standard of care and experimental arm c(p0, p1) for the two-sample case;
+\item{prob_null}{vector of length two containing the probability of event in
+the standard of care and experimental arm c(p0, p1) for the two-sample case
+for the null scenario;
+integer of event probability for one-sample case}
+
+\item{prob_alt}{vector of length two containing the probability of event in
+the standard of care and experimental arm c(p0, p1) for the two-sample case
+for the alternative scenario;
 integer of event probability for one-sample case}
 
 \item{n}{matrix containing the total number of patients accrued so far at
@@ -83,9 +90,10 @@ set.seed(123)
 
 # One-sample case
 \dontrun{
-calibrate_pp_ppp_threshold(prob = 0.1, n = seq(5, 25, 5),
-direction = "greater", p0 = 0.1, delta = NULL, prior = c(0.5, 0.5),
-S = 5000, N = 25, nsim = 1000, pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+calibrate_pp_ppp_threshold(prob_null = 0.1, prob_alt = 0.3, 
+n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL, 
+prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000, 
+pp_threshold = c(0.9, 0.95, 0.96, 0.98), 
 ppp_threshold = seq(0.05, 0.2, 0.05))
 }
 
