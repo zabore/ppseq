@@ -243,8 +243,7 @@ calibrate_pp_ppp_threshold <- function(prob_null, prob_alt, n,
                                        delta = 0, prior = c(0.5, 0.5), 
                                        S = 5000, N, nsim = 1000,
                                        pp_threshold, ppp_threshold) {
-  future::plan("future::multisession")
-  
+
   sim_dat_null <- 
     purrr::map(1:nsim, ~sim_dat1(prob = prob_null, n = n))
   

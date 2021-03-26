@@ -135,7 +135,7 @@ And we see that a threshold of 0.853 results in a type I error rate of 0.0990, j
 
 However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The `calibrate_pp_ppp_threshold()` function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.
 
-Let's consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1, and the alternative scenario where the observed response probability is 0.3. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the `future` and `furrr` packages, it still takes some time to run. On my personal computer this setting took just under 12 hours to run. As a result, we do not evaluate the below code in real time, but rather have saved the result and loaded it below.
+Let's consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1, and the alternative scenario where the observed response probability is 0.3. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the `future` and `furrr` packages, it still takes some time to run. 
 
 ```{r eval = FALSE}
 set.seed(123)
