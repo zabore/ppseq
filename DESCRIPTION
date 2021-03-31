@@ -33,4 +33,6 @@ Imports:
     future,
     furrr,
     here,
-    gt
+    gt,
+    ggplot2,
+    plotly

@@ -135,96 +135,80 @@ And we see that a threshold of 0.853 results in a type I error rate of 0.0990, j
 
 However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The `calibrate_pp_ppp_threshold()` function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.
 
-Let's consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1, and the alternative scenario where the observed response probability is 0.3. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the `future` and `furrr` packages, it still takes some time to run. 
+Let's consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1, and the alternative scenario where the observed response probability is 0.3. We generate 1000 simulated datasets. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment prior to running the function. I used the following code on a Unix server with 192 cores.
 
 ```{r eval = FALSE}
 set.seed(123)
 
-library(tictoc)
-tic()
+no_cores <- min(parallelly::availableCores() - 1, 90)
+future::plan(future::multicore(workers = no_cores))
+
 cal_tbl <- 
   calibrate_pp_ppp_threshold(prob_null = 0.1, prob_alt = 0.3, n = seq(5, 25, 5),
                              direction = "greater", p0 = 0.1,
                              delta = NULL, prior = c(0.5, 0.5),
                              S = 5000, N = 25, nsim = 1000,
-                             pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+                             pp_threshold = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 
+                                              0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 
+                                              0.97, 0.98, 0.99, 0.999, 0.9999, 
+                                              0.99999, 1),
                              ppp_threshold = seq(0.05, 0.2, 0.05))
-toc()
-```
-
-```{r eval = FALSE, echo = FALSE}
-save(cal_tbl, file = here::here("vignettes", "cal_tbl.rda"))
 ```
 
 ```{r echo = FALSE}
-load(here::here("vignettes", "cal_tbl.rda"))
+load("H:/ppseq_server/cal_tbl.rda")
 
-gt::gt(cal_tbl)
+gt::gt(cal_tbl[cal_tbl$prop_pos_null >= 0.05 & cal_tbl$prop_pos_null <= 0.1, ])
 ```
 
-In this table we have considered 4 different posterior probability thresholds, and 4 different predictive probability thresholds. The column labeled `prop_pos_null` represents the type I error rate and the column labeled `prop_pos_alt` represents the power. We see that the type I error rate is below 10\% for all combinations of posterior and predictive probability threshold that we have examined. In practice, we would likely want to evaluate a broader range of posterior probabilities in order to be able to target a more specific type I error rate. In this case if interest was in controlling the type I error at 10\%, we would select a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, which both control the type I error at 8\%. The average sample size of trials under these conditions is 17, and 72\% of trials stopped early for futility. We see that if we select a similar combination of thresholds as in the null scenario, a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, we will have power of 89\% to detect a difference. The average sample size of trials under these conditions is 24.3, suggesting that most trials accrue to the maximum sample size of 25, and we see that only 6.4\% of trials stopped early for futility.
+In this table we have considered 19 different posterior probability thresholds, and 4 different predictive probability thresholds, but here we only print the results that produced an acceptable type I error between 0.05 and 0.1. The column labeled `prop_pos_null` represents the type I error rate and the column labeled `prop_pos_alt` represents the power. We see that within our acceptable range of type I error, we get results with power ranging from 0.761 to 0.893. These are all fairly reasonable values of power to achieve in a type I trial.     
 
-
-
-
-```{r}
-knitr::knit_exit()
-```
-
-
-```{r echo = FALSE}
-load(here::here("vignettes", "type1_tbl.rda"))
-
-gt::gt(dplyr::ungroup(type1_tbl))
-```
-
-
-```{r echo = FALSE}
-load(here::here("vignettes", "power_tbl.rda"))
-
-gt::gt(dplyr::ungroup(power_tbl))
-```
-
-```{r}
-library(tidyverse)
+```{r fig.width = 8, fig.height = 8}
+library(dplyr)
 library(ggplot2)
 library(plotly)
 
 plot_tbl <- 
-  type1_tbl %>% 
-  rename(mean_n1_null = mean_n1,
-         prop_pos_null = prop_pos,
-         prop_stopped_null = prop_stopped) %>% 
-  full_join(
-    power_tbl %>% 
-      rename(mean_n1_alt = mean_n1,
-             prop_pos_alt = prop_pos,
-             prop_stopped_alt = prop_stopped)
-  ) %>% 
+  cal_tbl %>% 
+  filter(prop_pos_null >= 0.05 & prop_pos_null <= 0.1) %>% 
   mutate(
-    TPR = 1 - prop_stopped_alt,
-    FPR = 1 - prop_stopped_null
+    youden = prop_pos_alt + prop_stopped_null - 1
   )
 
-plot_tbl %>% select(pp_threshold, ppp_threshold, TPR, FPR)
-  
-# Euclidean distance function
-dist <- function(p1, p2, q1, q2) {
-  sqrt((q1 - p1)^2 + (q2 - p2)^2)
-}
+plot_tbl %>% select(pp_threshold, ppp_threshold, prop_stopped_null, prop_pos_alt, youden)
 
-dist(.277, 0.936, 0, 1)
-dist(.277, 0.936, 1, 0)
-dist(.277, 0.936, 0, 0)
-```
+# Option 1: maximize specificity
+print(plot_tbl[which.max(plot_tbl$prop_stopped_null), ], width = Inf)
 
-```{r}
-ggplot(plot_tbl, aes(x = FPR, y = TPR)) + 
+# Option 2: maximize sensitivity
+print(plot_tbl[which.max(plot_tbl$prop_pos_alt), ], width = Inf)
+
+# Option 3: maximize Youden's index
+print(plot_tbl[which.max(plot_tbl$youden), ], width = Inf)
+
+# Note that in this setting maximizing sensitivity and maximizing Youden's index gives the same result
+
+plot_tbl_dat <- 
+  plot_tbl %>% 
+  mutate(
+    `Maximum Youden` = ifelse(youden == max(youden), TRUE, FALSE)
+    ) %>% 
+  rename(Specificity = prop_stopped_null, Sensitivity = prop_pos_alt)
+
+p <- ggplot(plot_tbl_dat, aes(x = Specificity, y = Sensitivity, 
+                              color = `Maximum Youden`)) + 
   geom_point() + 
-  geom_line() +
-  xlim(0, 1) + 
-  ylim(0, 1)
+  scale_x_reverse(limits = c(1, 0)) +
+  ylim(0, 1) + 
+  labs(
+    x = "Proportion stopped under the null (Specificity)",
+    y = "Proportion positive under alternative (Sensitiivity)"
+  ) 
+
+ggplotly(p)
 ```
+
+
 
 
 

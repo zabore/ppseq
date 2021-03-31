@@ -246,7 +246,19 @@ p <span class='op'>=</span> <span class='fl'>0.1</span>, delta <span class='op'>
 <span class='fu'>sim_single_trial</span><span class='op'>(</span>prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.3</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>50</span>, <span class='fl'>5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>50</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>, 
 direction <span class='op'>=</span> <span class='st'>"greater"</span>, p0 <span class='op'>=</span> <span class='cn'>NULL</span>, delta <span class='op'>=</span> <span class='fl'>0</span>, prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>,<span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>,
 N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>50</span>, <span class='fl'>50</span><span class='op'>)</span>, theta <span class='op'>=</span> <span class='fl'>0.95</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in eval_tidy(xs[[j]], mask): object 'pp_threshold' not found</span></div><div class='input'>
+</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 10 x 7</span><span>
+#&gt;    pp_threshold    y0    y1    n0    n1    pp   ppp
+#&gt;           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>         0.95     0     2     5     5 0.945 0.862
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>         0.95     0     5    10    10 0.998 0.989
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>         0.95     2     5    15    15 0.896 0.691
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>         0.95     2     8    20    20 0.988 0.937
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>         0.95     2     9    25    25 0.991 0.963
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>         0.95     4    10    30    30 0.966 0.819
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>         0.95     5    12    35    35 0.974 0.855
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>         0.95     5    15    40    40 0.996 0.992
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>         0.95     5    15    45    45 0.995 0.999
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span>         0.95     5    18    50    50 0.999 1    </div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

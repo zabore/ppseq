@@ -78,13 +78,15 @@
 
       
 
-      </header><script src="one_sample_expansion_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="one_sample_expansion_files/accessible-code-block-0.0.1/empty-anchor.js"></script><script src="one_sample_expansion_files/htmlwidgets-1.5.3/htmlwidgets.js"></script><script src="one_sample_expansion_files/plotly-binding-4.9.3/plotly.js"></script><script src="one_sample_expansion_files/typedarray-0.1/typedarray.min.js"></script><script src="one_sample_expansion_files/jquery-3.5.1/jquery.min.js"></script><link href="one_sample_expansion_files/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet">
+<script src="one_sample_expansion_files/crosstalk-1.1.1/js/crosstalk.min.js"></script><link href="one_sample_expansion_files/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="one_sample_expansion_files/plotly-main-1.57.1/plotly-latest.min.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>One-sample expansion cohort</h1>
                         <h4 class="author">Emily C. Zabor</h4>
             
-            <h4 class="date">Last updated: 2021-03-23</h4>
+            <h4 class="date">Last updated: 2021-03-31</h4>
       
       
       <div class="hidden name"><code>one_sample_expansion.Rmd</code></div>
@@ -993,8 +995,6 @@
   <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">25</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
                                 p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
                                 S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="va">post_tbl</span><span class="op">)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -1416,7 +1416,7 @@
 </tbody>
 </table></div>
 <p>The resulting table contains the posterior probability threshold in the column <code>pp_threshold</code> and the proportion of positive trials in the column <code>prop_pos</code>. The proportion of positive trials will be the type I error in a null setting and the power in an alternative setting. In this case, we see that if we are targeting a type I error of 0.1, this falls between a threshold of 0.82 and 0.86. We can further refine our target thresholds and recalculate.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
 <span class="va">thresholds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.001</span><span class="op">)</span>
@@ -1425,9 +1425,6 @@
   <span class="fu"><a href="../reference/calibrate_posterior_threshold.html">calibrate_posterior_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, N <span class="op">=</span> <span class="fl">25</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, 
                                 p0 <span class="op">=</span> <span class="fl">0.1</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>,<span class="fl">0.5</span><span class="op">)</span>, 
                                 S <span class="op">=</span> <span class="fl">5000</span>, theta <span class="op">=</span> <span class="va">thresholds</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gt/man/gt.html">gt</a></span><span class="op">(</span><span class="va">post_tbl</span><span class="op">[</span><span class="va">post_tbl</span><span class="op">$</span><span class="va">pp_threshold</span> <span class="op">&lt;=</span> <span class="fl">0.855</span> <span class="op">&amp;</span> 
-                  <span class="va">post_tbl</span><span class="op">$</span><span class="va">pp_threshold</span> <span class="op">&gt;=</span> <span class="fl">0.850</span>, <span class="op">]</span><span class="op">)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
@@ -1802,16 +1799,22 @@
 <h3 class="hasAnchor">
 <a href="#simulataneously-calibrating-posterior-and-predictive-probabilities" class="anchor"></a>Simulataneously calibrating posterior and predictive probabilities</h3>
 <p>However, what we really want in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The <code><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold()</a></code> function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, thus accomplishing goals 1 through 3 above.</p>
-<p>Let’s consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1. We generate 1000 simulated datasets. Note that while this function does operate in parallel using functions from the <code>future</code> and <code>furrr</code> packages, it is still quite time consuming. On my personal computer this setting took just under 4 hours to run. As a result, we do not evaluate the below code in real time, but rather have saved the result and loaded it below.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p>Let’s consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1, and the alternative scenario where the observed response probability is 0.3. We generate 1000 simulated datasets. This function is written using the <code>future</code> and <code>furrr</code> packages, but the user will have to set up a call to <code><a href="https://rdrr.io/pkg/future/man/plan.html">future::plan</a></code> that is appropriate for their operating environment prior to running the function. I used the following code on a Unix server with 192 cores.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
-<span class="va">type1_tbl</span> <span class="op">&lt;-</span> 
-  <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.1</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
+<span class="va">no_cores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html">availableCores</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span>, <span class="fl">90</span><span class="op">)</span>
+<span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/future/man/plan.html">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/future/man/multicore.html">multicore</a></span><span class="op">(</span>workers <span class="op">=</span> <span class="va">no_cores</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">cal_tbl</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob_null <span class="op">=</span> <span class="fl">0.1</span>, prob_alt <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
                              direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
                              delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
                              S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
-                             pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
+                             pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.7</span>, <span class="fl">0.74</span>, <span class="fl">0.78</span>, <span class="fl">0.82</span>, <span class="fl">0.86</span>, 
+                                              <span class="fl">0.9</span>, <span class="fl">0.92</span>, <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, 
+                                              <span class="fl">0.97</span>, <span class="fl">0.98</span>, <span class="fl">0.99</span>, <span class="fl">0.999</span>, <span class="fl">0.9999</span>, 
+                                              <span class="fl">0.99999</span>, <span class="fl">1</span><span class="op">)</span>,
                              ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -2153,17 +2156,63 @@
 <thead class="gt_col_headings"><tr>
 <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">ppp_threshold</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">mean_n1</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_stopped</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">mean_n1_null</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos_null</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_stopped_null</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">mean_n1_alt</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos_alt</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_stopped_alt</th>
     </tr></thead>
 <tbody class="gt_table_body">
+<tr>
+<td class="gt_row gt_right">0.86</td>
+      <td class="gt_row gt_right">0.05</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.86</td>
+      <td class="gt_row gt_right">0.10</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.86</td>
+      <td class="gt_row gt_right">0.15</td>
+      <td class="gt_row gt_right">11.780</td>
+      <td class="gt_row gt_right">0.069</td>
+      <td class="gt_row gt_right">0.791</td>
+      <td class="gt_row gt_right">21.505</td>
+      <td class="gt_row gt_right">0.784</td>
+      <td class="gt_row gt_right">0.185</td>
+    </tr>
+<tr>
+<td class="gt_row gt_right">0.86</td>
+      <td class="gt_row gt_right">0.20</td>
+      <td class="gt_row gt_right">11.245</td>
+      <td class="gt_row gt_right">0.065</td>
+      <td class="gt_row gt_right">0.810</td>
+      <td class="gt_row gt_right">21.350</td>
+      <td class="gt_row gt_right">0.777</td>
+      <td class="gt_row gt_right">0.196</td>
+    </tr>
 <tr>
 <td class="gt_row gt_right">0.90</td>
       <td class="gt_row gt_right">0.05</td>
       <td class="gt_row gt_right">16.785</td>
       <td class="gt_row gt_right">0.080</td>
       <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
     </tr>
 <tr>
 <td class="gt_row gt_right">0.90</td>
@@ -2171,6 +2220,9 @@
       <td class="gt_row gt_right">16.785</td>
       <td class="gt_row gt_right">0.080</td>
       <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
     </tr>
 <tr>
 <td class="gt_row gt_right">0.90</td>
@@ -2178,571 +2230,207 @@
       <td class="gt_row gt_right">11.780</td>
       <td class="gt_row gt_right">0.069</td>
       <td class="gt_row gt_right">0.791</td>
+      <td class="gt_row gt_right">21.505</td>
+      <td class="gt_row gt_right">0.784</td>
+      <td class="gt_row gt_right">0.185</td>
     </tr>
 <tr>
 <td class="gt_row gt_right">0.90</td>
       <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">11.215</td>
-      <td class="gt_row gt_right">0.061</td>
-      <td class="gt_row gt_right">0.812</td>
+      <td class="gt_row gt_right">11.190</td>
+      <td class="gt_row gt_right">0.065</td>
+      <td class="gt_row gt_right">0.815</td>
+      <td class="gt_row gt_right">21.245</td>
+      <td class="gt_row gt_right">0.771</td>
+      <td class="gt_row gt_right">0.202</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.92</td>
       <td class="gt_row gt_right">0.05</td>
-      <td class="gt_row gt_right">16.640</td>
-      <td class="gt_row gt_right">0.023</td>
-      <td class="gt_row gt_right">0.752</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.92</td>
       <td class="gt_row gt_right">0.10</td>
-      <td class="gt_row gt_right">10.965</td>
-      <td class="gt_row gt_right">0.020</td>
-      <td class="gt_row gt_right">0.896</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.92</td>
       <td class="gt_row gt_right">0.15</td>
-      <td class="gt_row gt_right">9.225</td>
-      <td class="gt_row gt_right">0.017</td>
-      <td class="gt_row gt_right">0.915</td>
+      <td class="gt_row gt_right">11.780</td>
+      <td class="gt_row gt_right">0.069</td>
+      <td class="gt_row gt_right">0.791</td>
+      <td class="gt_row gt_right">21.505</td>
+      <td class="gt_row gt_right">0.784</td>
+      <td class="gt_row gt_right">0.185</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.92</td>
       <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">9.225</td>
-      <td class="gt_row gt_right">0.017</td>
-      <td class="gt_row gt_right">0.915</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.96</td>
-      <td class="gt_row gt_right">0.05</td>
-      <td class="gt_row gt_right">16.640</td>
-      <td class="gt_row gt_right">0.022</td>
-      <td class="gt_row gt_right">0.752</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.96</td>
-      <td class="gt_row gt_right">0.10</td>
-      <td class="gt_row gt_right">10.880</td>
-      <td class="gt_row gt_right">0.020</td>
-      <td class="gt_row gt_right">0.896</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.96</td>
-      <td class="gt_row gt_right">0.15</td>
-      <td class="gt_row gt_right">9.225</td>
-      <td class="gt_row gt_right">0.017</td>
-      <td class="gt_row gt_right">0.915</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.96</td>
-      <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">9.225</td>
-      <td class="gt_row gt_right">0.017</td>
-      <td class="gt_row gt_right">0.915</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.05</td>
-      <td class="gt_row gt_right">16.060</td>
-      <td class="gt_row gt_right">0.006</td>
-      <td class="gt_row gt_right">0.868</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.10</td>
-      <td class="gt_row gt_right">10.410</td>
-      <td class="gt_row gt_right">0.006</td>
-      <td class="gt_row gt_right">0.905</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.15</td>
-      <td class="gt_row gt_right">9.225</td>
-      <td class="gt_row gt_right">0.006</td>
-      <td class="gt_row gt_right">0.915</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">9.225</td>
-      <td class="gt_row gt_right">0.006</td>
-      <td class="gt_row gt_right">0.915</td>
-    </tr>
-</tbody>
-</table></div>
-<p>In this table we have considered 4 different posterior probability thresholds, and 4 different predictive probability thresholds. Since this is a null scenario, the column labeled <code>prop_pos</code>, which returns the proportion of simulated trials that resulted in a positive outcome, represents the type I error rate. We see that the type I error rate is below 10% for all combinations of posterior and predictive probability threshold that we have examined. In practice, we would likely want to evaluate a broader range of posterior probabilities in order to be able to target a more specific type I error rate. In this case if interest was in controlling the type I error at 10%, we would select a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, which both control the type I error at 8%. The average sample size of trials under these conditions is 17, and 72% of trials stopped early for futility.</p>
-<p>Most of the time we will want to consider power in addition to type I error when designing a clinical trial with an expansion cohort. To do so, we run the exact same simulation as before only under the alternative scenario rather than the null scenario, where the target response probability is 0.1 and the observed response probability is 0.3. This setting took just over 6.5 hours to run on my computer, longer than the null setting since fewer trials stop in the alternative case and so more computations are needed.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">456</span><span class="op">)</span>
-
-<span class="va">power_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_pp_ppp_threshold.html">calibrate_pp_ppp_threshold</a></span><span class="op">(</span>prob <span class="op">=</span> <span class="fl">0.3</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>,
-                                        direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>,
-                                        delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
-                                        S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">25</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
-                                        pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.98</span><span class="op">)</span>,
-                                        ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-}
-
-#mrfuzwexpm .gt_table {
-  display: table;
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#mrfuzwexpm .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 4px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#mrfuzwexpm .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#mrfuzwexpm .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#mrfuzwexpm .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#mrfuzwexpm .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#mrfuzwexpm .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#mrfuzwexpm .gt_group_heading {
-  padding: 8px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#mrfuzwexpm .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#mrfuzwexpm .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#mrfuzwexpm .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#mrfuzwexpm .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#mrfuzwexpm .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 12px;
-}
-
-#mrfuzwexpm .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#mrfuzwexpm .gt_first_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#mrfuzwexpm .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#mrfuzwexpm .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding: 4px;
-}
-
-#mrfuzwexpm .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#mrfuzwexpm .gt_sourcenote {
-  font-size: 90%;
-  padding: 4px;
-}
-
-#mrfuzwexpm .gt_left {
-  text-align: left;
-}
-
-#mrfuzwexpm .gt_center {
-  text-align: center;
-}
-
-#mrfuzwexpm .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#mrfuzwexpm .gt_font_normal {
-  font-weight: normal;
-}
-
-#mrfuzwexpm .gt_font_bold {
-  font-weight: bold;
-}
-
-#mrfuzwexpm .gt_font_italic {
-  font-style: italic;
-}
-
-#mrfuzwexpm .gt_super {
-  font-size: 65%;
-}
-
-#mrfuzwexpm .gt_footnote_marks {
-  font-style: italic;
-  font-size: 65%;
-}
-</style>
-<div id="mrfuzwexpm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="table gt_table">
-<thead class="gt_col_headings"><tr>
-<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">pp_threshold</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">ppp_threshold</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">mean_n1</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_pos</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">prop_stopped</th>
-    </tr></thead>
-<tbody class="gt_table_body">
-<tr>
-<td class="gt_row gt_right">0.90</td>
-      <td class="gt_row gt_right">0.05</td>
-      <td class="gt_row gt_right">24.290</td>
-      <td class="gt_row gt_right">0.891</td>
-      <td class="gt_row gt_right">0.064</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.90</td>
-      <td class="gt_row gt_right">0.10</td>
-      <td class="gt_row gt_right">24.290</td>
-      <td class="gt_row gt_right">0.891</td>
-      <td class="gt_row gt_right">0.064</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.90</td>
-      <td class="gt_row gt_right">0.15</td>
-      <td class="gt_row gt_right">21.660</td>
-      <td class="gt_row gt_right">0.789</td>
-      <td class="gt_row gt_right">0.181</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.90</td>
-      <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">21.410</td>
-      <td class="gt_row gt_right">0.776</td>
+      <td class="gt_row gt_right">11.200</td>
+      <td class="gt_row gt_right">0.065</td>
+      <td class="gt_row gt_right">0.809</td>
+      <td class="gt_row gt_right">21.280</td>
+      <td class="gt_row gt_right">0.772</td>
       <td class="gt_row gt_right">0.198</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.93</td>
       <td class="gt_row gt_right">0.05</td>
-      <td class="gt_row gt_right">24.255</td>
-      <td class="gt_row gt_right">0.793</td>
-      <td class="gt_row gt_right">0.071</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.93</td>
       <td class="gt_row gt_right">0.10</td>
-      <td class="gt_row gt_right">21.325</td>
-      <td class="gt_row gt_right">0.699</td>
-      <td class="gt_row gt_right">0.227</td>
+      <td class="gt_row gt_right">16.785</td>
+      <td class="gt_row gt_right">0.080</td>
+      <td class="gt_row gt_right">0.723</td>
+      <td class="gt_row gt_right">24.345</td>
+      <td class="gt_row gt_right">0.893</td>
+      <td class="gt_row gt_right">0.057</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.95</td>
+<td class="gt_row gt_right">0.93</td>
       <td class="gt_row gt_right">0.15</td>
-      <td class="gt_row gt_right">20.520</td>
-      <td class="gt_row gt_right">0.673</td>
-      <td class="gt_row gt_right">0.269</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.95</td>
-      <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">20.520</td>
-      <td class="gt_row gt_right">0.673</td>
-      <td class="gt_row gt_right">0.269</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.96</td>
-      <td class="gt_row gt_right">0.05</td>
-      <td class="gt_row gt_right">24.220</td>
+      <td class="gt_row gt_right">11.780</td>
+      <td class="gt_row gt_right">0.069</td>
       <td class="gt_row gt_right">0.791</td>
-      <td class="gt_row gt_right">0.078</td>
+      <td class="gt_row gt_right">21.505</td>
+      <td class="gt_row gt_right">0.784</td>
+      <td class="gt_row gt_right">0.185</td>
     </tr>
 <tr>
-<td class="gt_row gt_right">0.96</td>
-      <td class="gt_row gt_right">0.10</td>
-      <td class="gt_row gt_right">21.350</td>
-      <td class="gt_row gt_right">0.699</td>
-      <td class="gt_row gt_right">0.224</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.96</td>
-      <td class="gt_row gt_right">0.15</td>
-      <td class="gt_row gt_right">20.520</td>
-      <td class="gt_row gt_right">0.673</td>
-      <td class="gt_row gt_right">0.269</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.96</td>
+<td class="gt_row gt_right">0.93</td>
       <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">20.520</td>
-      <td class="gt_row gt_right">0.673</td>
-      <td class="gt_row gt_right">0.269</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.05</td>
-      <td class="gt_row gt_right">24.035</td>
-      <td class="gt_row gt_right">0.656</td>
-      <td class="gt_row gt_right">0.115</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.10</td>
-      <td class="gt_row gt_right">21.075</td>
-      <td class="gt_row gt_right">0.594</td>
-      <td class="gt_row gt_right">0.243</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.15</td>
-      <td class="gt_row gt_right">20.520</td>
-      <td class="gt_row gt_right">0.586</td>
-      <td class="gt_row gt_right">0.269</td>
-    </tr>
-<tr>
-<td class="gt_row gt_right">0.98</td>
-      <td class="gt_row gt_right">0.20</td>
-      <td class="gt_row gt_right">20.520</td>
-      <td class="gt_row gt_right">0.586</td>
-      <td class="gt_row gt_right">0.269</td>
+      <td class="gt_row gt_right">11.130</td>
+      <td class="gt_row gt_right">0.063</td>
+      <td class="gt_row gt_right">0.814</td>
+      <td class="gt_row gt_right">21.125</td>
+      <td class="gt_row gt_right">0.761</td>
+      <td class="gt_row gt_right">0.212</td>
     </tr>
 </tbody>
 </table></div>
-<p>In this table we have considered the same 4 posterior probability thresholds and 4 predictive probability thresholds. Since this is an alternative scenario, the column labeled <code>prop_pos</code>, which returns the proportion of simulated trials that resulted in a positive outcome, represents the power. We see that the power ranges from just under 0.6 to just under 0.9 depending on the combination of thresholds. We see that if we select a similar combination of thresholds as in the null scenario, a posterior probability threshold of 0.9 and a predictive probability threshold of either 0.05 or 0.1, we will have power of 89% to detect a difference. The average sample size of trials under these conditions is 24.3, suggesting that most trials accrue to the maximum sample size of 25, and we see that only 6.4% of trials stopped early for futility.</p>
+<p>In this table we have considered 19 different posterior probability thresholds, and 4 different predictive probability thresholds, but here we only print the results that produced an acceptable type I error between 0.05 and 0.1. The column labeled <code>prop_pos_null</code> represents the type I error rate and the column labeled <code>prop_pos_alt</code> represents the power. We see that within our acceptable range of type I error, we get results with power ranging from 0.761 to 0.893. These are all fairly reasonable values of power to achieve in a type I trial.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="co">#&gt; -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</span>
+<span class="co">#&gt; v ggplot2 3.3.3     v purrr   0.3.4</span>
+<span class="co">#&gt; v tibble  3.0.6     v dplyr   1.0.4</span>
+<span class="co">#&gt; v tidyr   1.1.2     v stringr 1.4.0</span>
+<span class="co">#&gt; v readr   1.4.0     v forcats 0.5.1</span>
+<span class="co">#&gt; -- Conflicts ------------------------------------------ tidyverse_conflicts() --</span>
+<span class="co">#&gt; x dplyr::filter() masks stats::filter()</span>
+<span class="co">#&gt; x dplyr::lag()    masks stats::lag()</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://plotly-r.com">plotly</a></span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'plotly'</span>
+<span class="co">#&gt; The following object is masked from 'package:ggplot2':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     last_plot</span>
+<span class="co">#&gt; The following object is masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     filter</span>
+<span class="co">#&gt; The following object is masked from 'package:graphics':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     layout</span>
+
+<span class="va">plot_tbl</span> <span class="op">&lt;-</span> 
+  <span class="va">cal_tbl</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">prop_pos_null</span> <span class="op">&gt;=</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">prop_pos_null</span> <span class="op">&lt;=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
+    youden <span class="op">=</span> <span class="va">prop_pos_alt</span> <span class="op">+</span> <span class="va">prop_stopped_null</span> <span class="op">-</span> <span class="fl">1</span>
+  <span class="op">)</span>
+
+<span class="va">plot_tbl</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">pp_threshold</span>, <span class="va">ppp_threshold</span>, <span class="va">prop_stopped_null</span>, <span class="va">prop_pos_alt</span>, <span class="va">youden</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 16 x 5</span>
+<span class="co">#&gt;    pp_threshold ppp_threshold prop_stopped_null prop_pos_alt youden</span>
+<span class="co">#&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;        &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt;  1         0.86          0.05             0.723        0.893  0.616</span>
+<span class="co">#&gt;  2         0.86          0.1              0.723        0.893  0.616</span>
+<span class="co">#&gt;  3         0.86          0.15             0.791        0.784  0.575</span>
+<span class="co">#&gt;  4         0.86          0.2              0.81         0.777  0.587</span>
+<span class="co">#&gt;  5         0.9           0.05             0.723        0.893  0.616</span>
+<span class="co">#&gt;  6         0.9           0.1              0.723        0.893  0.616</span>
+<span class="co">#&gt;  7         0.9           0.15             0.791        0.784  0.575</span>
+<span class="co">#&gt;  8         0.9           0.2              0.815        0.771  0.586</span>
+<span class="co">#&gt;  9         0.92          0.05             0.723        0.893  0.616</span>
+<span class="co">#&gt; 10         0.92          0.1              0.723        0.893  0.616</span>
+<span class="co">#&gt; 11         0.92          0.15             0.791        0.784  0.575</span>
+<span class="co">#&gt; 12         0.92          0.2              0.809        0.772  0.581</span>
+<span class="co">#&gt; 13         0.93          0.05             0.723        0.893  0.616</span>
+<span class="co">#&gt; 14         0.93          0.1              0.723        0.893  0.616</span>
+<span class="co">#&gt; 15         0.93          0.15             0.791        0.784  0.575</span>
+<span class="co">#&gt; 16         0.93          0.2              0.814        0.761  0.575</span>
+
+<span class="co"># Option 1: maximize specificity</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">plot_tbl</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html">which.max</a></span><span class="op">(</span><span class="va">plot_tbl</span><span class="op">$</span><span class="va">prop_stopped_null</span><span class="op">)</span>, <span class="op">]</span>, width <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 9</span>
+<span class="co">#&gt;   pp_threshold ppp_threshold mean_n1_null prop_pos_null prop_stopped_null</span>
+<span class="co">#&gt;          &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;</span>
+<span class="co">#&gt; 1          0.9           0.2         11.2         0.065             0.815</span>
+<span class="co">#&gt;   mean_n1_alt prop_pos_alt prop_stopped_alt youden</span>
+<span class="co">#&gt;         &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1        21.2        0.771            0.202  0.586</span>
+
+<span class="co"># Option 2: maximize sensitivity</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">plot_tbl</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html">which.max</a></span><span class="op">(</span><span class="va">plot_tbl</span><span class="op">$</span><span class="va">prop_pos_alt</span><span class="op">)</span>, <span class="op">]</span>, width <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 9</span>
+<span class="co">#&gt;   pp_threshold ppp_threshold mean_n1_null prop_pos_null prop_stopped_null</span>
+<span class="co">#&gt;          &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;</span>
+<span class="co">#&gt; 1         0.86          0.05         16.8          0.08             0.723</span>
+<span class="co">#&gt;   mean_n1_alt prop_pos_alt prop_stopped_alt youden</span>
+<span class="co">#&gt;         &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1        24.3        0.893            0.057  0.616</span>
+
+<span class="co"># Option 3: maximize Youden's index</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">plot_tbl</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html">which.max</a></span><span class="op">(</span><span class="va">plot_tbl</span><span class="op">$</span><span class="va">youden</span><span class="op">)</span>, <span class="op">]</span>, width <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 9</span>
+<span class="co">#&gt;   pp_threshold ppp_threshold mean_n1_null prop_pos_null prop_stopped_null</span>
+<span class="co">#&gt;          &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;</span>
+<span class="co">#&gt; 1         0.86          0.05         16.8          0.08             0.723</span>
+<span class="co">#&gt;   mean_n1_alt prop_pos_alt prop_stopped_alt youden</span>
+<span class="co">#&gt;         &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1        24.3        0.893            0.057  0.616</span>
+
+<span class="co"># Note that in this setting maximizing sensitivity and maximizing Youden's index gives the same result</span>
+
+<span class="va">plot_tbl_dat</span> <span class="op">&lt;-</span> 
+  <span class="va">plot_tbl</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
+    `Maximum Youden` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">youden</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">youden</span><span class="op">)</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span>
+    <span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>Specificity <span class="op">=</span> <span class="va">prop_stopped_null</span>, Sensitivity <span class="op">=</span> <span class="va">prop_pos_alt</span><span class="op">)</span>
+
+<span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_tbl_dat</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Specificity</span>, y <span class="op">=</span> <span class="va">Sensitivity</span>, 
+                              color <span class="op">=</span> <span class="va">`Maximum Youden`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_reverse</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>
+    x <span class="op">=</span> <span class="st">"Proportion stopped under the null (Specificity)"</span>,
+    y <span class="op">=</span> <span class="st">"Proportion positive under alternative (Sensitiivity)"</span>
+  <span class="op">)</span> 
+
+<span class="fu"><a href="https://docs.ropensci.org/plotly/reference/ggplotly.html">ggplotly</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
+<div id="htmlwidget-8cddf18534b9969d4497" style="width:768px;height:768px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8cddf18534b9969d4497">{"x":{"data":[{"x":[-0.791,-0.81,-0.791,-0.815,-0.791,-0.809,-0.791,-0.814],"y":[0.784,0.777,0.784,0.771,0.784,0.772,0.784,0.761],"text":["Specificity: 0.791<br />Sensitivity: 0.784<br />Maximum Youden: FALSE","Specificity: 0.810<br />Sensitivity: 0.777<br />Maximum Youden: FALSE","Specificity: 0.791<br />Sensitivity: 0.784<br />Maximum Youden: FALSE","Specificity: 0.815<br />Sensitivity: 0.771<br />Maximum Youden: FALSE","Specificity: 0.791<br />Sensitivity: 0.784<br />Maximum Youden: FALSE","Specificity: 0.809<br />Sensitivity: 0.772<br />Maximum Youden: FALSE","Specificity: 0.791<br />Sensitivity: 0.784<br />Maximum Youden: FALSE","Specificity: 0.814<br />Sensitivity: 0.761<br />Maximum Youden: FALSE"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"FALSE","legendgroup":"FALSE","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-0.723,-0.723,-0.723,-0.723,-0.723,-0.723,-0.723,-0.723],"y":[0.893,0.893,0.893,0.893,0.893,0.893,0.893,0.893],"text":"Specificity: 0.723<br />Sensitivity: 0.893<br />Maximum Youden:  TRUE","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"TRUE","legendgroup":"TRUE","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.3059360730594,"r":7.30593607305936,"b":37.2602739726027,"l":48.9497716894977},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1.05,0.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,-0.25,-0.5,-0.75,-1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Proportion stopped under the null (Specificity)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.05,1.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Proportion positive under alternative (Sensitiivity)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.979699803149606},"annotations":[{"text":"Maximum Youden","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"4130197b3e0":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"4130197b3e0","visdat":{"4130197b3e0":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
