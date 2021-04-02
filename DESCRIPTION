@@ -35,4 +35,6 @@ Imports:
     here,
     gt,
     ggplot2,
-    plotly
+    plotly,
+    clinfun,
+    gridExtra

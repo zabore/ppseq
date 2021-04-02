@@ -1,7 +1,7 @@
 #' Simulate a single dataset based on the response probability(ies), the total 
 #' sample size(s), and the interim look schedule(s)
 #' 
-#' @description Helper function for calibrate_pp_ppp() function that 
+#' @description Helper function for calibrate_thresholds() function that 
 #' generates a single dataset of n and response count at each look based on the 
 #' response probability(ies)
 #' 
@@ -32,8 +32,6 @@
 #' # Two-sample case
 #' sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 #' }
-
-
 sim_dat1 <- function(prob, n) {
   if(length(prob) == 2) {
     if(length(n) == 2 & is.matrix(n) == FALSE) {n <- matrix(n, nrow = 1)}
@@ -71,7 +69,7 @@ sim_dat1 <- function(prob, n) {
 #' Evaluate a single dataset for a single pp_threshold and ppp_threshold 
 #' combination
 #' 
-#' @description Helper function for calibrate_pp_ppp() function that evaluates
+#' @description Helper function for calibrate_thresholds() function that evaluates
 #' a single combination of a pp_threshold and a ppp_threshold for a single 
 #' dataset
 #' 
@@ -111,8 +109,6 @@ sim_dat1 <- function(prob, n) {
 #' dat2 <- sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 #' eval_thresh(dat2, 0.95, 0.3, S = 500, N = c(25, 25))
 #' }
-
-
 eval_thresh <- function(data, pp_threshold, ppp_threshold,
                         direction = "greater", p0 = NULL, delta = 0, 
                         prior = c(0.5, 0.5), S = 5000, N) {
@@ -227,7 +223,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' 
 #' # One-sample case
 #' \dontrun{
-#' calibrate_pp_ppp_threshold(prob_null = 0.1, prob_alt = 0.3, 
+#' calibrate_thresholds(prob_null = 0.1, prob_alt = 0.3, 
 #' n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL, 
 #' prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000, 
 #' pp_threshold = c(0.9, 0.95, 0.96, 0.98), 
@@ -238,7 +234,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #'
 #' @export
 
-calibrate_pp_ppp_threshold <- function(prob_null, prob_alt, n,
+calibrate_thresholds <- function(prob_null, prob_alt, n,
                                        direction = "greater", p0 = NULL, 
                                        delta = 0, prior = c(0.5, 0.5), 
                                        S = 5000, N, nsim = 1000,
@@ -346,5 +342,186 @@ calibrate_pp_ppp_threshold <- function(prob_null, prob_alt, n,
           )
         )
   }
-  return(res_summary)
+  
+  # create empty list to return everything
+  x <- list()
+  
+  # add the main results in
+  x$res_summary <- res_summary
+  
+  # will return call, and all object passed to in table1 call
+  # the object func_inputs is a list of every object passed to the function
+  calibrate_thresholds_inputs <- list(prob_null = prob_null, 
+                                      prob_alt = prob_alt, 
+                                      n = n,
+                                      direction = direction, 
+                                      p0 = p0,
+                                      delta = delta, 
+                                      prior = prior, 
+                                      S = S, 
+                                      N = N, 
+                                      nsim = nsim,
+                                      pp_threshold = pp_threshold, 
+                                      ppp_threshold = ppp_threshold)
+  
+  # create other objects to return
+  x$call_list <- list(calibrate_thresholds = match.call())
+  x$inputs <- calibrate_thresholds_inputs
+  
+  # assign a custom class for S3 plotting methods
+  class(x) <- c("calibrate_thresholds", class(x))
+  
+  x
+}
+
+# test <- calibrate_thresholds(prob_null = 0.1, prob_alt = 0.3, 
+#                      n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL, 
+#                      prior = c(0.5, 0.5), S = 500, N = 25, nsim = 10, 
+#                      pp_threshold = c(0.9, 0.95, 0.96, 0.98), 
+#                      ppp_threshold = seq(0.05, 0.2, 0.05))
+
+
+#' Print method for \code{calibrate_thresholds} objects
+#' 
+#' @description By default prints only the res_summary table from an object of 
+#' class 'calibrate_thresholds'
+#' 
+#' @param x an object of class 'calibrate_thresholds', usually returned by the 
+#' \code{calibrate_thresholds} function
+#' 
+#' @return 
+#' Returns a tibble
+#' 
+#' @export
+
+print.calibrate_thresholds <- function(x, ...) {
+  print(x$res_summary)
+}
+
+
+#' Plot method for \code{calibrate_thresholds} objects
+#' 
+#' @param x an object of class 'calibrate_thresholds', usually returned by the 
+#' \code{calibrate_thresholds} function
+#' 
+#' @export
+#' 
+
+plot.calibrate_thresholds <- function(x, 
+                                      type1_range = c(0.05, 0.1), 
+                                      minimum_power = 0.8, ...) {
+  library(ggplot2)
+  library(plotly)
+  
+  plot_x <- 
+    dplyr::mutate(
+    dplyr::filter(x$res_summary, 
+           prop_pos_null >= type1_range[1] & 
+             prop_pos_null <= type1_range[2] &
+             prop_pos_alt >= min_power),
+    `Youden's index` = prop_pos_alt + prop_stopped_null - 1
+    )
+  
+  p1 <- 
+    ggplot2::ggplot(plot_x, ggplot2::aes(x = prop_stopped_null, 
+                                         y = prop_pos_alt, 
+                                         color = `Youden's index`)) + 
+    ggplot2::geom_point() + 
+    ggplot2::scale_x_reverse(limits = c(1, 0)) +
+    ggplot2::ylim(0, 1) + 
+    ggplot2::labs(
+      x = "Proportion stopped under the null (Specificity)",
+      y = "Proportion positive under alternative (Sensitiivity)"
+    ) 
+  
+  simon_lower <- clinfun::ph2simon(pu = x$inputs$prob_null, 
+                                   pa = x$inputs$prob_alt, 
+                                   ep1 = type1_range[1], 
+                                   ep2 = 1 - minimum_power)
+  
+  xopt_lower <- simon_lower$out[
+    c(((1:n)[simon_lower$out[, 5] == min(simon_lower$out[, 5])])[1], 1), ]
+  
+  plot_simon_lower <- tibble::add_column(
+    dplyr::rename(
+      tibble::as_tibble(xopt_lower), 
+      mean_n1_null = "EN(p0)", 
+      prop_stopped_null = "PET(p0)"
+    ),
+    prop_pos_null = type1_range[1],
+    design = c(paste0("Simon's optimal \n Type I error = ", type1_range[1]), 
+               paste0("Simon's minimax \n Type I error = ", type1_range[1])))
+  
+  simon_upper <- clinfun::ph2simon(pu = x$inputs$prob_null, 
+                                   pa = x$inputs$prob_alt, 
+                                   ep1 = type1_range[2],
+                                   ep2 = 1 - minimum_power)
+  
+  xopt_upper <- simon_upper$out[
+    c(((1:n)[simon_upper$out[, 5] == min(simon_upper$out[, 5])])[1], 1), ]
+  
+  plot_simon_upper <- tibble::add_column(
+    dplyr::rename(
+      tibble::as_tibble(xopt_upper), 
+      mean_n1_null = "EN(p0)", 
+      prop_stopped_null = "PET(p0)"
+    ),
+    prop_pos_null = type1_range[2],
+    design = c(paste0("Simon's optimal \n Type I error = ", type1_range[2]), 
+               paste0("Simon's minimax \n Type I error = ", type1_range[2])))
+  
+  p2 <- ggplot2::ggplot(plot_x, ggplot2::aes(x = mean_n1_null, 
+                                             y = prop_stopped_null, 
+                                             color = prop_pos_null)) + 
+    ggplot2::geom_point() + 
+    ggplot2::ylim(0, 1) + 
+    ggplot2::labs(
+      x = "Expected N under the null",
+      y = "Probability of early stopping under the null",
+      color = "Type I error"
+    ) +
+    ggplot2::geom_point(data = plot_simon_lower) +
+    ggplot2::geom_text(
+      data = plot_simon_lower,
+      aes(label = design),
+      size = 3
+    ) +
+    ggplot2::geom_point(data = plot_simon_upper) +
+    ggplot2::geom_text(
+      data = plot_simon_upper,
+      aes(label = design),
+      size = 3
+    )
+  
+  gridExtra::grid.arrange(p1, p2, ncol = 2)
+  
+}
+
+
+#' Custom optimization method for \code{calibrate_thresholds} objects
+#' 
+#' @description Determines the optimal designs based on a variety of criteria
+#' 
+#' @param x an object of class 'calibrate_thresholds', usually returned by the 
+#' \code{calibrate_thresholds} function
+#' 
+#' @export
+
+optimize <- function(x) UseMethod("optimize")
+
+optimize.calibrate_thresholds <- function(x) {
+  
+  options(tibble.width = Inf)
+  
+  x$res_summary$youden <- x$res_summary$prop_pos_alt + 
+    x$res_summary$prop_stopped_null - 1
+  
+  list(
+    "The design that maximizes specificity (i.e. the proportion stopped under the null) is:" = 
+      x$res_summary[which.max(x$res_summary$prop_stopped_null), ],
+    "The design that maximizes sensitivity (i.e. the proportion positive under the alternative) is:" = 
+      x$res_summary[which.max(x$res_summary$prop_pos_alt), ],
+    "The design that maximizes Youden's index is:" =
+      x$res_summary[which.max(x$res_summary$youden), ]
+  )
 }

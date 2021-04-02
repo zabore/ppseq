@@ -163,40 +163,32 @@ gt::gt(cal_tbl[cal_tbl$prop_pos_null >= 0.05 & cal_tbl$prop_pos_null <= 0.1, ])
 
 In this table we have considered 19 different posterior probability thresholds, and 4 different predictive probability thresholds, but here we only print the results that produced an acceptable type I error between 0.05 and 0.1. The column labeled `prop_pos_null` represents the type I error rate and the column labeled `prop_pos_alt` represents the power. We see that within our acceptable range of type I error, we get results with power ranging from 0.761 to 0.893. These are all fairly reasonable values of power to achieve in a type I trial.     
 
+
+```{r}
+knitr::knit_exit()
+```
+
+
 ```{r fig.width = 8, fig.height = 8}
 library(dplyr)
 library(ggplot2)
 library(plotly)
 
+lower_type1 <- 0.05
+upper_type1 <- 0.1
+min_power <- 0.75
+
 plot_tbl <- 
   cal_tbl %>% 
-  filter(prop_pos_null >= 0.05 & prop_pos_null <= 0.1) %>% 
+  filter(prop_pos_null >= lower_type1 & 
+           prop_pos_null <= upper_type1 &
+           prop_pos_alt >= min_power) %>% 
   mutate(
-    youden = prop_pos_alt + prop_stopped_null - 1
+    `Youden's index` = prop_pos_alt + prop_stopped_null - 1
   )
 
-plot_tbl %>% select(pp_threshold, ppp_threshold, prop_stopped_null, prop_pos_alt, youden)
-
-# Option 1: maximize specificity
-print(plot_tbl[which.max(plot_tbl$prop_stopped_null), ], width = Inf)
-
-# Option 2: maximize sensitivity
-print(plot_tbl[which.max(plot_tbl$prop_pos_alt), ], width = Inf)
-
-# Option 3: maximize Youden's index
-print(plot_tbl[which.max(plot_tbl$youden), ], width = Inf)
-
-# Note that in this setting maximizing sensitivity and maximizing Youden's index gives the same result
-
-plot_tbl_dat <- 
-  plot_tbl %>% 
-  mutate(
-    `Maximum Youden` = ifelse(youden == max(youden), TRUE, FALSE)
-    ) %>% 
-  rename(Specificity = prop_stopped_null, Sensitivity = prop_pos_alt)
-
-p <- ggplot(plot_tbl_dat, aes(x = Specificity, y = Sensitivity, 
-                              color = `Maximum Youden`)) + 
+p <- ggplot(plot_tbl, aes(x = prop_stopped_null, y = prop_pos_alt, 
+                              color = `Youden's index`)) + 
   geom_point() + 
   scale_x_reverse(limits = c(1, 0)) +
   ylim(0, 1) + 
@@ -206,7 +198,56 @@ p <- ggplot(plot_tbl_dat, aes(x = Specificity, y = Sensitivity,
   ) 
 
 ggplotly(p)
+
+simon_lower <- clinfun::ph2simon(pu = 0.1, pa = 0.3, ep1 = 0.05, ep2 = 0.25)
+simon_upper <- clinfun::ph2simon(pu = 0.1, pa = 0.3, ep1 = 0.1, ep2 = 0.25)
+
+xopt_lower <- simon_lower$out[
+  c(((1:n)[simon_lower$out[, 5]==min(simon_lower$out[,5])])[1], 1), ]
+plot_simon_lower <- tibble::add_column(
+  dplyr::rename(
+    tibble::as_tibble(xopt_lower), mean_n1_null = "EN(p0)", prop_stopped_null = "PET(p0)"
+  ),
+  prop_pos_null = 0.05,
+  design = c("Simon's optimal \n Type I error = 0.05", 
+             "Simon's minimax \n Type I error = 0.05"))
+
+xopt_upper <- simon_upper$out[
+  c(((1:n)[simon_upper$out[, 5]==min(simon_upper$out[,5])])[1], 1), ]
+plot_simon_upper <- tibble::add_column(
+  dplyr::rename(
+    tibble::as_tibble(xopt_upper), mean_n1_null = "EN(p0)", prop_stopped_null = "PET(p0)"
+  ),
+  prop_pos_null = 0.05,
+  design = c("Simon's optimal \n Type I error = 0.1", 
+             "Simon's minimax \n Type I error = 0.1"))
+
+p2 <- ggplot(plot_tbl, aes(x = mean_n1_null, y = prop_stopped_null, 
+                           color = prop_pos_null)) + 
+  geom_point() + 
+  ylim(0, 1) + 
+  labs(
+    x = "Expected N under the null",
+    y = "Probability of early stopping under the null",
+    color = "Type I error"
+  ) +
+  geom_point(data = plot_simon_lower) +
+  geom_text(
+    data = plot_simon_lower,
+    aes(label = design),
+    size = 3
+  ) +
+  geom_point(data = plot_simon_upper) +
+  geom_text(
+    data = plot_simon_upper,
+    aes(label = design),
+    size = 3
+  )
+
+ggplotly(p2)
 ```
+
+
 
 
 
