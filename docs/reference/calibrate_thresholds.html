@@ -6,8 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulate a single dataset based on the response probability(ies), the total
-sample size(s), and the interim look schedule(s) — sim_dat1 • ppseq</title>
+<title>Calibrate according to posterior probability threshold and predictive
+probability threshold with interim futility monitoring — calibrate_thresholds • ppseq</title>
 
 
 <!-- jquery -->
@@ -40,11 +40,15 @@ sample size(s), and the interim look schedule(s) — sim_dat1 • ppseq</title>
 
 
 
-<meta property="og:title" content="Simulate a single dataset based on the response probability(ies), the total
-sample size(s), and the interim look schedule(s) — sim_dat1" />
-<meta property="og:description" content="Helper function for calibrate_thresholds() function that
-generates a single dataset of n and response count at each look based on the
-response probability(ies)" />
+<meta property="og:title" content="Calibrate according to posterior probability threshold and predictive
+probability threshold with interim futility monitoring — calibrate_thresholds" />
+<meta property="og:description" content="This function is meant to be used in the context of a
+clinical trial with a binary endpoint. For a vector of possible posterior
+decision thresholds, the function simulates many trials and then calculates
+the average number of times the posterior probability exceeds a given
+threshold. In a null case, this will result in the type I error at a given
+threshold. In an alternative case, this will result in the power at a given
+threshold." />
 
 
 
@@ -128,27 +132,52 @@ response probability(ies)" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simulate a single dataset based on the response probability(ies), the total
-sample size(s), and the interim look schedule(s)</h1>
+    <h1>Calibrate according to posterior probability threshold and predictive
+probability threshold with interim futility monitoring</h1>
     
-    <div class="hidden name"><code>sim_dat1.Rd</code></div>
+    <div class="hidden name"><code>calibrate_thresholds.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Helper function for calibrate_thresholds() function that
-generates a single dataset of n and response count at each look based on the
-response probability(ies)</p>
+    <p>This function is meant to be used in the context of a
+clinical trial with a binary endpoint. For a vector of possible posterior
+decision thresholds, the function simulates many trials and then calculates
+the average number of times the posterior probability exceeds a given
+threshold. In a null case, this will result in the type I error at a given
+threshold. In an alternative case, this will result in the power at a given
+threshold.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sim_dat1</span><span class='op'>(</span><span class='va'>prob</span>, <span class='va'>n</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>calibrate_thresholds</span><span class='op'>(</span>
+  <span class='va'>prob_null</span>,
+  <span class='va'>prob_alt</span>,
+  <span class='va'>n</span>,
+  direction <span class='op'>=</span> <span class='st'>"greater"</span>,
+  p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
+  delta <span class='op'>=</span> <span class='fl'>0</span>,
+  prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
+  S <span class='op'>=</span> <span class='fl'>5000</span>,
+  <span class='va'>N</span>,
+  nsim <span class='op'>=</span> <span class='fl'>1000</span>,
+  <span class='va'>pp_threshold</span>,
+  <span class='va'>ppp_threshold</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>prob</th>
+      <th>prob_null</th>
       <td><p>vector of length two containing the probability of event in
-the standard of care and experimental arm c(p0, p1) for the two-sample case;
+the standard of care and experimental arm c(p0, p1) for the two-sample case
+for the null scenario;
+integer of event probability for one-sample case</p></td>
+    </tr>
+    <tr>
+      <th>prob_alt</th>
+      <td><p>vector of length two containing the probability of event in
+the standard of care and experimental arm c(p0, p1) for the two-sample case
+for the alternative scenario;
 integer of event probability for one-sample case</p></td>
     </tr>
     <tr>
@@ -163,24 +192,81 @@ at the end of the trial, this can be a vector specifying the total sample
 size c(N0, N1) for the two-sample case or an integer specifying the total
 sample size N for the one-sample case</p></td>
     </tr>
+    <tr>
+      <th>direction</th>
+      <td><p>"greater" (default) if interest is in p(p1 &gt; p0) and "less"
+if interest is in p(p1 &lt; p0) for two-sample case. For one-sample case,
+"greater" if interest is in p(p &gt; p0) and "less" if interest is in p(p &lt; p0).</p></td>
+    </tr>
+    <tr>
+      <th>p0</th>
+      <td><p>The target value to compare to in the one-sample case</p></td>
+    </tr>
+    <tr>
+      <th>delta</th>
+      <td><p>clinically meaningful difference between groups.
+Typically 0 (default).</p></td>
+    </tr>
+    <tr>
+      <th>prior</th>
+      <td><p>hyperparameters of prior beta distribution.
+Beta(0.5, 0.5) is default</p></td>
+    </tr>
+    <tr>
+      <th>S</th>
+      <td><p>number of samples drawn from the posterior. Default is 5000</p></td>
+    </tr>
+    <tr>
+      <th>N</th>
+      <td><p>the total planned sample size at the end of the trial, c(N0, N1)
+for two-sample case; integer of total planned sample size at end of trial N
+for one-sample case</p></td>
+    </tr>
+    <tr>
+      <th>nsim</th>
+      <td><p>Number of simulated trial datasets.</p></td>
+    </tr>
+    <tr>
+      <th>pp_threshold</th>
+      <td><p>the posterior probability threshold of interest</p></td>
+    </tr>
+    <tr>
+      <th>ppp_threshold</th>
+      <td><p>the posterior probability threshold of interest for
+futility monitoring</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Returns a tibble with n0, n1, y0, y1 for the two-sample case and
-a tibble with n1 and y1 for the one-sample case</p>
+    <p>A list containing a</p><ol>
+<li><p>a tibble 'res_summary' containing the posterior probability threshold
+(pp_threshold), the predictive probability threshold (ppp_threshold),
+the mean sample size (mean_n0 and mean_n1 for two-sample case; mean_n1 for
+one-sample case), and the proportion of positive trials.</p></li>
+<li><p>'call_list' containing the original function call</p></li>
+<li><p>'calibrate_thresholds_inputs' a list containing the inputs to the
+original function call</p></li>
+</ol>
+
+<p>The proportion of positive trials will be a measure of the type I error
+for a null setting, and a measure of the power in the alternative setting.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+<span class='co'># One-sample case</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
-<span class='co'># One-sample case</span>
-<span class='fu'>sim_dat1</span><span class='op'>(</span>prob <span class='op'>=</span> <span class='fl'>0.1</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>calibrate_thresholds</span><span class='op'>(</span>prob_null <span class='op'>=</span> <span class='fl'>0.1</span>, prob_alt <span class='op'>=</span> <span class='fl'>0.3</span>, 
+n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, p0 <span class='op'>=</span> <span class='fl'>0.1</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, 
+prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, N <span class='op'>=</span> <span class='fl'>25</span>, nsim <span class='op'>=</span> <span class='fl'>1000</span>, 
+pp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>, <span class='fl'>0.95</span>, <span class='fl'>0.96</span>, <span class='fl'>0.98</span><span class='op'>)</span>, 
+ppp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.2</span>, <span class='fl'>0.05</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
 
 <span class='co'># Two-sample case</span>
-<span class='fu'>sim_dat1</span><span class='op'>(</span>prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.3</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

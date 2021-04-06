@@ -67,10 +67,16 @@ for one-sample case}
 futility monitoring}
 }
 \value{
-A tibble containing the posterior probability threshold
+A list containing a
+\enumerate{
+\item a tibble 'res_summary' containing the posterior probability threshold
 (pp_threshold), the predictive probability threshold (ppp_threshold),
 the mean sample size (mean_n0 and mean_n1 for two-sample case; mean_n1 for
 one-sample case), and the proportion of positive trials.
+\item 'call_list' containing the original function call
+\item 'calibrate_thresholds_inputs' a list containing the inputs to the
+original function call
+}
 
 The proportion of positive trials will be a measure of the type I error
 for a null setting, and a measure of the power in the alternative setting.
@@ -86,10 +92,10 @@ threshold.
 }
 \examples{
 
-set.seed(123)
-
 # One-sample case
 \dontrun{
+set.seed(123)
+
 calibrate_thresholds(prob_null = 0.1, prob_alt = 0.3, 
 n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL, 
 prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000, 

@@ -13,13 +13,25 @@
     <loc>http://www.emilyzabor.com/ppseq//reference/calibrate_posterior_threshold.html</loc>
   </url>
   <url>
-    <loc>http://www.emilyzabor.com/ppseq//reference/calibrate_pp_ppp_threshold.html</loc>
+    <loc>http://www.emilyzabor.com/ppseq//reference/calibrate_thresholds.html</loc>
   </url>
   <url>
     <loc>http://www.emilyzabor.com/ppseq//reference/eval_thresh.html</loc>
   </url>
   <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/optimize_design.calibrate_thresholds.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/optimize_design.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/plot.calibrate_thresholds.html</loc>
+  </url>
+  <url>
     <loc>http://www.emilyzabor.com/ppseq//reference/ppseq-package.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/print.calibrate_thresholds.html</loc>
   </url>
   <url>
     <loc>http://www.emilyzabor.com/ppseq//reference/sim_dat1.html</loc>

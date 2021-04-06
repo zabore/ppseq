@@ -157,101 +157,120 @@ cal_tbl <-
 
 ```{r echo = FALSE}
 load("H:/ppseq_server/cal_tbl.rda")
-
-gt::gt(cal_tbl[cal_tbl$prop_pos_null >= 0.05 & cal_tbl$prop_pos_null <= 0.1, ])
 ```
 
-In this table we have considered 19 different posterior probability thresholds, and 4 different predictive probability thresholds, but here we only print the results that produced an acceptable type I error between 0.05 and 0.1. The column labeled `prop_pos_null` represents the type I error rate and the column labeled `prop_pos_alt` represents the power. We see that within our acceptable range of type I error, we get results with power ranging from 0.761 to 0.893. These are all fairly reasonable values of power to achieve in a type I trial.     
+We can print the results with a call to print, and can limit the printed results to those within a desired range of acceptable type I error and meeting a desired minimum power.
 
+```{r eval = FALSE}
+print(cal_tbl, type1_range = c(0.05, 0.1), minimum_power = 0.7)
+```
+
+```{r echo = FALSE}
+gt::gt(print(cal_tbl, type1_range = c(0.05, 0.1), minimum_power = 0.7))
+```
+
+In this table we have considered 19 different posterior probability thresholds, and 4 different predictive probability thresholds, but here we only print the results that produced an acceptable type I error between 0.05 and 0.1 and a power of at least 70\%. The column labeled `prop_pos_null` represents the type I error rate and the column labeled `prop_pos_alt` represents the power. We see that within our acceptable range of type I error and power, we get results with power ranging from 0.761 to 0.893. These are all fairly reasonable values of power to achieve in a phase I trial.  
+
+But which design should we choose? The function `optimize_design` will return the design options that maximum sensitivity, specificity, and Youden's index within the specified range of acceptable type I error and minimum power. Based on the clinical context of the trial design, one of these designs can be selected for use.
 
 ```{r}
-knitr::knit_exit()
+optimize_design(cal_tbl, type1_range = c(0.05, 0.1), minimum_power = 0.7)
 ```
 
+Finally, we can plot the results to visualize the different design options.
 
-```{r fig.width = 8, fig.height = 8}
-library(dplyr)
-library(ggplot2)
-library(plotly)
+```{r eval = FALSE}
+plot(cal_tbl, type1_range = c(0.05, 0.1), minimum_power = 0.7)
+```
 
-lower_type1 <- 0.05
-upper_type1 <- 0.1
-min_power <- 0.75
+```{r echo = FALSE, fig.width = 8, fig.height = 6}
+x <- cal_tbl
+type1_range <- c(0.05, 0.1)
+minimum_power <- 0.7
 
-plot_tbl <- 
-  cal_tbl %>% 
-  filter(prop_pos_null >= lower_type1 & 
-           prop_pos_null <= upper_type1 &
-           prop_pos_alt >= min_power) %>% 
-  mutate(
+plot_x <- 
+  dplyr::mutate(
+    dplyr::filter(x$res_summary, 
+                  prop_pos_null >= type1_range[1] & 
+                    prop_pos_null <= type1_range[2] &
+                    prop_pos_alt >= minimum_power),
     `Youden's index` = prop_pos_alt + prop_stopped_null - 1
-  )
-
-p <- ggplot(plot_tbl, aes(x = prop_stopped_null, y = prop_pos_alt, 
-                              color = `Youden's index`)) + 
-  geom_point() + 
-  scale_x_reverse(limits = c(1, 0)) +
-  ylim(0, 1) + 
-  labs(
+    )
+  
+p1 <- 
+  ggplot2::ggplot(plot_x, ggplot2::aes(x = prop_stopped_null, 
+                                       y = prop_pos_alt, 
+                                       color = `Youden's index`)) + 
+  ggplot2::geom_point() + 
+  ggplot2::scale_x_reverse(limits = c(1, 0)) +
+  ggplot2::ylim(0, 1) + 
+  ggplot2::labs(
     x = "Proportion stopped under the null (Specificity)",
     y = "Proportion positive under alternative (Sensitiivity)"
-  ) 
+    ) 
+  
+plotly::ggplotly(p1)
+```
 
-ggplotly(p)
-
-simon_lower <- clinfun::ph2simon(pu = 0.1, pa = 0.3, ep1 = 0.05, ep2 = 0.25)
-simon_upper <- clinfun::ph2simon(pu = 0.1, pa = 0.3, ep1 = 0.1, ep2 = 0.25)
+```{r echo = FALSE, fig.width = 8, fig.height = 6}
+simon_lower <- clinfun::ph2simon(pu = x$inputs$prob_null, 
+                                 pa = x$inputs$prob_alt, 
+                                 ep1 = type1_range[1], 
+                                 ep2 = 1 - minimum_power)
 
 xopt_lower <- simon_lower$out[
-  c(((1:n)[simon_lower$out[, 5]==min(simon_lower$out[,5])])[1], 1), ]
+  c(((1:nrow(simon_lower$out))[simon_lower$out[, 5] == min(simon_lower$out[, 5])])[1], 1), ]
+
 plot_simon_lower <- tibble::add_column(
   dplyr::rename(
-    tibble::as_tibble(xopt_lower), mean_n1_null = "EN(p0)", prop_stopped_null = "PET(p0)"
+    tibble::as_tibble(xopt_lower), 
+    mean_n1_null = "EN(p0)", 
+    prop_stopped_null = "PET(p0)"
   ),
-  prop_pos_null = 0.05,
-  design = c("Simon's optimal \n Type I error = 0.05", 
-             "Simon's minimax \n Type I error = 0.05"))
+  prop_pos_null = type1_range[1],
+  design = c(paste0("Simon's optimal \n Type I error = ", type1_range[1]), 
+             paste0("Simon's minimax \n Type I error = ", type1_range[1])))
+
+simon_upper <- clinfun::ph2simon(pu = x$inputs$prob_null, 
+                                 pa = x$inputs$prob_alt, 
+                                 ep1 = type1_range[2],
+                                 ep2 = 1 - minimum_power)
 
 xopt_upper <- simon_upper$out[
-  c(((1:n)[simon_upper$out[, 5]==min(simon_upper$out[,5])])[1], 1), ]
+  c(((1:nrow(simon_upper$out))[simon_upper$out[, 5] == min(simon_upper$out[, 5])])[1], 1), ]
+
 plot_simon_upper <- tibble::add_column(
   dplyr::rename(
-    tibble::as_tibble(xopt_upper), mean_n1_null = "EN(p0)", prop_stopped_null = "PET(p0)"
+    tibble::as_tibble(xopt_upper), 
+    mean_n1_null = "EN(p0)", 
+    prop_stopped_null = "PET(p0)"
   ),
-  prop_pos_null = 0.05,
-  design = c("Simon's optimal \n Type I error = 0.1", 
-             "Simon's minimax \n Type I error = 0.1"))
+  prop_pos_null = type1_range[2],
+  design = c(paste0("Simon's optimal \n Type I error = ", type1_range[2]), 
+             paste0("Simon's minimax \n Type I error = ", type1_range[2])))
 
-p2 <- ggplot(plot_tbl, aes(x = mean_n1_null, y = prop_stopped_null, 
-                           color = prop_pos_null)) + 
-  geom_point() + 
-  ylim(0, 1) + 
-  labs(
+p2 <- ggplot2::ggplot(plot_x, ggplot2::aes(x = mean_n1_null, 
+                                           y = prop_stopped_null, 
+                                           color = prop_pos_null)) + 
+  ggplot2::geom_point() + 
+  ggplot2::ylim(0, 1) + 
+  ggplot2::labs(
     x = "Expected N under the null",
     y = "Probability of early stopping under the null",
     color = "Type I error"
   ) +
-  geom_point(data = plot_simon_lower) +
-  geom_text(
+  ggplot2::geom_point(data = plot_simon_lower) +
+  ggplot2::geom_text(
     data = plot_simon_lower,
-    aes(label = design),
+    ggplot2::aes(label = design),
     size = 3
   ) +
-  geom_point(data = plot_simon_upper) +
-  geom_text(
+  ggplot2::geom_point(data = plot_simon_upper) +
+  ggplot2::geom_text(
     data = plot_simon_upper,
-    aes(label = design),
+    ggplot2::aes(label = design),
     size = 3
   )
 
-ggplotly(p2)
+plotly::ggplotly(p2)
 ```
-
-
-
-
-
-
-
-
-
