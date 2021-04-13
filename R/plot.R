@@ -36,84 +36,61 @@ plot.calibrate_thresholds <- function(x,
     stop("type1_range must be a numeric vector of length 2 or NULL")
   
   plot_x <- 
-    dplyr::mutate(
-      dplyr::filter(x$res_summary, 
-                    prop_pos_null >= type1_range[1] & 
-                      prop_pos_null <= type1_range[2] &
-                      prop_pos_alt >= minimum_power),
-      `Youden's index` = prop_pos_alt + prop_stopped_null - 1
+    dplyr::rename(
+      dplyr::mutate(
+        dplyr::filter(
+          x$res_summary, 
+          prop_pos_null >= type1_range[1] & 
+            prop_pos_null <= type1_range[2] &
+            prop_pos_alt >= minimum_power
+        ),
+        `Youden's index` = prop_pos_alt + prop_stopped_null - 1,
+        Design = paste0("Posterior threshold ", pp_threshold, 
+                        " and predictive threshold ", ppp_threshold),
+        n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
+                           (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
+      ),
+      `Type I error` = prop_pos_null,
+      Power = prop_pos_alt,
+      `Average N under the null` = mean_n1_null,
+      `Average N under the alternative` = mean_n1_alt,
+      `Distance to min(N under null) and max(N under alt)` = n_dist_metric
     )
   
   p1 <- 
-    ggplot2::ggplot(plot_x, ggplot2::aes(x = prop_stopped_null, 
-                                         y = prop_pos_alt, 
-                                         color = `Youden's index`)) + 
-    ggplot2::geom_point() + 
-    ggplot2::scale_x_reverse(limits = c(1, 0)) +
-    ggplot2::ylim(0, 1) + 
-    ggplot2::labs(
-      x = "Proportion stopped under the null (Specificity)",
-      y = "Proportion positive under alternative (Sensitiivity)"
-    ) 
-  
-  simon_lower <- clinfun::ph2simon(pu = x$inputs$prob_null, 
-                                   pa = x$inputs$prob_alt, 
-                                   ep1 = type1_range[1], 
-                                   ep2 = 1 - minimum_power)
-  
-  xopt_lower <- simon_lower$out[
-    c(((1:nrow(simon_lower$out))[simon_lower$out[, 5] == min(simon_lower$out[, 5])])[1], 1), ]
-  
-  plot_simon_lower <- tibble::add_column(
-    dplyr::rename(
-      tibble::as_tibble(xopt_lower), 
-      mean_n1_null = "EN(p0)", 
-      prop_stopped_null = "PET(p0)"
-    ),
-    prop_pos_null = type1_range[1],
-    design = c(paste0("Simon's optimal \n Type I error = ", type1_range[1]), 
-               paste0("Simon's minimax \n Type I error = ", type1_range[1])))
-  
-  simon_upper <- clinfun::ph2simon(pu = x$inputs$prob_null, 
-                                   pa = x$inputs$prob_alt, 
-                                   ep1 = type1_range[2],
-                                   ep2 = 1 - minimum_power)
-  
-  xopt_upper <- simon_upper$out[
-    c(((1:nrow(simon_upper$out))[simon_upper$out[, 5] == min(simon_upper$out[, 5])])[1], 1), ]
-  
-  plot_simon_upper <- tibble::add_column(
-    dplyr::rename(
-      tibble::as_tibble(xopt_upper), 
-      mean_n1_null = "EN(p0)", 
-      prop_stopped_null = "PET(p0)"
-    ),
-    prop_pos_null = type1_range[2],
-    design = c(paste0("Simon's optimal \n Type I error = ", type1_range[2]), 
-               paste0("Simon's minimax \n Type I error = ", type1_range[2])))
-  
-  p2 <- ggplot2::ggplot(plot_x, ggplot2::aes(x = mean_n1_null, 
-                                             y = prop_stopped_null, 
-                                             color = prop_pos_null)) + 
+    ggplot2::ggplot(plot_x, 
+                    ggplot2::aes(
+                      x = `Type I error`, 
+                      y = Power, 
+                      color = `Youden's index`,
+                      Design = Design)) + 
     ggplot2::geom_point() + 
     ggplot2::ylim(0, 1) + 
+    ggplot2::xlim(0, 1) +
     ggplot2::labs(
-      x = "Expected N under the null",
-      y = "Probability of early stopping under the null",
-      color = "Type I error"
+      x = "Type I error",
+      y = "Power"
     ) +
-    ggplot2::geom_point(data = plot_simon_lower) +
-    ggplot2::geom_text(
-      data = plot_simon_lower,
-      ggplot2::aes(label = design),
-      size = 3
+    ggplot2::scale_color_viridis_c() +
+    ggplot2::theme_bw()
+  
+  p2 <- 
+    ggplot2::ggplot(plot_x, 
+                    ggplot2::aes(
+                      x = `Average N under the null`, 
+                      y = `Average N under the alternative`,
+                      color = `Distance to min(N under null) and max(N under alt)`,
+                      Design = Design)) + 
+    ggplot2::geom_point() + 
+    ggplot2::ylim(min(plot_x$mean_n1_null), max(plot_x$mean_n1_alt)) +
+    ggplot2::xlim(min(plot_x$mean_n1_null), max(plot_x$mean_n1_alt)) +
+    ggplot2::labs(
+      x = "Average N under the null",
+      y = "Average N under the alternative",
+      color = "Distance to best"
     ) +
-    ggplot2::geom_point(data = plot_simon_upper) +
-    ggplot2::geom_text(
-      data = plot_simon_upper,
-      ggplot2::aes(label = design),
-      size = 3
-    )
+    ggplot2::scale_color_viridis_c() +
+    ggplot2::theme_bw()
   
   # gridExtra::grid.arrange(p1, p2, ncol = 2)
   plotly::ggplotly(p1)

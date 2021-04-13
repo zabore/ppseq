@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function to setup usage of optimize_design.calibrate_thresholds — optimize_design • ppseq</title>
+<title>Output from a call to calibrate_threshold — cal_tbl • ppseq</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,12 @@
 
 
 
-<meta property="og:title" content="Function to setup usage of optimize_design.calibrate_thresholds — optimize_design" />
-<meta property="og:description" content="Function to setup usage of optimize_design.calibrate_thresholds" />
+<meta property="og:title" content="Output from a call to calibrate_threshold — cal_tbl" />
+<meta property="og:description" content="This .rda file contains output from a call to calibrate_threshold.
+See the vignette titled &quot;One-sample expansion cohort&quot; for a description of
+the input parameters used, or run cal_tbl$calibrate_thresholds_inputs
+to see a list of the original function inputs. For use in testing global
+functions and in vignettes." />
 
 
 
@@ -127,42 +131,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Function to setup usage of <code>optimize_design.calibrate_thresholds</code></h1>
+    <h1>Output from a call to <code>calibrate_threshold</code></h1>
     
-    <div class="hidden name"><code>optimize_design.Rd</code></div>
+    <div class="hidden name"><code>cal_tbl.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Function to setup usage of <code>optimize_design.calibrate_thresholds</code></p>
+    <p>This .rda file contains output from a call to <code>calibrate_threshold</code>.
+See the vignette titled "One-sample expansion cohort" for a description of
+the input parameters used, or run <code>cal_tbl$calibrate_thresholds_inputs</code>
+to see a list of the original function inputs. For use in testing global
+functions and in vignettes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>optimize_design</span><span class='op'>(</span><span class='va'>x</span>, type1_range <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.1</span><span class='op'>)</span>, minimum_power <span class='op'>=</span> <span class='fl'>0.8</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>cal_tbl</span><span class='op'>)</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>x</th>
-      <td><p>an object of class 'calibrate_thresholds', usually returned by the
-<code>calibrate_thresholds</code> function</p></td>
-    </tr>
-    <tr>
-      <th>type1_range</th>
-      <td><p>a vector specifying the minimum and maximum acceptable
-type I error. Specify NULL to return the full range of resulting type I
-error. Defaults to c(0.05, 0.1)</p></td>
-    </tr>
-    <tr>
-      <th>minimum_power</th>
-      <td><p>a numeric between 0 and 1 specifying the minimum
-acceptable power. Specify NULL to return the full range of resulting power.
-Defaults to 0.8.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>ignored</p></td>
-    </tr>
-    </table>
+
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>A list containing a</p><ol>
+<li><p>a tibble 'res_summary' containing the posterior probability threshold
+(pp_threshold), the predictive probability threshold (ppp_threshold),
+the ceiling of the mean sample size (mean_n0 and mean_n1 for two-sample case;
+mean_n1 for one-sample case), and the proportion of positive trials.</p></li>
+<li><p>'call_list' containing the original function call</p></li>
+<li><p>'calibrate_thresholds_inputs' a list containing the inputs to the
+original function call</p></li>
+<li><p>'simon_res' gives results from a Simon's two-stage minimax design with
+unacceptable rate 0.1, acceptable rate 0.3, and theoretical type I error of
+0.05 and power of 0.8</p></li>
+</ol>
 
 
   </div>

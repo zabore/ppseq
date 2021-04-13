@@ -16,6 +16,9 @@
     <loc>http://www.emilyzabor.com/ppseq//reference/calibrate_thresholds.html</loc>
   </url>
   <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/cal_tbl.html</loc>
+  </url>
+  <url>
     <loc>http://www.emilyzabor.com/ppseq//reference/eval_thresh.html</loc>
   </url>
   <url>
@@ -41,5 +44,8 @@
   </url>
   <url>
     <loc>http://www.emilyzabor.com/ppseq//articles/one_sample_expansion.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//articles/two_sample_randomized.html</loc>
   </url>
 </urlset>

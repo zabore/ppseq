@@ -1,0 +1,61 @@
+---
+title: "Two-sample randomized phase 2"
+author: "Emily C. Zabor"
+date: "Last updated: `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Two-sample randomized phase 2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The goal of this article is to provide a tutorial on the use of the functions in {ppseq} in the context of a two-sample randomized phase 2 trial. While phase 2 trials are commonly conducted in a one-sample setting, all of the details on the [One-sample expansion cohort vignette](one-sample-expansion.html) could be used to plan a one-sample phase 2 trial as well. In this article we demonstrate the use of sequential posterior probability monitoring for futility in the context of a two-sample randomized phase 2 trial.
+
+
+# Setup
+
+To execute the code in this tutorial, you first need to install and load the {ppseq} package.
+
+```{r setup}
+# remotes::install_github("zabore/ppseq")
+library(ppseq)
+```
+
+
+# Trial design
+
+We want to plan a two-sample randomized phase 2 trial with a control arm and an treatment arm. The response rate in the control group is assumed to be 0.05 and the target response rate in the treatment group is 0.25. We plan to check for futility after every 8 patients, with a maximum sample size of 40 in each group.
+
+
+# Calibrating the posterior and predictive probability thresholds
+
+As detailed in the [One-sample expansion cohort vignette](one-sample-expansion.html), we wish to simulate many trials to simultaneously calibrate the posterior and predictive probability thresholds to meet the desired design properties and to obtain the trial operating characteristics. We can do this using the `calibrate_thresholds()` function.
+
+We consider the null scenario where the response probability in the control arm is 0.05 and the response probability in the treatment arm is also 0.05, and the alternative scenario where the response probability in the treatment arm is 0.25. We generate 1000 simulated datasets. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment prior to running the function. I used the following code on a Unix server with 192 cores, with the goal of utilizing a maximum of 90 cores or leaving at least one core available. 
+
+```{r eval = FALSE}
+set.seed(123)
+
+no_cores <- min(parallelly::availableCores() - 1, 90)
+future::plan(future::multicore(workers = no_cores))
+
+two_sample_cal_tbl <- 
+  calibrate_thresholds(prob_null = c(0.05, 0.05), prob_alt = c(0.05, 0.25), 
+                       n = matrix(rep(seq(8, 40, 8), 2), ncol = 2, 
+                                  byrow = FALSE), direction = "greater", 
+                       p0 = NULL, delta = 0, prior = c(0.5, 0.5),
+                       S = 5000, N = c(40, 40), nsim = 1000,
+                       pp_threshold = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
+                                        0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
+                                        0.98, 0.99, 0.999, 0.9999, 0.99999, 1),
+                       ppp_threshold = seq(0.05, 0.2, 0.05))
+```

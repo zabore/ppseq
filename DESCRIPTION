@@ -24,7 +24,9 @@ Depends:
     R (>= 3.5.0)
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0),
+    covr
 VignetteBuilder: knitr
 Imports: 
     purrr,
@@ -38,3 +40,4 @@ Imports:
     plotly,
     clinfun,
     gridExtra
+Config/testthat/edition: 3
