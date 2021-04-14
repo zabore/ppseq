@@ -251,7 +251,11 @@ p2 <-
 plotly::ggplotly(p2)
 ```
 
-Both of these plots suggest selecting the design with posterior probability threshold 0.93 and predictive probability threshold 0.1, which maximizes both Youden's index and the distance to the point with minimum average sample size under the null and maximum average sample size under the alternative. This design has a type I error rate of 0.08, power of 89.3\%, average sample size under the null of 17, and average sample size under the alternative of 25.
+The first plot suggests selecting the design with posterior probability threshold 0.93 and predictive probability threshold 0.1, which maximizes Youden's index. This design has a type I error rate of 0.08, power of 89.3\%, average sample size under the null of 17, and average sample size under the alternative of 25.
+
+The second plot suggests selecting the design with posterior probability threshold 0.93 and predictive probability threshold 0.15, which minimizes the distance to the point with minimum average sample size under the null and maximum average sample size under the alternative. This design has a type I error rate of 0.069, power of 78.4\%, average sample size under the null of 12, and average sample size under the alternative of 22.
+
+In this case, the investigator would have to consider the tradeoffs in type I error/power versus average sample size to select the ideal design for their purposes.
 
 The function `optimize_design` will return the design options that maximize sensitivity, specificity, and Youden's index within the specified range of acceptable type I error and minimum power. Based on the clinical context of the trial design, one of these designs can be selected for use.
 
