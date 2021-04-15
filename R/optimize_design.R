@@ -70,21 +70,40 @@ optimize_design.calibrate_thresholds <- function(x,
   
   options(tibble.width = Inf)
   
-  plot_x <- 
-    dplyr::mutate(
-      dplyr::filter(x$res_summary, 
-                    prop_pos_null >= type1_range[1] & 
-                      prop_pos_null <= type1_range[2] &
-                      prop_pos_alt >= minimum_power),
-      `Youden's index` = prop_pos_alt + prop_stopped_null - 1
-    )
+  if(length(x$inputs$prob_null) == 2) {
+    opt_x <- 
+      dplyr::mutate(
+        dplyr::filter(x$res_summary, 
+                      prop_pos_null >= type1_range[1] & 
+                        prop_pos_null <= type1_range[2] &
+                        prop_pos_alt >= minimum_power),
+        mean_n_null = (mean_n0_null + mean_n1_null) / 2,
+        mean_n_alt = (mean_n0_alt + mean_n1_alt) / 2,
+        ab_dist_metric = ((prop_pos_null - 0)^2 + 
+                            (prop_pos_alt - 1)^2)^(1/2),
+        n_dist_metric = ((mean_n_null - min(mean_n_null))^2 + 
+                           (mean_n_alt - max(mean_n_alt))^2)^(1/2)
+      )
+    
+  } else if(length(x$inputs$prob_null) == 1) {
+    opt_x <- 
+      dplyr::mutate(
+        dplyr::filter(x$res_summary, 
+                      prop_pos_null >= type1_range[1] & 
+                        prop_pos_null <= type1_range[2] &
+                        prop_pos_alt >= minimum_power),
+        ab_dist_metric = ((prop_pos_null - 0)^2 + 
+                            (prop_pos_alt - 1)^2)^(1/2),
+        n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
+                           (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
+      )
+  }
+  
   
   list(
-    "The design that maximizes specificity (i.e. the proportion stopped under the null) is:" = 
-      plot_x[which.max(plot_x$prop_stopped_null), ],
-    "The design that maximizes sensitivity (i.e. the proportion positive under the alternative) is:" = 
-      plot_x[which.max(plot_x$prop_pos_alt), ],
-    "The design that maximizes Youden's index is:" =
-      plot_x[which.max(plot_x$`Youden's index`), ]
+    "The design that minimizes Euclidean distance to (0, 1) on the type I error by power plot is:" =
+      opt_x[opt_x$ab_dist_metric == min(opt_x$ab_dist_metric), ],
+    "The design that minimizes Euclidean distance to the point with minimum average sample size under the null and maximum average sample size under the alternative is:" = 
+      opt_x[opt_x$n_dist_metric == min(opt_x$n_dist_metric), ]
   )
 }

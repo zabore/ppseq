@@ -35,36 +35,68 @@ plot.calibrate_thresholds <- function(x,
   if(!is.numeric(type1_range) & !is.null(type1_range))
     stop("type1_range must be a numeric vector of length 2 or NULL")
   
-  plot_x <- 
-    dplyr::rename(
-      dplyr::mutate(
-        dplyr::filter(
-          x$res_summary, 
-          prop_pos_null >= type1_range[1] & 
-            prop_pos_null <= type1_range[2] &
-            prop_pos_alt >= minimum_power
+  if(length(x$inputs$prob_null) == 2) {
+    plot_x <- 
+      dplyr::rename(
+        dplyr::mutate(
+          dplyr::filter(
+            x$res_summary, 
+            prop_pos_null >= type1_range[1] & 
+              prop_pos_null <= type1_range[2] &
+              prop_pos_alt >= minimum_power
+          ),
+          Design = paste0("Posterior threshold ", pp_threshold, 
+                          " and predictive threshold ", ppp_threshold),
+          ab_dist_metric = ((prop_pos_null - 0)^2 + 
+                              (prop_pos_alt - 1)^2)^(1/2),
+          mean_n_null = (mean_n0_null + mean_n1_null) / 2,
+          mean_n_alt = (mean_n0_alt + mean_n1_alt) / 2,
+          n_dist_metric = ((mean_n_null - min(mean_n_null))^2 + 
+                             (mean_n_alt - max(mean_n_alt))^2)^(1/2)
         ),
-        `Youden's index` = prop_pos_alt + prop_stopped_null - 1,
-        Design = paste0("Posterior threshold ", pp_threshold, 
-                        " and predictive threshold ", ppp_threshold),
-        n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
-                           (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
-      ),
-      `Type I error` = prop_pos_null,
-      Power = prop_pos_alt,
-      `Average N under the null` = mean_n1_null,
-      `Average N under the alternative` = mean_n1_alt,
-      `Distance to min(N under null) and max(N under alt)` = n_dist_metric
-    )
+        `Type I error` = prop_pos_null,
+        Power = prop_pos_alt,
+        `Average N under the null` = mean_n_null,
+        `Average N under the alternative` = mean_n_alt,
+        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
+        `Distance to (0, 1)` = ab_dist_metric
+      )
+    
+  } else if(length(x$inputs$prob_null) == 1) {
+    plot_x <- 
+      dplyr::rename(
+        dplyr::mutate(
+          dplyr::filter(
+            x$res_summary, 
+            prop_pos_null >= type1_range[1] & 
+              prop_pos_null <= type1_range[2] &
+              prop_pos_alt >= minimum_power
+          ),
+          Design = paste0("Posterior threshold ", pp_threshold, 
+                          " and predictive threshold ", ppp_threshold),
+          ab_dist_metric = ((prop_pos_null - 0)^2 + 
+                              (prop_pos_alt - 1)^2)^(1/2),
+          n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
+                             (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
+        ),
+        `Type I error` = prop_pos_null,
+        Power = prop_pos_alt,
+        `Average N under the null` = mean_n1_null,
+        `Average N under the alternative` = mean_n1_alt,
+        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
+        `Distance to (0, 1)` = ab_dist_metric
+      )
+  }
+  
   
   p1 <- 
     ggplot2::ggplot(plot_x, 
                     ggplot2::aes(
                       x = `Type I error`, 
                       y = Power, 
-                      color = `Youden's index`,
+                      color = `Distance to (0, 1)`,
                       Design = Design)) + 
-    ggplot2::geom_point() + 
+    ggplot2::geom_jitter(width = 0.01, height = 0.01) +
     ggplot2::ylim(0, 1) + 
     ggplot2::xlim(0, 1) +
     ggplot2::labs(
@@ -81,9 +113,11 @@ plot.calibrate_thresholds <- function(x,
                       y = `Average N under the alternative`,
                       color = `Distance to min(N under null) and max(N under alt)`,
                       Design = Design)) + 
-    ggplot2::geom_point() + 
-    ggplot2::ylim(min(plot_x$mean_n1_null), max(plot_x$mean_n1_alt)) +
-    ggplot2::xlim(min(plot_x$mean_n1_null), max(plot_x$mean_n1_alt)) +
+    ggplot2::geom_jitter(width = 0.5, height = 0.5) + 
+    ggplot2::ylim(min(plot_x$`Average N under the null`), 
+                  max(plot_x$`Average N under the alternative`)) +
+    ggplot2::xlim(min(plot_x$`Average N under the null`), 
+                  max(plot_x$`Average N under the alternative`)) +
     ggplot2::labs(
       x = "Average N under the null",
       y = "Average N under the alternative",

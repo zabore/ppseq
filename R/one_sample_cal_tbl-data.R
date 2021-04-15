@@ -1,14 +1,16 @@
-#' Output from a call to \code{calibrate_threshold}
+#' Output from a one-sample call to \code{calibrate_threshold}
 #'
-#' This .rda file contains output from a call to \code{calibrate_threshold}. 
+#' This .rda file contains output from a one-sample call to 
+#' \code{calibrate_threshold}. 
 #' See the vignette titled "One-sample expansion cohort" for a description of
-#' the input parameters used, or run \code{cal_tbl$calibrate_thresholds_inputs}
+#' the input parameters used, or run 
+#' \code{one_sample_cal_tbl$calibrate_thresholds_inputs}
 #' to see a list of the original function inputs. For use in testing global 
 #' functions and in vignettes.
 #'
 #' @docType data
 #'
-#' @usage data(cal_tbl)
+#' @usage data(one_sample_cal_tbl)
 #'
 #' @format A list containing a 
 #' 1) a tibble 'res_summary' containing the posterior probability threshold 
@@ -23,4 +25,4 @@
 #' 0.05 and power of 0.8
 #'
 #' @keywords datasets
-"cal_tbl"
+"one_sample_cal_tbl"
