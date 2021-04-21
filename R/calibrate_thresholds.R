@@ -312,12 +312,12 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
       dplyr::ungroup(
         dplyr::summarize(
           dplyr::group_by(res_df, pp_threshold, ppp_threshold),
-          mean_n0_null = ceiling(mean(n0_null)),
-          mean_n1_null = ceiling(mean(n1_null)),
+          mean_n0_null = mean(n0_null),
+          mean_n1_null = mean(n1_null),
           prop_pos_null = mean(positive_null),
           prop_stopped_null = mean(sum(n0_null, n1_null) < sum(N)),
-          mean_n0_alt = ceiling(mean(n0_alt)),
-          mean_n1_alt = ceiling(mean(n1_alt)),
+          mean_n0_alt = mean(n0_alt),
+          mean_n1_alt = mean(n1_alt),
           prop_pos_alt = mean(positive_alt),
           prop_stopped_alt = mean(sum(n0_alt, n1_alt) < sum(N))
           )
@@ -337,10 +337,10 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
       dplyr::ungroup(
         dplyr::summarize(
           dplyr::group_by(res_df, pp_threshold, ppp_threshold),
-          mean_n1_null = ceiling(mean(n1_null)),
+          mean_n1_null = mean(n1_null),
           prop_pos_null = mean(positive_null),
           prop_stopped_null = mean(n1_null < N),
-          mean_n1_alt = ceiling(mean(n1_alt)),
+          mean_n1_alt = mean(n1_alt),
           prop_pos_alt = mean(positive_alt),
           prop_stopped_alt = mean(n1_alt < N)
           )
