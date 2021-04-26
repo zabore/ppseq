@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • ppseq</title>
+<title>Output from a two-sample call to calibrate_threshold — two_sample_cal_tbl • ppseq</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,14 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Output from a two-sample call to calibrate_threshold — two_sample_cal_tbl" />
+<meta property="og:description" content="This .rda file contains output from a two-sample call to
+calibrate_threshold.
+See the vignette titled &quot;Two-sample randomized phase 2&quot; for a description of
+the input parameters used, or run
+two_sample_cal_tbl$calibrate_thresholds_inputs
+to see a list of the original function inputs. For use in testing global
+functions and in vignettes." />
 
 
 
@@ -58,7 +65,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -124,117 +131,43 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Output from a two-sample call to <code>calibrate_threshold</code></h1>
+    
+    <div class="hidden name"><code>two_sample_cal_tbl.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>This .rda file contains output from a two-sample call to
+<code>calibrate_threshold</code>.
+See the vignette titled "Two-sample randomized phase 2" for a description of
+the input parameters used, or run
+<code>two_sample_cal_tbl$calibrate_thresholds_inputs</code>
+to see a list of the original function inputs. For use in testing global
+functions and in vignettes.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>two_sample_cal_tbl</span><span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="calc_posterior.html">calc_posterior()</a></code> </p>
-        </td>
-        <td><p>Calculate a single posterior probability</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="calc_predictive.html">calc_predictive()</a></code> </p>
-        </td>
-        <td><p>Calculate a single posterior predictive value</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="calibrate_posterior_threshold.html">calibrate_posterior_threshold()</a></code> </p>
-        </td>
-        <td><p>Calibrate the posterior probability threshold</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="calibrate_thresholds.html">calibrate_thresholds()</a></code> </p>
-        </td>
-        <td><p>Calibrate according to posterior probability threshold and predictive
-probability threshold with interim futility monitoring</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="eval_thresh.html">eval_thresh()</a></code> </p>
-        </td>
-        <td><p>Evaluate a single dataset for a single pp_threshold and ppp_threshold
-combination</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="one_sample_cal_tbl.html">one_sample_cal_tbl</a></code> </p>
-        </td>
-        <td><p>Output from a one-sample call to <code>calibrate_threshold</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="optimize_design.calibrate_thresholds.html">optimize_design(<i>&lt;calibrate_thresholds&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Custom optimization method for <code>calibrate_thresholds</code> objects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="optimize_design.html">optimize_design()</a></code> </p>
-        </td>
-        <td><p>Function to setup usage of <code>optimize_design.calibrate_thresholds</code></p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot.calibrate_thresholds.html">plot(<i>&lt;calibrate_thresholds&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Plot method for <code>calibrate_thresholds</code> objects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print.calibrate_thresholds.html">print(<i>&lt;calibrate_thresholds&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print method for <code>calibrate_thresholds</code> objects</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sim_dat1.html">sim_dat1()</a></code> </p>
-        </td>
-        <td><p>Simulate a single dataset based on the response probability(ies), the total
-sample size(s), and the interim look schedule(s)</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sim_single_trial.html">sim_single_trial()</a></code> </p>
-        </td>
-        <td><p>Simulate a single trial with posterior probability monitoring</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="two_sample_cal_tbl.html">two_sample_cal_tbl</a></code> </p>
-        </td>
-        <td><p>Output from a two-sample call to <code>calibrate_threshold</code></p></td>
-      </tr>
-    </tbody>
-    </table>
+
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>A list containing a</p><ol>
+<li><p>a tibble 'res_summary' containing the posterior probability threshold
+(pp_threshold), the predictive probability threshold (ppp_threshold),
+the ceiling of the mean sample size (mean_n0 and mean_n1 for two-sample case;
+mean_n1 for one-sample case), and the proportion of positive trials.</p></li>
+<li><p>'call_list' containing the original function call</p></li>
+<li><p>'calibrate_thresholds_inputs' a list containing the inputs to the
+original function call</p></li>
+<li><p>'simon_res' gives results from a Simon's two-stage minimax design with
+unacceptable rate 0.1, acceptable rate 0.3, and theoretical type I error of
+0.05 and power of 0.8</p></li>
+</ol>
+
+
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

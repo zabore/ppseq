@@ -8,4 +8,6 @@ utils::globalVariables(c("n0", "n1", "positive", "pp_threshold",
                          "Type I error", "Power", "Design", 
                          "Average N under the null", 
                          "Average N under the alternative",
-                         "Distance to min(N under null) and max(N under alt)"))
+                         "Distance to min(N under null) and max(N under alt)",
+                         "mean_n0_null", "mean_n0_alt", "mean_n_null",
+                         "mean_n_alt", "ab_dist_metric", "Distance to (0, 1)"))

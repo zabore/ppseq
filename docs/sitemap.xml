@@ -16,10 +16,10 @@
     <loc>http://www.emilyzabor.com/ppseq//reference/calibrate_thresholds.html</loc>
   </url>
   <url>
-    <loc>http://www.emilyzabor.com/ppseq//reference/cal_tbl.html</loc>
+    <loc>http://www.emilyzabor.com/ppseq//reference/eval_thresh.html</loc>
   </url>
   <url>
-    <loc>http://www.emilyzabor.com/ppseq//reference/eval_thresh.html</loc>
+    <loc>http://www.emilyzabor.com/ppseq//reference/one_sample_cal_tbl.html</loc>
   </url>
   <url>
     <loc>http://www.emilyzabor.com/ppseq//reference/optimize_design.calibrate_thresholds.html</loc>
@@ -41,6 +41,9 @@
   </url>
   <url>
     <loc>http://www.emilyzabor.com/ppseq//reference/sim_single_trial.html</loc>
+  </url>
+  <url>
+    <loc>http://www.emilyzabor.com/ppseq//reference/two_sample_cal_tbl.html</loc>
   </url>
   <url>
     <loc>http://www.emilyzabor.com/ppseq//articles/one_sample_expansion.html</loc>

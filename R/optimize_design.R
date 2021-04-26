@@ -72,38 +72,70 @@ optimize_design.calibrate_thresholds <- function(x,
   
   if(length(x$inputs$prob_null) == 2) {
     opt_x <- 
-      dplyr::mutate(
-        dplyr::filter(x$res_summary, 
-                      prop_pos_null >= type1_range[1] & 
-                        prop_pos_null <= type1_range[2] &
-                        prop_pos_alt >= minimum_power),
-        mean_n_null = (mean_n0_null + mean_n1_null) / 2,
-        mean_n_alt = (mean_n0_alt + mean_n1_alt) / 2,
-        ab_dist_metric = ((prop_pos_null - 0)^2 + 
-                            (prop_pos_alt - 1)^2)^(1/2),
-        n_dist_metric = ((mean_n_null - min(mean_n_null))^2 + 
-                           (mean_n_alt - max(mean_n_alt))^2)^(1/2)
-      )
+      dplyr::rename(
+        dplyr::mutate(
+          dplyr::filter(x$res_summary, 
+                        prop_pos_null >= type1_range[1] & 
+                          prop_pos_null <= type1_range[2] &
+                          prop_pos_alt >= minimum_power),
+          mean_n_null = (mean_n0_null + mean_n1_null) / 2,
+          mean_n_alt = (mean_n0_alt + mean_n1_alt) / 2,
+          ab_dist_metric = ((prop_pos_null - 0)^2 + 
+                              (prop_pos_alt - 1)^2)^(1/2),
+          n_dist_metric = ((mean_n_null - min(mean_n_null))^2 + 
+                             (mean_n_alt - max(mean_n_alt))^2)^(1/2)
+          ),
+        `Type I error` = prop_pos_null,
+        Power = prop_pos_alt,
+        `Average N under the null` = mean_n_null,
+        `Average N under the alternative` = mean_n_alt,
+        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
+        `Distance to (0, 1)` = ab_dist_metric)
     
   } else if(length(x$inputs$prob_null) == 1) {
     opt_x <- 
-      dplyr::mutate(
-        dplyr::filter(x$res_summary, 
-                      prop_pos_null >= type1_range[1] & 
-                        prop_pos_null <= type1_range[2] &
-                        prop_pos_alt >= minimum_power),
-        ab_dist_metric = ((prop_pos_null - 0)^2 + 
-                            (prop_pos_alt - 1)^2)^(1/2),
-        n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
-                           (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
-      )
+      dplyr::rename(
+        dplyr::mutate(
+          dplyr::filter(x$res_summary, 
+                        prop_pos_null >= type1_range[1] & 
+                          prop_pos_null <= type1_range[2] &
+                          prop_pos_alt >= minimum_power),
+          ab_dist_metric = ((prop_pos_null - 0)^2 + 
+                              (prop_pos_alt - 1)^2)^(1/2),
+          n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
+                             (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
+          ),
+        `Type I error` = prop_pos_null,
+        Power = prop_pos_alt,
+        `Average N under the null` = mean_n1_null,
+        `Average N under the alternative` = mean_n1_alt,
+        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
+        `Distance to (0, 1)` = ab_dist_metric)
   }
+  
+  opt_ab <- 
+    dplyr::slice(
+      dplyr::group_by(
+        dplyr::arrange(opt_x, 
+                       `Distance to (0, 1)`, -pp_threshold, -ppp_threshold),
+        `Distance to (0, 1)`), 
+      1)
+  
+  opt_nn <-
+    dplyr::slice(
+      dplyr::group_by(
+        dplyr::arrange(opt_x, 
+                       `Distance to min(N under null) and max(N under alt)`, 
+                       -pp_threshold, -ppp_threshold),
+        `Distance to min(N under null) and max(N under alt)`),
+      1)
   
   
   list(
     "The design that minimizes Euclidean distance to (0, 1) on the type I error by power plot is:" =
-      opt_x[opt_x$ab_dist_metric == min(opt_x$ab_dist_metric), ],
+      opt_ab[opt_ab$`Distance to (0, 1)` == min(opt_ab$`Distance to (0, 1)`), ],
     "The design that minimizes Euclidean distance to the point with minimum average sample size under the null and maximum average sample size under the alternative is:" = 
-      opt_x[opt_x$n_dist_metric == min(opt_x$n_dist_metric), ]
+      opt_nn[opt_nn$`Distance to min(N under null) and max(N under alt)` == 
+               min(opt_nn$`Distance to min(N under null) and max(N under alt)`), ]
   )
 }

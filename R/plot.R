@@ -88,15 +88,31 @@ plot.calibrate_thresholds <- function(x,
       )
   }
   
+  plot_ab <- 
+    dplyr::slice(
+      dplyr::group_by(
+        dplyr::arrange(plot_x, 
+                       `Distance to (0, 1)`, -pp_threshold, -ppp_threshold),
+        `Distance to (0, 1)`), 
+      1)
+  
+  plot_nn <-
+    dplyr::slice(
+      dplyr::group_by(
+        dplyr::arrange(plot_x, 
+                       `Distance to min(N under null) and max(N under alt)`, 
+                       -pp_threshold, -ppp_threshold),
+        `Distance to min(N under null) and max(N under alt)`),
+      1)
   
   p1 <- 
-    ggplot2::ggplot(plot_x, 
+    ggplot2::ggplot(plot_ab, 
                     ggplot2::aes(
                       x = `Type I error`, 
                       y = Power, 
                       color = `Distance to (0, 1)`,
                       Design = Design)) + 
-    ggplot2::geom_jitter(width = 0.01, height = 0.01) +
+    ggplot2::geom_point() +
     ggplot2::ylim(0, 1) + 
     ggplot2::xlim(0, 1) +
     ggplot2::labs(
@@ -107,13 +123,13 @@ plot.calibrate_thresholds <- function(x,
     ggplot2::theme_bw()
   
   p2 <- 
-    ggplot2::ggplot(plot_x, 
+    ggplot2::ggplot(plot_nn, 
                     ggplot2::aes(
                       x = `Average N under the null`, 
                       y = `Average N under the alternative`,
                       color = `Distance to min(N under null) and max(N under alt)`,
                       Design = Design)) + 
-    ggplot2::geom_jitter(width = 0.5, height = 0.5) + 
+    ggplot2::geom_point() +
     ggplot2::ylim(min(plot_x$`Average N under the null`), 
                   max(plot_x$`Average N under the alternative`)) +
     ggplot2::xlim(min(plot_x$`Average N under the null`), 
@@ -126,8 +142,6 @@ plot.calibrate_thresholds <- function(x,
     ggplot2::scale_color_viridis_c() +
     ggplot2::theme_bw()
   
-  # gridExtra::grid.arrange(p1, p2, ncol = 2)
-  plotly::ggplotly(p1)
-  plotly::ggplotly(p2)
+  list(plotly::ggplotly(p1), plotly::ggplotly(p2))
 
 }

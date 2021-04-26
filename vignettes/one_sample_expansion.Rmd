@@ -204,18 +204,38 @@ plot_x <-
     `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
     `Distance to (0, 1)` = ab_dist_metric
     )
+
+# For designs with the same optimization criteria, only keep the one with maximum posterior probability
+
+# Need to do this separately for the two plots
+plot_ab <- 
+  dplyr::slice(
+    dplyr::group_by(
+      dplyr::arrange(plot_x, 
+                     `Distance to (0, 1)`, -pp_threshold, -ppp_threshold),
+      `Distance to (0, 1)`), 
+    1)
+
+plot_nn <-
+  dplyr::slice(
+    dplyr::group_by(
+      dplyr::arrange(plot_x, 
+                    `Distance to min(N under null) and max(N under alt)`, 
+                    -pp_threshold, -ppp_threshold),
+      `Distance to min(N under null) and max(N under alt)`),
+    1)
 ```
 
 ```{r echo = FALSE, fig.width = 8, fig.height = 6}
 # Plot 1
 p1 <- 
-  ggplot2::ggplot(plot_x, 
+  ggplot2::ggplot(plot_ab, 
                   ggplot2::aes(
                     x = `Type I error`, 
                     y = Power, 
                     color = `Distance to (0, 1)`,
                     Design = Design)) + 
-  ggplot2::geom_jitter(width = 0.01, height = 0.01) +
+  ggplot2::geom_point() +
   ggplot2::ylim(0, 1) + 
   ggplot2::xlim(0, 1) +
   ggplot2::labs(
@@ -231,13 +251,13 @@ plotly::ggplotly(p1)
 ```{r echo = FALSE, fig.width = 8, fig.height = 6}
 # Plot 2
 p2 <- 
-  ggplot2::ggplot(plot_x, 
+  ggplot2::ggplot(plot_nn, 
                   ggplot2::aes(
                     x = `Average N under the null`, 
                     y = `Average N under the alternative`,
                     color = `Distance to min(N under null) and max(N under alt)`,
                     Design = Design)) + 
-  ggplot2::geom_jitter(width = 0.5, height = 0.5) + 
+  ggplot2::geom_point() +
   ggplot2::ylim(min(plot_x$`Average N under the null`), 
                 max(plot_x$`Average N under the alternative`)) +
   ggplot2::xlim(min(plot_x$`Average N under the null`), 
@@ -253,7 +273,7 @@ p2 <-
 plotly::ggplotly(p2)
 ```
 
-*Note that overlapping points are jittered on both plots, so hover carefully to identify optimal points, or use 'optimize_design' to print the optimal design options*
+*Note that when points were tied, the point with the highest posterior and predictive threshold was selected for plotting*
 
 We can also use the function `optimize_design` to list the design options with optimal criteria with respect to Type I error/power and average sample size within the specified range of acceptable type I error and minimum power. Based on the clinical context of the trial design, one of these designs can be selected for use.
 
@@ -263,9 +283,7 @@ optimize_design(one_sample_cal_tbl,
                 minimum_power = 0.7)
 ```
 
-We see that in this case a number of designs can minimize the distance to (0, 1) on the type I error by power plot, and likewise a number of designs can minimize the distance to the point with minimum average sample size under the null and maximum average sample size under the alternative.
-
-In this case, the investigator would have to consider the tradeoffs in type I error/power versus average sample size to select the ideal design for their purposes.
+And we see that we can select from between two design choices. Both have posterior threshold 0.93. To optimize the distance to the top left point on the type I error by power plot, we would use a predictive threshold of 0.1, resulting in a  design with type I error of 0.08 and power of 0.893. To optimize the distance to the point with minimum average sample size under the null and maximum average sample size under the alternative, we would use a predictive threshold of 0.15, resulting in a design with type I error of 0.069 and power of 0.784. 
 
 
 
