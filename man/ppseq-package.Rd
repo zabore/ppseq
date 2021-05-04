@@ -4,7 +4,7 @@
 \name{ppseq-package}
 \alias{ppseq}
 \alias{ppseq-package}
-\title{ppseq: Conduct sequential posterior probablity monitoring}
+\title{ppseq: Conduct sequential predictive probablity monitoring}
 \description{
 What the package does (one paragraph).
 }

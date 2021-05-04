@@ -1,5 +1,5 @@
 Package: ppseq
-Title: Conduct sequential posterior probablity monitoring
+Title: Conduct sequential predictive probablity monitoring
 Version: 0.0.0.9000
 Authors@R: 
   c(person(given = "Emily C.",
