@@ -3,7 +3,7 @@
 \docType{data}
 \name{one_sample_cal_tbl}
 \alias{one_sample_cal_tbl}
-\title{Output from a one-sample call to \code{calibrate_threshold}}
+\title{Output from a one-sample call to \code{calibrate_thresholds}}
 \format{
 A list containing a
 \enumerate{

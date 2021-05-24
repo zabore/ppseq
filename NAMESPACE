@@ -3,6 +3,7 @@
 S3method(optimize_design,calibrate_thresholds)
 S3method(plot,calibrate_thresholds)
 S3method(print,calibrate_thresholds)
+export(calc_decision_rules)
 export(calc_posterior)
 export(calc_predictive)
 export(calibrate_posterior_threshold)

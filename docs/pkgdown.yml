@@ -1,10 +1,10 @@
-pandoc: 2.7.3
+pandoc: 2.11.4
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   one_sample_expansion: one_sample_expansion.html
   two_sample_randomized: two_sample_randomized.html
-last_built: 2021-04-26T14:31Z
+last_built: 2021-05-24T18:27Z
 urls:
   reference: http://www.emilyzabor.com/ppseq//reference
   article: http://www.emilyzabor.com/ppseq//articles

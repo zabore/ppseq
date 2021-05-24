@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculate a single posterior predictive value — calc_predictive • ppseq</title>
+<title>Calculate a decision rule table for interim monitoring of a pre-specified
+design — calc_decision_rules • ppseq</title>
 
 
 <!-- jquery -->
@@ -39,14 +40,14 @@
 
 
 
-<meta property="og:title" content="Calculate a single posterior predictive value — calc_predictive" />
-<meta property="og:description" content="This function is meant to be used in the context of a
-clinical trial with a binary endpoint. The goal is to calculate the posterior
-predictive probability of success at the end of a trial, given the data
-available at an interim analysis. For the two-arm case the number of events
-observed at interim analysis, the sample size at interim analysis,
-and the total planned sample size are denoted y0, n0, and N0 in
-the standard-of-care arm and y1, n1, and N1 in the experimental arm." />
+<meta property="og:title" content="Calculate a decision rule table for interim monitoring of a pre-specified
+design — calc_decision_rules" />
+<meta property="og:description" content="This function will take the posterior and predictive thresholds
+for a pre-specified design with a given null response rate and fixed interim
+looks and total sample size, and return the decision rules at each interim
+analysis and the end of the trial. Intended for use after selecting an
+optimal design using the functions calibrate_thresholds and
+optimize_design." />
 
 
 
@@ -133,61 +134,55 @@ the standard-of-care arm and y1, n1, and N1 in the experimental arm." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculate a single posterior predictive value</h1>
+    <h1>Calculate a decision rule table for interim monitoring of a pre-specified
+design</h1>
     
-    <div class="hidden name"><code>calc_predictive.Rd</code></div>
+    <div class="hidden name"><code>calc_decision_rules.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function is meant to be used in the context of a
-clinical trial with a binary endpoint. The goal is to calculate the posterior
-predictive probability of success at the end of a trial, given the data
-available at an interim analysis. For the two-arm case the number of events
-observed at interim analysis, the sample size at interim analysis,
-and the total planned sample size are denoted y0, n0, and N0 in
-the standard-of-care arm and y1, n1, and N1 in the experimental arm.</p>
+    <p>This function will take the posterior and predictive thresholds
+for a pre-specified design with a given null response rate and fixed interim
+looks and total sample size, and return the decision rules at each interim
+analysis and the end of the trial. Intended for use after selecting an
+optimal design using the functions <code>calibrate_thresholds</code> and
+<code>optimize_design</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calc_predictive</span><span class='op'>(</span>
-  <span class='va'>y</span>,
+    <pre class="usage"><span class='fu'>calc_decision_rules</span><span class='op'>(</span>
   <span class='va'>n</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
-  delta <span class='op'>=</span> <span class='fl'>0</span>,
+  <span class='va'>p0</span>,
+  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>,
   <span class='va'>N</span>,
-  theta <span class='op'>=</span> <span class='fl'>0.95</span>
+  <span class='va'>theta</span>,
+  <span class='va'>ppp</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>y</th>
-      <td><p>vector of length two containing number of events observed so far
-c(y0, y1) for two-sample case; integer of number of events y observed so far
-for one-sample case</p></td>
-    </tr>
-    <tr>
       <th>n</th>
-      <td><p>vector of length two containing the sample size so far c(n0, n1)
-for two-sample case; integer of sample size so far for one-sample case</p></td>
+      <td><p>integer of sample size so far for one-sample case</p></td>
     </tr>
     <tr>
       <th>direction</th>
-      <td><p>"greater" (default) if interest is in P(p1 &gt; p0) and "less"
-if interest is in P(p1 &lt; p0) for two-sample case. For one-sample case,
-"greater" if interest is in P(p &gt; p0) and "less" if interest is in P(p &lt; p0).</p></td>
+      <td><p>For one-sample case, "greater" if interest is in P(p &gt; p0)
+and "less" if interest is in P(p &lt; p0).</p></td>
     </tr>
     <tr>
       <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case</p></td>
+      <td><p>The target value to compare to in the one-sample case
+(i.e. the null response rate)</p></td>
     </tr>
     <tr>
       <th>delta</th>
       <td><p>clinically meaningful difference between groups.
-Typically 0 (default). NULL for one-sample case.</p></td>
+Typically 0. NULL for one-sample case (default). Placeholder for when
+two-sample case is added.</p></td>
     </tr>
     <tr>
       <th>prior</th>
@@ -200,33 +195,42 @@ Beta(0.5, 0.5) is default</p></td>
     </tr>
     <tr>
       <th>N</th>
-      <td><p>the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial N
+      <td><p>tinteger of total planned sample size at end of trial N
 for one-sample case</p></td>
     </tr>
     <tr>
       <th>theta</th>
       <td><p>The target posterior probability. e.g. Efficacy decision if
-P(p1 &gt; p0) &gt; theta for the two-sample case with greater direction.
-Default is 0.95.</p></td>
+P(p &gt; p0) &gt; theta for the one-sample case with greater direction.</p></td>
+    </tr>
+    <tr>
+      <th>ppp</th>
+      <td><p>The target predictive probability. e.g. Stop the trial if the
+predictive probability falls below this target.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Returns the posterior predictive probability of interest</p>
+    <p>Returns a tibble with n at each look and r. Stop the trial at that
+look if the number of observed responses is &lt;=r. At the end of the trial,
+the treatment is considered promising if the number of observed responses isr.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
-<span class='co'># Two-sample case</span>
-<span class='fu'>calc_predictive</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>7</span>, <span class='fl'>12</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>50</span>, <span class='fl'>50</span><span class='op'>)</span>, N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.5512</div><div class='input'>
 <span class='co'># One-sample case</span>
-<span class='fu'>calc_predictive</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fl'>14</span>, n <span class='op'>=</span> <span class='fl'>50</span>, p0 <span class='op'>=</span> <span class='fl'>0.2</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, N <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.6248</div><div class='input'>
-</div></pre>
+<span class='fu'>calc_decision_rules</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, p0 <span class='op'>=</span> <span class='fl'>0.1</span>, N <span class='op'>=</span> <span class='fl'>25</span>, theta <span class='op'>=</span> <span class='fl'>0.86</span>, ppp <span class='op'>=</span> <span class='fl'>0.2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5 x 2</span><span>
+#&gt;       n     r
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     5     0
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span>    10     0
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span>    15     1
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span>    20     2
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span>    25     4</div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

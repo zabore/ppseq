@@ -22,7 +22,7 @@ c(y0, y1) for two-sample case; integer of number of events y observed so far
 for one-sample case}
 
 \item{n}{vector of length two containing the sample size so far c(n0, n1)
-for two-sample case; integer of sample size so far n for one-sample case}
+for two-sample case; integer of sample size so far for one-sample case}
 
 \item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
 if interest is in P(p1 < p0) for two-sample case. For one-sample case,
@@ -31,7 +31,7 @@ if interest is in P(p1 < p0) for two-sample case. For one-sample case,
 \item{p0}{The target value to compare to in the one-sample case}
 
 \item{delta}{clinically meaningful difference between groups.
-Typically 0 (default).}
+Typically 0 (default). NULL for one-sample case.}
 
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}

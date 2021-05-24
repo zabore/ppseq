@@ -1,4 +1,4 @@
-#' Output from a one-sample call to \code{calibrate_threshold}
+#' Output from a one-sample call to \code{calibrate_thresholds}
 #'
 #' This .rda file contains output from a one-sample call to 
 #' \code{calibrate_threshold}. 
