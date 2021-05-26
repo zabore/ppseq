@@ -28,8 +28,8 @@
 #' 
 #' @return Returns a tibble with n at each look and r. Stop the trial at that
 #' look if the number of observed responses is <=r. At the end of the trial,
-#' the treatment is considered promising if the number of observed responses is 
-#' >r.
+#' the treatment is considered promising if the number of observed responses 
+#' is >r.
 #'
 #' @examples
 #' 

@@ -47,7 +47,8 @@ predictive probability falls below this target.}
 \value{
 Returns a tibble with n at each look and r. Stop the trial at that
 look if the number of observed responses is <=r. At the end of the trial,
-the treatment is considered promising if the number of observed responses isr.
+the treatment is considered promising if the number of observed responses
+is >r.
 }
 \description{
 This function will take the posterior and predictive thresholds

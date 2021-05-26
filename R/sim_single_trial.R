@@ -106,13 +106,16 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
                                 n1 = rep(n[, 2], length(theta)),
                                 pp_threshold = rep(theta, each = length(pp)))
     
-    ppp <- purrr::pmap_dbl(crossargs, 
-                           ~calc_predictive(
-                             y = c(..1, ..2), 
-                             n = c(..3, ..4), 
-                             p0 = p0, delta = delta, prior = prior,
-                             S = S, N = N, theta = ..5)
-    )
+    ppp <- furrr::future_pmap_dbl(
+      crossargs, 
+      ~calc_predictive(
+        y = c(..1, ..2), 
+        n = c(..3, ..4), 
+        p0 = p0, delta = delta, prior = prior,
+        S = S, N = N, theta = ..5),
+      .options = furrr_options(
+        seed = TRUE,
+        chunk_size = ceiling(floor(nrow(crossargs)/future::nbrOfWorkers()))))
     
     res <- dplyr::arrange(
       dplyr::select(
@@ -148,14 +151,17 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
                                 n1 = rep(n, length(theta)),
                                 pp_threshold = rep(theta, each = length(pp)))
     
-    ppp <- purrr::pmap_dbl(crossargs, 
-                           ~calc_predictive(
-                             y = ..1, 
-                             n = ..2, 
-                             p0 = p0, delta = delta, prior = prior,
-                             S = S, N = N, theta = ..3)
-    )
-    
+    ppp <- furrr::future_pmap_dbl(
+      crossargs, 
+      ~calc_predictive(
+        y = ..1, 
+        n = ..2, 
+        p0 = p0, delta = delta, prior = prior,
+        S = S, N = N, theta = ..3),
+      .options = furrr_options(
+        seed = TRUE,
+        chunk_size = ceiling(nrow(crossargs)/future::nbrOfWorkers())))
+
     res <- dplyr::arrange(
       dplyr::select(
         tibble::add_column(crossargs, pp = rep(pp, length(theta)), ppp = ppp),
