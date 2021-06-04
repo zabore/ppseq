@@ -12,13 +12,17 @@
 #' @param minimum_power a numeric between 0 and 1 specifying the minimum 
 #' acceptable power. Specify NULL to return the full range of resulting power.
 #' Defaults to 0.8.
+#' @param plotly a logical indicator of whether you want the plots returned as 
+#' interactive plotly plots or non-interactive ggplots
 #' @param ... unused
 #' 
 #' @export
 
 plot.calibrate_thresholds <- function(x, 
                                       type1_range = c(0.05, 0.1), 
-                                      minimum_power = 0.8, ...) {
+                                      minimum_power = 0.8, 
+                                      plotly = FALSE,
+                                      ...) {
   
   if(any(class(x) =="calibrate_thresholds") == FALSE)
     stop("x must be class 'calibrate_thresholds', usually an object returned from a call to the function ppseq::calibrate_thresholds()")
@@ -72,8 +76,8 @@ plot.calibrate_thresholds <- function(x,
               prop_pos_null <= type1_range[2] &
               prop_pos_alt >= minimum_power
           ),
-          Design = paste0("Posterior threshold ", pp_threshold, 
-                          " and predictive threshold ", ppp_threshold),
+          Design = paste0("Posterior threshold = ", pp_threshold, 
+                          " and predictive threshold = ", ppp_threshold),
           ab_dist_metric = ((prop_pos_null - 0)^2 + 
                               (prop_pos_alt - 1)^2)^(1/2),
           n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
@@ -83,36 +87,50 @@ plot.calibrate_thresholds <- function(x,
         Power = prop_pos_alt,
         `Average N under the null` = mean_n1_null,
         `Average N under the alternative` = mean_n1_alt,
-        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
-        `Distance to (0, 1)` = ab_dist_metric
+        `Distance to optimal efficiency` = n_dist_metric,
+        `Distance to optimal accuracy` = ab_dist_metric
       )
   }
   
   plot_ab <- 
-    dplyr::slice(
-      dplyr::group_by(
-        dplyr::arrange(plot_x, 
-                       `Distance to (0, 1)`, -pp_threshold, -ppp_threshold),
-        `Distance to (0, 1)`), 
-      1)
+    dplyr::mutate(
+      dplyr::ungroup(
+        dplyr::slice(
+          dplyr::group_by(
+            dplyr::arrange(plot_x, 
+                           `Distance to optimal accuracy`, 
+                           -pp_threshold, 
+                           -ppp_threshold),
+            `Distance to optimal accuracy`), 
+          1)
+      ),
+      optimal_accuracy = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
+    )
   
   plot_nn <-
-    dplyr::slice(
-      dplyr::group_by(
-        dplyr::arrange(plot_x, 
-                       `Distance to min(N under null) and max(N under alt)`, 
-                       -pp_threshold, -ppp_threshold),
-        `Distance to min(N under null) and max(N under alt)`),
-      1)
+    dplyr::mutate(
+      dplyr::ungroup(
+        dplyr::slice(
+          dplyr::group_by(
+            dplyr::arrange(plot_x, 
+                           `Distance to optimal efficiency`, 
+                           -pp_threshold, -ppp_threshold),
+            `Distance to optimal efficiency`),
+          1)
+      ),
+      optimal_efficiency = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
+    )
   
   p1 <- 
     ggplot2::ggplot(plot_ab, 
                     ggplot2::aes(
                       x = `Type I error`, 
                       y = Power, 
-                      color = `Distance to (0, 1)`,
+                      color = `Distance to optimal accuracy`,
                       Design = Design)) + 
-    ggplot2::geom_point() +
+    ggplot2::geom_point(
+      shape = ifelse(plot_ab$optimal_accuracy == TRUE, 18, 19),
+      size = ifelse(plot_ab$optimal_accuracy == TRUE, 4, 2)) +
     ggplot2::ylim(0, 1) + 
     ggplot2::xlim(0, 1) +
     ggplot2::labs(
@@ -120,28 +138,33 @@ plot.calibrate_thresholds <- function(x,
       y = "Power"
     ) +
     ggplot2::scale_color_viridis_c() +
-    ggplot2::theme_bw()
+    ggplot2::theme_bw() + 
+    ggplot2::theme(legend.position = "bottom")
   
   p2 <- 
     ggplot2::ggplot(plot_nn, 
                     ggplot2::aes(
                       x = `Average N under the null`, 
                       y = `Average N under the alternative`,
-                      color = `Distance to min(N under null) and max(N under alt)`,
+                      color = `Distance to optimal efficiency`,
                       Design = Design)) + 
-    ggplot2::geom_point() +
+    ggplot2::geom_point(
+      shape = ifelse(plot_nn$optimal_efficiency == TRUE, 18, 19), 
+      size = ifelse(plot_nn$optimal_efficiency == TRUE, 4, 2)) +
     ggplot2::ylim(min(plot_x$`Average N under the null`), 
                   max(plot_x$`Average N under the alternative`)) +
     ggplot2::xlim(min(plot_x$`Average N under the null`), 
                   max(plot_x$`Average N under the alternative`)) +
     ggplot2::labs(
       x = "Average N under the null",
-      y = "Average N under the alternative",
-      color = "Distance to best"
+      y = "Average N under the alternative"
     ) +
     ggplot2::scale_color_viridis_c() +
-    ggplot2::theme_bw()
+    ggplot2::theme_bw() + 
+    ggplot2::theme(legend.position = "bottom")
   
-  list(plotly::ggplotly(p1), plotly::ggplotly(p2))
-
+  ifelse(plotly == TRUE, 
+         list(plotly::ggplotly(p1), plotly::ggplotly(p2)),
+         gridExtra::grid.arrange(p1, p2, nrow = 1, ncol = 2)
+         )
 }

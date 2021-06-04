@@ -26,17 +26,19 @@
 #' @param ppp The target predictive probability. e.g. Stop the trial if the 
 #' predictive probability falls below this target.
 #' 
-#' @return Returns a tibble with n at each look and r. Stop the trial at that
+#' @return Returns a tibble with n at each look and r. Stop the trial at that 
 #' look if the number of observed responses is <=r. At the end of the trial,
-#' the treatment is considered promising if the number of observed responses is 
-#' >r.
+#' the treatment is considered promising if the number of observed responses 
+#' is >r.
 #'
 #' @examples
 #' 
+#' \dontrun{
 #' set.seed(123)
 #' 
 #' # One-sample case
 #' calc_decision_rules(seq(5, 25, 5), p0 = 0.1, N = 25, theta = 0.86, ppp = 0.2)
+#' }
 #'
 #' @export
 
@@ -45,8 +47,7 @@ calc_decision_rules <- function(n, direction = "greater", p0,
                                 N, theta, ppp) {
 
   if((is.null(p0) & is.null(delta)) | (!is.null(p0) & !is.null(delta)))
-    stop("Exactly one of delta or p0 must be specified for the two-sample and 
-         one-sample case, respectively")
+    stop("Exactly one of delta or p0 must be specified for the two-sample and one-sample case, respectively")
   
   if(!direction %in% c("greater", "less")) 
     stop('direction must be either "greater" or "less"')
@@ -58,10 +59,11 @@ calc_decision_rules <- function(n, direction = "greater", p0,
   )
   
   # initialize the ytest parameter (will have 1 added in loop so will really start at 0)
-  ytest <- -1
+ 
   
   # Loop over each value of n and for each, continue while the predictive probability for a given ytest is less than the ppp threshold
   for(i in n) {
+    ytest <- -1
     pred <- 0
     while(pred < ppp) {
       ytest <- ytest + 1

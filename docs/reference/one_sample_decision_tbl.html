@@ -6,8 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Calculate a decision rule table for interim monitoring of a pre-specified
-design — calc_decision_rules • ppseq</title>
+<title>Output from a one-sample call to calc_decision_rules — one_sample_decision_tbl • ppseq</title>
 
 
 <!-- jquery -->
@@ -40,14 +39,11 @@ design — calc_decision_rules • ppseq</title>
 
 
 
-<meta property="og:title" content="Calculate a decision rule table for interim monitoring of a pre-specified
-design — calc_decision_rules" />
-<meta property="og:description" content="This function will take the posterior and predictive thresholds
-for a pre-specified design with a given null response rate and fixed interim
-looks and total sample size, and return the decision rules at each interim
-analysis and the end of the trial. Intended for use after selecting an
-optimal design using the functions calibrate_thresholds and
-optimize_design." />
+<meta property="og:title" content="Output from a one-sample call to calc_decision_rules — one_sample_decision_tbl" />
+<meta property="og:description" content="This .rda file contains output from a one-sample call to
+calc_decision_rules().
+See the vignette titled &quot;One-sample expansion cohort&quot; for a description of
+the input parameters used." />
 
 
 
@@ -134,99 +130,29 @@ optimize_design." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Calculate a decision rule table for interim monitoring of a pre-specified
-design</h1>
+    <h1>Output from a one-sample call to <code>calc_decision_rules</code></h1>
     
-    <div class="hidden name"><code>calc_decision_rules.Rd</code></div>
+    <div class="hidden name"><code>one_sample_decision_tbl.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function will take the posterior and predictive thresholds
-for a pre-specified design with a given null response rate and fixed interim
-looks and total sample size, and return the decision rules at each interim
-analysis and the end of the trial. Intended for use after selecting an
-optimal design using the functions <code>calibrate_thresholds</code> and
-<code>optimize_design</code>.</p>
+    <p>This .rda file contains output from a one-sample call to
+<code><a href='calc_decision_rules.html'>calc_decision_rules()</a></code>.
+See the vignette titled "One-sample expansion cohort" for a description of
+the input parameters used.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>calc_decision_rules</span><span class='op'>(</span>
-  <span class='va'>n</span>,
-  direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  <span class='va'>p0</span>,
-  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
-  prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
-  S <span class='op'>=</span> <span class='fl'>5000</span>,
-  <span class='va'>N</span>,
-  <span class='va'>theta</span>,
-  <span class='va'>ppp</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>one_sample_decision_tbl</span><span class='op'>)</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>n</th>
-      <td><p>integer of sample size so far for one-sample case</p></td>
-    </tr>
-    <tr>
-      <th>direction</th>
-      <td><p>For one-sample case, "greater" if interest is in P(p &gt; p0)
-and "less" if interest is in P(p &lt; p0).</p></td>
-    </tr>
-    <tr>
-      <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case
-(i.e. the null response rate)</p></td>
-    </tr>
-    <tr>
-      <th>delta</th>
-      <td><p>clinically meaningful difference between groups.
-Typically 0. NULL for one-sample case (default). Placeholder for when
-two-sample case is added.</p></td>
-    </tr>
-    <tr>
-      <th>prior</th>
-      <td><p>hyperparameters of prior beta distribution.
-Beta(0.5, 0.5) is default</p></td>
-    </tr>
-    <tr>
-      <th>S</th>
-      <td><p>number of samples, default is 5000</p></td>
-    </tr>
-    <tr>
-      <th>N</th>
-      <td><p>tinteger of total planned sample size at end of trial N
-for one-sample case</p></td>
-    </tr>
-    <tr>
-      <th>theta</th>
-      <td><p>The target posterior probability. e.g. Efficacy decision if
-P(p &gt; p0) &gt; theta for the one-sample case with greater direction.</p></td>
-    </tr>
-    <tr>
-      <th>ppp</th>
-      <td><p>The target predictive probability. e.g. Stop the trial if the
-predictive probability falls below this target.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>Returns a tibble with n at each look and r. Stop the trial at that
-look if the number of observed responses is &lt;=r. At the end of the trial,
-the treatment is considered promising if the number of observed responses
-is &gt;r.</p>
+    <p>A tibble containing n, the number of patients enrolled at each
+futility monitoring point, and r, the number of responses at which we would
+stop the trial at a given look if the number of observed responses is &lt;=r,
+or at the end of the trial the treatment is considered promising if the
+number of observed responses is &gt;r.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
-
-<span class='co'># One-sample case</span>
-<span class='fu'>calc_decision_rules</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, p0 <span class='op'>=</span> <span class='fl'>0.1</span>, N <span class='op'>=</span> <span class='fl'>25</span>, theta <span class='op'>=</span> <span class='fl'>0.86</span>, ppp <span class='op'>=</span> <span class='fl'>0.2</span><span class='op'>)</span>
-<span class='op'>}</span>
-
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

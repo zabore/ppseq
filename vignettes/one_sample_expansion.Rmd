@@ -19,14 +19,9 @@ knitr::opts_chunk$set(
 ```
 
 
-# Introduction
-
-The goal of this article is to provide a tutorial on the use of the functions from {ppseq} in the context of a one-sample expansion cohort. It is becoming increasingly common for expansion cohorts to be included at the end of phase I trials. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D) that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. Since one goal of expansion cohorts is to conserve the limited available resources for clinical studies, early stopping for futility is an important consideration. In this article we demonstrate the use of sequential posterior probability monitoring for futility in the context of a one-sample expansion cohort.
-
-
 # Setup
 
-To execute the code in this tutorial, you first need to install and load the {ppseq} package.
+To execute the code in this vignette, you first need to install and load the {ppseq} package.
 
 ```{r setup}
 # remotes::install_github("zabore/ppseq")
@@ -34,248 +29,202 @@ library(ppseq)
 ```
 
 
-# Trial design
+# Introduction
 
-We want to plan a one-sample expansion study. The unacceptable response rate is 0.1, and the acceptable response rate is 0.3. We plan to check for futility after every 5 patients, with a maximum sample size of 25.
-
-
-## Single simulated trial
-
-Let's start by seeing what happens in a single simulated trial. We use the function `sim_single_trial()` to simulate response counts based on the properties of our trial and calculate the posterior predictive value of exceeding the target posterior probability of success at each look. For simplicity, let's say that we would stop for futility if our posterior predictive probability of exceeding the target posterior probability, which in this case is 0.95, falls below 0.1. 
-
-First let's consider a trial where we achieve our acceptable response rate of 0.3.
-
-```{r}
-set.seed(123)
-
-alt1_tbl <-
-  sim_single_trial(prob = 0.3, n = seq(5, 50, 5), direction = "greater", 
-                   p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 5000, 
-                   N = 50, theta = 0.95)
-```
-
-```{r echo = FALSE}
-gt::gt(alt1_tbl)
-```
-
-We see here that the posterior predictive probability, in the column `ppp`, never drops below the futility level of 0.1, so we would continue enrolling in this expansion cohort until the end of the trial, where we see we have reached a 100\% predictive probability of having posterior probability exceeding 0.95. 
-
-Now let's consider a trial where we do not achieve our acceptable response rate of 0.3, but rather observe the unacceptable response rate of 0.1.
-
-```{r}
-set.seed(123)
-
-null1_tbl <- 
-  sim_single_trial(prob = 0.1, n = seq(5, 50, 5), direction = "greater", 
-                   p = 0.1, delta = NULL, prior = c(0.5,0.5), S = 5000, 
-                   N = 50, theta = 0.95)
-```
-
-```{r echo = FALSE}
-gt::gt(null1_tbl)
-```
-
-We see in this example that we drop below the futility threshold of 0.1 after enrolling 15 patients, at which point we have a posterior predictive probability of 9.7\% of exceeding the posterior probability of 0.95. This would cause the trial to stop for futility to preserve resources for the investigation of more promising treatments.
+While traditional phase I clinical trials in oncology were focused on identification of the maximum tolerated dose, typically using the rule-based 3+3 design or at times an alternative model-based design, the focus is now shifting to interest in obtaining additional safety data across a range of doses or a variety of disease subtypes, and characterizing preliminary efficacy. As a result, one-sample expansion cohorts are becoming increasingly common in phase I clinical trials in oncology, particularly in the context of immunotherapies or other non-cytotoxic treatments, where the maximum tolerated dose may not exist. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D), or possibly several contending doses, that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. While expansion cohorts have been used extensively in phase I clinical trials in oncology, they have often not been planned in advance or with statistical properties in mind, allowing the sample size at times to expand to  very large numbers of treated patients. While having data on more patients can sometimes seem desirable, the goal in phase I trials should still be focused on identifying promising treatments for further study in phase 2 and beyond while limiting the number of patients treated with possibly inefficacious drugs. We propose a design for phase I expansion cohorts based on sequential predictive probability monitoring that allows an investigator to identify an optimal clinical trial design within constraints of traditional type I error control and power, and with futility stopping rules that preserve valuable human and financial resources (cite one-sample paper when it's available). The {ppseq} package provides functions to implement the proposed design. This vignette will demonstrate how to use functions from the {ppseq} package to design a phase I expansion cohort, in the context of a case study based on the study of atezolizumab in metastatic urothelial carcinoma.
 
 
-## Trial operating characteristics
+# Case study background
 
-But when we are designing a trial, we want to achieve fixed operating characteristics such as type I error and power. There are several goals:
-
-1. Determine the posterior probability threshold to declare the trial positive. For demonstration purposes in the previous examples we used an arbitrary threshold of 0.95, but in practice we would want to calibrate this threshold to the desired design properties of our trial.
-2. Determine the predictive probability threshold to stop for futility, calibrated to achieve the desired design properties of our trial.
-3. Using the identified thresholds, simulate many trials to determine the average probability of stopping early for futility. 
-4. Consider different interim monitoring schedules
+Atezolizumab is an anti-PD-L1 treatment that was originally tested in the phase I setting in a basket trial across a variety of cancer sites harboring PD-L1 mutations. The atezolizumab expansion study in metastatic urothelial carcinoma had the primary aim of further evaluating safety, pharmacodynamics and pharmacokinetics and therefore was not designed to meet any specific criteria for type I error or power. An expansion cohort in metastatic urothelial carcinoma (mUC) was not part of the original protocol design, but was rather added later. The expansion cohort in mUC ultimately enrolled a total of 95 participants (Powles et al., 2014). Other expansion cohorts that were included in the original protocol, including in renal-cell carcinoma, non-small-cell lung cancer, and melanoma, were planned to have a sample size of 40. These pre-planned expansion cohorts were designed with a single interim analysis for futility that would stop the trial if 0 responses were seen in the first 14 patients enrolled. According to the trial protocol, this futility rule is associated with at most a 4.4% chance of observing no responses in 14 patients if the true response rate is 20% or higher. The protocol also states the widths of the 90% confidence intervals for a sample size of 40 if the observed response rate is 30%. There was no stated decision rule for efficacy since efficacy was not an explicit aim of the expansion cohorts. 
 
 
-### Calibrating posterior threshold
+# Re-design of case study 
 
-To accomplish the first goal, we simulate many trials and search over a range of thresholds to identify the threshold that achieves our desired design properties
+We will demonstrate the use of the functions in {ppseq} to re-design the one-sample expansion cohort for the study of atezolizumab in mUC using sequential predictive probability monitoring. We assume a null, or unacceptable, response rate of 0.1 and an alternative, or acceptable, response rate of 0.2. We plan a study with up to a total of 95 participants. In our sequential predictive probability design we will check for futility after every 5 patients are enrolled. To design the study, we need to calibrate the design over a range of posterior probability thresholds and predictive probability thresholds. 
 
-The `calibrate_posterior_threshold()` function can accomplish this at the final sample size only, not considering any interim looks or early stopping.
+The posterior probability is calculated from the posterior distribution based on the specified priors and the data observed so far, and represents the probability of success based only on the data accrued so far. A posterior probability threshold would be set during the design stage and if, at the end of the trial, the posterior probability exceeded the pre-specified threshold, the trial would be declared a success. The posterior predictive probability is the probability that, at a given interim monitoring point, the treatment will be declared efficacious at the end of the trial when full enrollment is reached, conditional on the currently observed data and the specified priors. Predictive probability provides an intuitive monitoring framework that tells an investigator what the chances are of declaring the treatment efficacious at the end of the trial if we were to continue enrolling to the maximum planned sample size, given the data observed so far in the trial. If this probability drops below a certain threshold, which is pre-specified during the design stage, the trial would be stopped early. Predictive probability thresholds closer to 0 lead to less frequent stopping for futility, whereas thresholds near 1 lead to frequent stopping unless there is almost certain probability of success. 
 
-We can calibrate for type I error by running this simulation in the null setting where both our target and observed response probabilities are set to 0.1. We look over a range of posterior thresholds.
-
-```{r}
-set.seed(123)
-
-thresholds <- c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95,
-                0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1)
-
-post_tbl <- 
-  calibrate_posterior_threshold(prob = 0.1, N = 25, direction = "greater", 
-                                p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
-                                S = 5000, theta = thresholds)
-```
-
-```{r echo = FALSE}
-gt::gt(post_tbl)
-```
-
-The resulting table contains the posterior probability threshold in the column `pp_threshold` and the proportion of positive trials in the column `prop_pos`. The proportion of positive trials will be the type I error in a null setting and the power in an alternative setting. In this case, we see that if we are targeting a type I error of 0.1, this falls between a threshold of 0.82 and 0.86. We can further refine our target thresholds and recalculate.
-
-```{r}
-set.seed(123)
-
-thresholds <- seq(0.82, 0.86, 0.001)
-
-post_tbl <- 
-  calibrate_posterior_threshold(prob = 0.1, N = 25, direction = "greater", 
-                                p0 = 0.1, delta = NULL, prior = c(0.5,0.5), 
-                                S = 5000, theta = thresholds)
-```
-
-```{r echo = FALSE}
-gt::gt(post_tbl[post_tbl$pp_threshold <= 0.855 & 
-                  post_tbl$pp_threshold >= 0.850, ])
-```
-
-And we see that a threshold of 0.853 results in a type I error rate of 0.0990, just below our desired target of 0.1. (*Note that I have printed only a subset of the resulting table above*) 
+We consider a grid of thresholds so that we have a range of possible designs from which to select a design with optimal operating characteristics such as type I error, power, and sample size under the null and alternative. In this example we will consider posterior thresholds of 0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, and 1, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2. 
 
 
-### Simulataneously calibrating posterior and predictive probabilities
+# Using `calibrate_thresholds()` to obtain design options
 
-However, our real goal in this case is to simultaneously calibrate the posterior threshold and the predictive threshold, considering the interim looks for futility. The `calibrate_thresholds()` function can accomplish this, and will return the average sample size, the proportion of positive trials, and the proportion of trials that were stopped early for each combination of considered thresholds, under both the null and alternative settings, thus accomplishing goals 1 through 3 as outlined above. The function would have to be run multiple times with different inputs in order to accomplish goal 4 of comparing interim monitoring schedules.
+To conduct the case study re-design, we use the `calibrate_thresholds()` function from the {ppseq} package. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment and their simulation setup prior to running the function. In this example, we used the following code on a Unix server with 192 cores, with the goal of utilizing 76 cores since our grid of thresholds to consider was 19 posterior thresholds by 4 predictive thresholds. 
 
-We consider the null scenario where the target response probability is 0.1 and the observed response probability is also 0.1, and the alternative scenario where the observed response probability is 0.3. We generate 1000 simulated datasets. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment prior to running the function. I used the following code on a Unix server with 192 cores, with the goal of utilizing a maximum of 90 cores or leaving at least one core available. 
+The `calibrate_thresholds()` function will simulate `nsim` datasets under the null hypothesis and `nsim` datasets under the alternative hypothesis. For each simulated dataset, every combination of posterior and predictive thresholds will be considered and the final sample size and whether or not the trial was positive will be saved. Then across all simulated datasets, `calibrate_thresholds()` will return the average sample size under the null, the average sample size under the alternative, the proportion of positive trials under the null (i.e. the type I error), and the proportion of positive trials under the alternative (i.e. the power).
+
+Because `calibrate_thresholds()` randomly generates simulated datasets, you will want to set a seed before running the function in order to ensure your results are reproducible.
+
+The inputs to `calibrate_thresholds()` for our case study re-design include `prob_null = 0.1` as the null response rate, `prob_alt = 0.2` as the alternative response rate, `n = seq(5, 95, 5)` indicates interim looks after every 5 patients up to a total of 95, `direction = "greater"` specifies that interest is in whether the alternative response rate exceeds the null response rate, `p0 = 0.1` specifies the target response rate to compare to (this will be the same as `prob_null` in this case), `delta = NULL` because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, `prior = c(0.5, 0.5)` specifies that both hyperparameters of the prior beta distribution be set to 0.5, `S = 5000` specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, `N = 95` indicates the final total sample size of 95, `nsim = 1000` specifies that we will generate 1000 simulated datasets under both the null and the alternative, `pp_threshold` is a vector of the posterior thresholds of interest, and `ppp_threshold` is a vector of predictive thresholds of interest.
 
 ```{r eval = FALSE}
 set.seed(123)
 
-no_cores <- min(parallelly::availableCores() - 1, 90)
+no_cores <- 76
 future::plan(future::multicore(workers = no_cores))
 
 one_sample_cal_tbl <- 
-  calibrate_thresholds(prob_null = 0.1, prob_alt = 0.3, n = seq(5, 25, 5),
+  calibrate_thresholds(prob_null = 0.1, prob_alt = 0.2, n = seq(5, 95, 5),
                        direction = "greater", p0 = 0.1, delta = NULL, 
-                       prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
+                       prior = c(0.5, 0.5), S = 5000, N = 95, nsim = 1000,
                        pp_threshold = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
                                         0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
                                         0.98, 0.99, 0.999, 0.9999, 0.99999, 1),
                        ppp_threshold = seq(0.05, 0.2, 0.05))
 ```
 
-We can print the results with a call to print, and can limit the printed results to those within a desired range of acceptable type I error and meeting a desired minimum power.
+
+# Results
+
+We will limit our consideration to designs with type I error between 0.01 and 0.2, and a minimum power of 0.7.
+
+## `print()` 
+
+When you pass the results of `calibrate_thresholds()` to `print()` you will get back a table of the resulting design options that satisfy the desired range of type I error, specified as a vector of minimum and maximum passed to the `type1_range` argument, and minimal power, specified as a numeric value between 0 and 1 passed to the argument `minimum_power`.
 
 ```{r eval = FALSE}
-print(one_sample_cal_tbl, type1_range = c(0.05, 0.1), minimum_power = 0.7)
+print(one_sample_cal_tbl, 
+      type1_range = c(0.01, 0.2), 
+      minimum_power = 0.7)
 ```
 
 ```{r echo = FALSE}
-gt::gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.05, 
-                     prop_pos_null <= 0.1, prop_pos_alt >= 0.7))
+gt::gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.01, 
+                     prop_pos_null <= 0.2, prop_pos_alt >= 0.7))
 ```
 
-In this table we have considered 19 different posterior probability thresholds, and 4 different predictive probability thresholds, but here we only print the results that produced an acceptable type I error between 0.05 and 0.1 and a power of at least 70\%. The column labeled `prop_pos_null` represents the type I error rate and the column labeled `prop_pos_alt` represents the power. We see that within our acceptable range of type I error and power, we get results with power ranging from 0.761 to 0.893. These are all fairly reasonable values of power to achieve in a phase I trial.  
-But which design should we choose? 
+We find that 35 of the 76 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
 
-We can plot the results to visualize the different design options.
+## `plot()` 
+
+Passing the results of `calibrate_thresholds()` to `plot()` returns two plots, one of type I error by power, and one of average sample size under the null by average sample size under the alternative. The arguments `type1_range` and `power` are used in the same way as for the `print()` function. The argument `plotly` defaults to FALSE, which results in a pair of side-by-side ggplots being returned. If set to TRUE, two individual interactive plotly plots will be returned, as demonstrated below.
 
 ```{r eval = FALSE}
-plot(one_sample_cal_tbl, type1_range = c(0.05, 0.1), minimum_power = 0.7)
+plot(one_sample_cal_tbl, 
+     type1_range = c(0.01, 0.2), 
+     minimum_power = 0.7,
+     plotly = TRUE)
 ```
 
 ```{r echo = FALSE}
-# Setup data for plotting
+# I need to manually include the plots because otherwise they don't display properly in the vignette
 x <- one_sample_cal_tbl
-type1_range <- c(0.05, 0.1)
+type1_range <- c(0.01, 0.2)
 minimum_power <- 0.7
 
 plot_x <- 
-  dplyr::rename(
-    dplyr::mutate(
-      dplyr::filter(
-        x$res_summary, 
-        prop_pos_null >= type1_range[1] & 
-          prop_pos_null <= type1_range[2] &
-          prop_pos_alt >= minimum_power
+      dplyr::rename(
+        dplyr::mutate(
+          dplyr::filter(
+            x$res_summary, 
+            prop_pos_null >= type1_range[1] & 
+              prop_pos_null <= type1_range[2] &
+              prop_pos_alt >= minimum_power
+          ),
+          Design = paste0("Posterior threshold = ", pp_threshold, 
+                          " and predictive threshold = ", ppp_threshold),
+          ab_dist_metric = ((prop_pos_null - 0)^2 + 
+                              (prop_pos_alt - 1)^2)^(1/2),
+          n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
+                             (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
         ),
-      Design = paste0("Posterior threshold ", pp_threshold, 
-                      " and predictive threshold ", ppp_threshold),
-      ab_dist_metric = ((prop_pos_null - 0)^2 + 
-                         (prop_pos_alt - 1)^2)^(1/2),
-      n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
-                         (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
+        `Type I error` = prop_pos_null,
+        Power = prop_pos_alt,
+        `Average N under the null` = mean_n1_null,
+        `Average N under the alternative` = mean_n1_alt,
+        `Distance to optimal efficiency` = n_dist_metric,
+        `Distance to optimal accuracy` = ab_dist_metric
+      )
+
+plot_ab <- 
+    dplyr::mutate(
+      dplyr::ungroup(
+        dplyr::slice(
+          dplyr::group_by(
+            dplyr::arrange(plot_x, 
+                           `Distance to optimal accuracy`, 
+                           -pp_threshold, 
+                           -ppp_threshold),
+            `Distance to optimal accuracy`), 
+          1)
       ),
-    `Type I error` = prop_pos_null,
-    Power = prop_pos_alt,
-    `Average N under the null` = mean_n1_null,
-    `Average N under the alternative` = mean_n1_alt,
-    `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
-    `Distance to (0, 1)` = ab_dist_metric
+      optimal_accuracy = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
     )
 
-# For designs with the same optimization criteria, only keep the one with maximum posterior probability
-
-# Need to do this separately for the two plots
-plot_ab <- 
-  dplyr::slice(
-    dplyr::group_by(
-      dplyr::arrange(plot_x, 
-                     `Distance to (0, 1)`, -pp_threshold, -ppp_threshold),
-      `Distance to (0, 1)`), 
-    1)
-
 plot_nn <-
-  dplyr::slice(
-    dplyr::group_by(
-      dplyr::arrange(plot_x, 
-                    `Distance to min(N under null) and max(N under alt)`, 
-                    -pp_threshold, -ppp_threshold),
-      `Distance to min(N under null) and max(N under alt)`),
-    1)
+    dplyr::mutate(
+      dplyr::ungroup(
+        dplyr::slice(
+          dplyr::group_by(
+            dplyr::arrange(plot_x, 
+                           `Distance to optimal efficiency`, 
+                           -pp_threshold, -ppp_threshold),
+            `Distance to optimal efficiency`),
+          1)
+      ),
+      optimal_efficiency = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
+    )
 ```
 
 ```{r echo = FALSE, fig.width = 8, fig.height = 6}
-# Plot 1
 p1 <- 
-  ggplot2::ggplot(plot_ab, 
-                  ggplot2::aes(
-                    x = `Type I error`, 
-                    y = Power, 
-                    color = `Distance to (0, 1)`,
-                    Design = Design)) + 
-  ggplot2::geom_point() +
-  ggplot2::ylim(0, 1) + 
-  ggplot2::xlim(0, 1) +
-  ggplot2::labs(
-    x = "Type I error",
-    y = "Power"
+    ggplot2::ggplot(plot_ab, 
+                    ggplot2::aes(
+                      x = `Type I error`, 
+                      y = Power, 
+                      color = `Distance to optimal accuracy`,
+                      Design = Design)) + 
+    ggplot2::geom_point(
+      shape = ifelse(plot_ab$optimal_accuracy == TRUE, 18, 19),
+      size = ifelse(plot_ab$optimal_accuracy == TRUE, 4, 2)) +
+    ggplot2::ylim(0, 1) + 
+    ggplot2::xlim(0, 1) +
+    ggplot2::labs(
+      x = "Type I error",
+      y = "Power"
     ) +
-  ggplot2::scale_color_viridis_c() +
-  ggplot2::theme_bw()
+    ggplot2::scale_color_viridis_c() +
+    ggplot2::theme_bw() + 
+    ggplot2::theme(legend.position = "bottom")
   
 plotly::ggplotly(p1)
 ```
 
 ```{r echo = FALSE, fig.width = 8, fig.height = 6}
-# Plot 2
 p2 <- 
-  ggplot2::ggplot(plot_nn, 
-                  ggplot2::aes(
-                    x = `Average N under the null`, 
-                    y = `Average N under the alternative`,
-                    color = `Distance to min(N under null) and max(N under alt)`,
-                    Design = Design)) + 
-  ggplot2::geom_point() +
-  ggplot2::ylim(min(plot_x$`Average N under the null`), 
-                max(plot_x$`Average N under the alternative`)) +
-  ggplot2::xlim(min(plot_x$`Average N under the null`), 
-                max(plot_x$`Average N under the alternative`)) +
-  ggplot2::labs(
-    x = "Average N under the null",
-    y = "Average N under the alternative",
-    color = "Distance to best"
-  ) +
-  ggplot2::scale_color_viridis_c() +
-  ggplot2::theme_bw()
+    ggplot2::ggplot(plot_nn, 
+                    ggplot2::aes(
+                      x = `Average N under the null`, 
+                      y = `Average N under the alternative`,
+                      color = `Distance to optimal efficiency`,
+                      Design = Design)) + 
+    ggplot2::geom_point(
+      shape = ifelse(plot_nn$optimal_efficiency == TRUE, 18, 19), 
+      size = ifelse(plot_nn$optimal_efficiency == TRUE, 4, 2)) +
+    ggplot2::ylim(min(plot_x$`Average N under the null`), 
+                  max(plot_x$`Average N under the alternative`)) +
+    ggplot2::xlim(min(plot_x$`Average N under the null`), 
+                  max(plot_x$`Average N under the alternative`)) +
+    ggplot2::labs(
+      x = "Average N under the null",
+      y = "Average N under the alternative"
+    ) +
+    ggplot2::scale_color_viridis_c() +
+    ggplot2::theme_bw() + 
+    ggplot2::theme(legend.position = "bottom")
 
 plotly::ggplotly(p2)
 ```
 
-*Note that when points were tied, the point with the highest posterior and predictive threshold was selected for plotting*
+Note that when points were tied based on optimization criteria, the point with the highest posterior and predictive threshold is selected for plotting.
 
-We can also use the function `optimize_design` to list the design options with optimal criteria with respect to Type I error/power and average sample size within the specified range of acceptable type I error and minimum power. Based on the clinical context of the trial design, one of these designs can be selected for use.
+The diamond-shaped point represents the optimal design based on each criteria, which is discussed in more detail below. Using the `plotly = TRUE` option to `plot()` we can hover over each point to see the x-axis and y-axis values, along with the distance to the top left corner on each plot, and the posterior and predictive thresholds associated with each point.
+
+
+## `optimize_design()` 
+
+Finally, we can pass the results from a call to `calibrate_thresholds()` to the `optimize_design()` function to list the optimal design with respect to type I error and power, termed the "optimal accuracy" design, and the optimal design with respect to the average sample sizes under the null and alternative, termed the "optimal efficiency" design, within the specified range of acceptable type I error and minimum power. 
 
 ```{r}
 optimize_design(one_sample_cal_tbl, 
@@ -283,7 +232,32 @@ optimize_design(one_sample_cal_tbl,
                 minimum_power = 0.7)
 ```
 
-And we see that we can select from between two design choices. Both have posterior threshold 0.93. To optimize the distance to the top left point on the type I error by power plot, we would use a predictive threshold of 0.1, resulting in a  design with type I error of 0.08 and power of 0.893. To optimize the distance to the point with minimum average sample size under the null and maximum average sample size under the alternative, we would use a predictive threshold of 0.15, resulting in a design with type I error of 0.069 and power of 0.784. 
+The optimal accuracy design is the one with posterior threshold 0.9 and predictive threshold 0.05. It has a type I error of 0.072, power of 0.883, average sample size under the null of 51, and average sample size under the alternative of 91. 
+
+The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.1. It has a type I error of 0.06, power of 0.796, average sample size under the null of 39, and average sample size under the alternative of 82.
+
+For comparison, the original design of the atezolizumab expansion cohort in mUC, with a single look for futility after the first 14 patients, has a type I error of 0.005, power of 0.528, average sample size under the null of 76, and average sample size under the alternative of 92.
+
+In this case study, we find that either the optimal accuracy or the optimal efficiency sequential predictive probability design has superior performance to the original design of the atezolizumab expansion cohort in mUC with respect to both type I error and power, and average sample size under the null. In this case we may choose to use the optimal efficiency design, which has the desirable trait of a very small average sample size under the null of just 39 patients, while still maintaining reasonable type I error of 0.06 and power of 0.796. This design would allow us to stop early if the treatment were inefficacious, thus preserving valuable financial resources for use in studying more promising treatments and preventing our human subjects from continuing an ineffective treatment.
+
+
+## `calc_decision_rules()`
+
+Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.1` specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above.
+
+```{r eval = FALSE}
+set.seed(123)
+
+calc_decision_rules(n = seq(5, 95, 5), direction = "greater", p0 = 0.1, 
+                    delta = NULL, prior = c(0.5, 0.5), S = 5000,
+                    N = 95, theta = 0.92, ppp = 0.1)
+```
+
+```{r echo = FALSE}
+gt::gt(one_sample_decision_tbl)
+```
+
+In the results table, `n` indicates the number of enrolled patients at each look for futility and `r` indicates the number of response for which we would stop the trial at a given interim look if the number of observed responses is <=r, or at the end of the trial the treatment would be considered promising if the number of observed responses is >r. So in this case we see that at the first interim futility look after just 5 patients, we would not stop the trial. After the first 10 patients we would stop the trial if there were 0 responses, and so on. At the end of the trial when all 95 patients have accrued, we would declare the treatment promising of further study if there were >=14 responses.
 
 
 

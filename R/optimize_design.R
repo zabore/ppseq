@@ -132,10 +132,14 @@ optimize_design.calibrate_thresholds <- function(x,
   
   
   list(
-    "The design that minimizes Euclidean distance to (0, 1) on the type I error by power plot is:" =
-      opt_ab[opt_ab$`Distance to (0, 1)` == min(opt_ab$`Distance to (0, 1)`), ],
-    "The design that minimizes Euclidean distance to the point with minimum average sample size under the null and maximum average sample size under the alternative is:" = 
+    "Optimal accuracy design:" =
+      opt_ab[opt_ab$`Distance to (0, 1)` == min(opt_ab$`Distance to (0, 1)`), 
+             c("pp_threshold", "ppp_threshold", "Type I error", "Power",
+               "Average N under the null", "Average N under the alternative")],
+    "Optimal efficiency design:" = 
       opt_nn[opt_nn$`Distance to min(N under null) and max(N under alt)` == 
-               min(opt_nn$`Distance to min(N under null) and max(N under alt)`), ]
+               min(opt_nn$`Distance to min(N under null) and max(N under alt)`), 
+             c("pp_threshold", "ppp_threshold", "Type I error", "Power",
+               "Average N under the null", "Average N under the alternative")]
   )
 }

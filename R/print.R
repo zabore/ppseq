@@ -55,6 +55,14 @@ print.calibrate_thresholds <- function(x,
   if(!is.numeric(type1_range) & !is.null(type1_range))
     stop("type1_range must be a numeric vector of length 2 or NULL")
   
+  if(minimum_power < 0 | minimum_power > 1)
+    stop("minimum_power must be a numeric value between 0 and 1")
+  
+  if(type1_range[1] < 0 | type1_range[1] > 1 | 
+     type1_range[2] < 0 | type1_range[2] > 1 |
+     type1_range[1] > type1_range[2])
+    stop("type1_range must be a vector of numeric values, both between 0 and 1, with the first value less than the second value")
+  
   if (is.null(type1_range) & is.null(minimum_power)) {
     print(x$res_summary)
   } else if(is.null(type1_range) & !is.null(minimum_power)) {
