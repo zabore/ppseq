@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   one_sample_expansion: one_sample_expansion.html
   two_sample_randomized: two_sample_randomized.html
-last_built: 2021-05-24T18:27Z
+last_built: 2021-06-04T18:31Z
 urls:
   reference: http://www.emilyzabor.com/ppseq//reference
   article: http://www.emilyzabor.com/ppseq//articles

@@ -60,9 +60,11 @@ optimal design using the functions \code{calibrate_thresholds} and
 }
 \examples{
 
+\dontrun{
 set.seed(123)
 
 # One-sample case
 calc_decision_rules(seq(5, 25, 5), p0 = 0.1, N = 25, theta = 0.86, ppp = 0.2)
+}
 
 }
