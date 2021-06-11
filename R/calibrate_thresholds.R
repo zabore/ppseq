@@ -253,32 +253,29 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
   cross_threshold <- 
     purrr::cross_df(list(pp_threshold = pp_threshold, 
                          ppp_threshold = ppp_threshold))
-  
   res_null <- 
     furrr::future_map(
       sim_dat_null,
       function(x) 
-        furrr::future_pmap_dfr(cross_threshold,
-                        function(pp_threshold, ppp_threshold) 
-                          eval_thresh(x, pp_threshold, ppp_threshold,
-                                      direction = direction, p0 = p0, 
-                                      delta = delta, prior = prior, 
-                                      S = S, N = N), 
-                        .options = furrr::furrr_options(seed = TRUE)), 
+        pmap_dfr(cross_threshold,
+                 function(pp_threshold, ppp_threshold) 
+                   eval_thresh(x, pp_threshold, ppp_threshold,
+                 direction = direction, p0 = p0, 
+                 delta = delta, prior = prior, 
+                 S = S, N = N)), 
       .options = furrr::furrr_options(seed = TRUE)
-      )
+    )
   
   res_alt <- 
     furrr::future_map(
       sim_dat_alt,
       function(x) 
-        furrr::future_pmap_dfr(cross_threshold,
-                               function(pp_threshold, ppp_threshold) 
-                                 eval_thresh(x, pp_threshold, ppp_threshold,
-                                             direction = direction, p0 = p0, 
-                                             delta = delta, prior = prior, 
-                                             S = S, N = N), 
-                               .options = furrr::furrr_options(seed = TRUE)), 
+        pmap_dfr(cross_threshold,
+                 function(pp_threshold, ppp_threshold) 
+                   eval_thresh(x, pp_threshold, ppp_threshold,
+                 direction = direction, p0 = p0, 
+                 delta = delta, prior = prior, 
+                 S = S, N = N)),
       .options = furrr::furrr_options(seed = TRUE)
     )
   
