@@ -12,5 +12,8 @@ utils::globalVariables(c(
   "Distance to optimal efficiency",
   "mean_n0_null", "mean_n0_alt", "mean_n_null",
   "mean_n_alt", "ab_dist_metric",
-  "Distance to optimal accuracy"
+  "Distance to optimal accuracy",
+  "Distance to (0, 1)",
+  "Distance to min(N under null) and max(N under alt)",
+  "Distance to (0, 1) Distance to min(N under null) and max(N under alt)"
 ))

@@ -83,8 +83,4 @@ calc_decision_rules <- function(n, direction = "greater", p0,
   }
 
   return(res)
-<<<<<<< HEAD
-  
-=======
->>>>>>> a8c2506ff84e6a78fb96f7c35709170f6b7b5f9d
 }

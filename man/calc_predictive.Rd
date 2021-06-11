@@ -67,5 +67,4 @@ calc_predictive(y = c(7, 12), n = c(50, 50), N = c(100, 100))
 
 # One-sample case
 calc_predictive(y = 14, n = 50, p0 = 0.2, delta = NULL, N = 100)
-
 }
