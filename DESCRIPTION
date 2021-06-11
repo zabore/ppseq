@@ -1,5 +1,5 @@
 Package: ppseq
-Title: Conduct sequential predictive probablity monitoring
+Title: Design a clinical trial using sequential predictive probablity monitoring
 Version: 0.0.0.9000
 Authors@R: 
   c(person(given = "Emily C.",
@@ -10,11 +10,11 @@ Authors@R:
     person(given = "Brian P.", 
           family = "Hobbs",
           role = "aut"),
-    person(given = "Alex",
-          family = "Kaizer",
+    person(given = "Michael J.",
+          family = "Kane",
           role = "aut")
           )
-Description: What the package does (one paragraph).
+Description: This package provides functions to design clinical trials using sequential predictive probability monitoring. Functions are available to calibrate designs over a range of posterior and predictive thresholds, to plot the various design options, and to obtain the operating characteristics of optimal accuracy and optimal efficiency designs.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -27,6 +27,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
+    spelling
 VignetteBuilder: knitr
 Imports: 
     clinfun,
@@ -41,3 +42,4 @@ Imports:
     purrr,
     tibble
 Config/testthat/edition: 3
+Language: en-US

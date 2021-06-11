@@ -4,7 +4,7 @@
 \alias{plot.calibrate_thresholds}
 \title{Plot method for \code{calibrate_thresholds} objects}
 \usage{
-\method{plot}{calibrate_thresholds}(x, type1_range = c(0.05, 0.1), minimum_power = 0.8, ...)
+\method{plot}{calibrate_thresholds}(x, type1_range = c(0.05, 0.1), minimum_power = 0.8, plotly = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class 'calibrate_thresholds', usually returned by the
@@ -17,6 +17,9 @@ error. Defaults to c(0.05, 0.1)}
 \item{minimum_power}{a numeric between 0 and 1 specifying the minimum
 acceptable power. Specify NULL to return the full range of resulting power.
 Defaults to 0.8.}
+
+\item{plotly}{a logical indicator of whether you want the plots returned as
+interactive plotly plots or non-interactive ggplots}
 
 \item{...}{unused}
 }
