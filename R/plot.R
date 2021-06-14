@@ -16,6 +16,12 @@
 #' interactive plotly plots or non-interactive ggplots
 #' @param ... unused
 #'
+#' @importFrom dplyr rename mutate filter ungroup slice group_by arrange
+#'                   row_number
+#' @importFrom ggplot2 ggplot aes geom_point xlim ylim labs 
+#'                     scale_color_viridis_c theme_bw theme
+#' @importFrom gridExtra grid.arrange
+#' @importFrom plotly ggplotly
 #' @export
 
 plot.calibrate_thresholds <- function(x,
@@ -40,9 +46,9 @@ plot.calibrate_thresholds <- function(x,
 
   if (length(x$inputs$prob_null) == 2) {
     plot_x <-
-      dplyr::rename(
-        dplyr::mutate(
-          dplyr::filter(
+      rename(
+        mutate(
+          filter(
             x$res_summary,
             prop_pos_null >= type1_range[1] &
               prop_pos_null <= type1_range[2] &
@@ -68,9 +74,9 @@ plot.calibrate_thresholds <- function(x,
       )
   } else if (length(x$inputs$prob_null) == 1) {
     plot_x <-
-      dplyr::rename(
-        dplyr::mutate(
-          dplyr::filter(
+      rename(
+        mutate(
+          filter(
             x$res_summary,
             prop_pos_null >= type1_range[1] &
               prop_pos_null <= type1_range[2] &
@@ -95,11 +101,11 @@ plot.calibrate_thresholds <- function(x,
   }
 
   plot_ab <-
-    dplyr::mutate(
-      dplyr::ungroup(
-        dplyr::slice(
-          dplyr::group_by(
-            dplyr::arrange(
+    mutate(
+      ungroup(
+        slice(
+          group_by(
+            arrange(
               plot_x,
               `Distance to optimal accuracy`,
               -pp_threshold,
@@ -110,15 +116,15 @@ plot.calibrate_thresholds <- function(x,
           1
         )
       ),
-      optimal_accuracy = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
+      optimal_accuracy = ifelse(row_number() == 1, TRUE, FALSE)
     )
 
   plot_nn <-
-    dplyr::mutate(
-      dplyr::ungroup(
-        dplyr::slice(
-          dplyr::group_by(
-            dplyr::arrange(
+    mutate(
+      ungroup(
+        slice(
+          group_by(
+            arrange(
               plot_x,
               `Distance to optimal efficiency`,
               -pp_threshold, -ppp_threshold
@@ -128,65 +134,65 @@ plot.calibrate_thresholds <- function(x,
           1
         )
       ),
-      optimal_efficiency = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
+      optimal_efficiency = ifelse(row_number() == 1, TRUE, FALSE)
     )
 
   p1 <-
-    ggplot2::ggplot(
+    ggplot(
       plot_ab,
-      ggplot2::aes(
+      aes(
         x = `Type I error`,
         y = Power,
         color = `Distance to optimal accuracy`,
         Design = Design
       )
     ) +
-    ggplot2::geom_point(
+    geom_point(
       shape = ifelse(plot_ab$optimal_accuracy == TRUE, 18, 19),
       size = ifelse(plot_ab$optimal_accuracy == TRUE, 4, 2)
     ) +
-    ggplot2::ylim(0, 1) +
-    ggplot2::xlim(0, 1) +
-    ggplot2::labs(
+    ylim(0, 1) +
+    xlim(0, 1) +
+    labs(
       x = "Type I error",
       y = "Power"
     ) +
-    ggplot2::scale_color_viridis_c() +
-    ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "bottom")
+    scale_color_viridis_c() +
+    theme_bw() +
+    theme(legend.position = "bottom")
 
   p2 <-
-    ggplot2::ggplot(
+    ggplot(
       plot_nn,
-      ggplot2::aes(
+      aes(
         x = `Average N under the null`,
         y = `Average N under the alternative`,
         color = `Distance to optimal efficiency`,
         Design = Design
       )
     ) +
-    ggplot2::geom_point(
+    geom_point(
       shape = ifelse(plot_nn$optimal_efficiency == TRUE, 18, 19),
       size = ifelse(plot_nn$optimal_efficiency == TRUE, 4, 2)
     ) +
-    ggplot2::ylim(
+    ylim(
       min(plot_x$`Average N under the null`),
       max(plot_x$`Average N under the alternative`)
     ) +
-    ggplot2::xlim(
+    xlim(
       min(plot_x$`Average N under the null`),
       max(plot_x$`Average N under the alternative`)
     ) +
-    ggplot2::labs(
+    labs(
       x = "Average N under the null",
       y = "Average N under the alternative"
     ) +
-    ggplot2::scale_color_viridis_c() +
-    ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "bottom")
+    scale_color_viridis_c() +
+    theme_bw() +
+    theme(legend.position = "bottom")
 
   ifelse(plotly == TRUE,
-    list(plotly::ggplotly(p1), plotly::ggplotly(p2)),
-    gridExtra::grid.arrange(p1, p2, nrow = 1, ncol = 2)
+    list(ggplotly(p1), ggplotly(p2)),
+    grid.arrange(p1, p2, nrow = 1, ncol = 2)
   )
 }

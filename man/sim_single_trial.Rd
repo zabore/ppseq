@@ -73,15 +73,15 @@ given the data available at each interim analysis.
 # One-sample case
 set.seed(123)
 sim_single_trial(
-  prob = 0.3, n = seq(5, 50, 5), direction = "greater",
-  p = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 5000, N = 50, theta = 0.95
+  prob = 0.3, n = c(5, 10), direction = "greater",
+  p = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 5000, N = 25, theta = 0.95
 )
 
-# Two-sample case
-set.seed(123)
-sim_single_trial(
-  prob = c(0.1, 0.3), n = cbind(seq(5, 50, 5), seq(5, 50, 5)),
-  direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5), S = 5000,
-  N = c(50, 50), theta = 0.95
-)
+# # Two-sample case (not run)
+# set.seed(123)
+#  sim_single_trial(
+#    prob = c(0.1, 0.3), n = cbind(c(5, 10), c(5, 10)),
+#    direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5), 
+#    S = 5000, N = c(50, 50), theta = 0.95
+#  )
 }

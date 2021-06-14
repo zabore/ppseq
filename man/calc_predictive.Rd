@@ -62,9 +62,9 @@ the standard-of-care arm and y1, n1, and N1 in the experimental arm.
 
 set.seed(123)
 
-# Two-sample case
-calc_predictive(y = c(7, 12), n = c(50, 50), N = c(100, 100))
-
-# One-sample case
+# One-sample case (not run)
 calc_predictive(y = 14, n = 50, p0 = 0.2, delta = NULL, N = 100)
+
+# # Two-sample case (not run)
+# calc_predictive(y = c(7, 12), n = c(50, 50), N = c(100, 100))
 }
