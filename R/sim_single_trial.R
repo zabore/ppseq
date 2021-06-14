@@ -40,7 +40,14 @@
 #' probability), number of responses, sample size,
 #' posterior probability, and posterior predictive probability at each
 #' look
-#'
+#' 
+#' @importFrom stats rbinom
+#' @importFrom purrr pmap_dbl map2_dbl
+#' @importFrom tibble tibble add_column
+#' @importFrom furrr future_pmap_dbl furrr_options
+#' @importFrom future nbrOfWorkers
+#' @importFrom dplyr arrange select everything
+#' 
 #' @examples
 #'
 #' # One-sample case
@@ -183,6 +190,5 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       pp_threshold
     )
   }
-
   return(res)
 }

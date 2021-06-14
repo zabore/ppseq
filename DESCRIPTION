@@ -23,23 +23,23 @@ RoxygenNote: 7.1.1
 Depends:
     R (>= 3.5.0)
 Suggests: 
+    covr,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    covr,
     spelling
 VignetteBuilder: knitr
 Imports: 
-    purrr,
-    tibble,
+    clinfun,
     dplyr,
-    future,
     furrr,
-    here,
+    future,
     gt,
     ggplot2,
+    gridExtra,
+    here,
     plotly,
-    clinfun,
-    gridExtra
+    purrr,
+    tibble
 Config/testthat/edition: 3
 Language: en-US

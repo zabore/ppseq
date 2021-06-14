@@ -32,7 +32,6 @@ generates a single dataset of n and response count at each look based on the
 response probability(ies)
 }
 \examples{
-
 \dontrun{
 set.seed(123)
 

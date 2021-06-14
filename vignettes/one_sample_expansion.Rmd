@@ -26,6 +26,8 @@ To execute the code in this vignette, you first need to install and load the {pp
 ```{r setup}
 # remotes::install_github("zabore/ppseq")
 library(ppseq)
+library(future)
+plan(multisession)
 ```
 
 

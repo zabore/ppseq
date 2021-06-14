@@ -251,6 +251,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' }
 #'
 #' # Two-sample case
+#' @importFrom purrr pmap_dfr
 #' @export
 
 calibrate_thresholds <- function(prob_null, prob_alt, n,
@@ -270,35 +271,38 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
       ppp_threshold = ppp_threshold
     ))
 
-  res_null <-
+  sim_dat_null <- 
+    purrr::map(1:nsim, ~sim_dat1(prob = prob_null, n = n))
+  
+  sim_dat_alt <- 
+    purrr::map(1:nsim, ~sim_dat1(prob = prob_alt, n = n))
+  
+  cross_threshold <- 
+    purrr::cross_df(list(pp_threshold = pp_threshold, 
+                         ppp_threshold = ppp_threshold))
+  res_null <- 
     furrr::future_map(
       sim_dat_null,
-      function(x)
-        furrr::future_pmap_dfr(cross_threshold,
-          function(pp_threshold, ppp_threshold)
-            eval_thresh(x, pp_threshold, ppp_threshold,
-              direction = direction, p0 = p0,
-              delta = delta, prior = prior,
-              S = S, N = N
-            ),
-          .options = furrr::furrr_options(seed = TRUE)
-        ),
+      function(x) 
+        pmap_dfr(cross_threshold,
+                 function(pp_threshold, ppp_threshold) 
+                   eval_thresh(x, pp_threshold, ppp_threshold,
+                 direction = direction, p0 = p0, 
+                 delta = delta, prior = prior, 
+                 S = S, N = N)), 
       .options = furrr::furrr_options(seed = TRUE)
     )
-
-  res_alt <-
+  
+  res_alt <- 
     furrr::future_map(
       sim_dat_alt,
-      function(x)
-        furrr::future_pmap_dfr(cross_threshold,
-          function(pp_threshold, ppp_threshold)
-            eval_thresh(x, pp_threshold, ppp_threshold,
-              direction = direction, p0 = p0,
-              delta = delta, prior = prior,
-              S = S, N = N
-            ),
-          .options = furrr::furrr_options(seed = TRUE)
-        ),
+      function(x) 
+        pmap_dfr(cross_threshold,
+                 function(pp_threshold, ppp_threshold) 
+                   eval_thresh(x, pp_threshold, ppp_threshold,
+                 direction = direction, p0 = p0, 
+                 delta = delta, prior = prior, 
+                 S = S, N = N)),
       .options = furrr::furrr_options(seed = TRUE)
     )
 
@@ -404,12 +408,6 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
 
   # assign a custom class for S3 plotting methods
   class(x) <- c("calibrate_thresholds", class(x))
-
   x
 }
 
-# test <- calibrate_thresholds(prob_null = 0.1, prob_alt = 0.3,
-#                      n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL,
-#                      prior = c(0.5, 0.5), S = 500, N = 25, nsim = 10,
-#                      pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#                      ppp_threshold = seq(0.05, 0.2, 0.05))

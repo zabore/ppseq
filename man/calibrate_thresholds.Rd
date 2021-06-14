@@ -96,13 +96,14 @@ threshold.
 \dontrun{
 set.seed(123)
 
-calibrate_thresholds(prob_null = 0.1, prob_alt = 0.3, 
-n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL, 
-prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000, 
-pp_threshold = c(0.9, 0.95, 0.96, 0.98), 
-ppp_threshold = seq(0.05, 0.2, 0.05))
+calibrate_thresholds(
+  prob_null = 0.1, prob_alt = 0.3,
+  n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL,
+  prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
+  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+  ppp_threshold = seq(0.05, 0.2, 0.05)
+)
 }
 
 # Two-sample case
-
 }

@@ -56,7 +56,6 @@ a single combination of a pp_threshold and a ppp_threshold for a single
 dataset
 }
 \examples{
-
 \dontrun{
 set.seed(123)
 
