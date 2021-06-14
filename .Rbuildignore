@@ -9,3 +9,4 @@
 ^covid-files$
 ^README\.Rmd$
 ^codecov\.yml$
+^\.github$
