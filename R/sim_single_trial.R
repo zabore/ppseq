@@ -54,7 +54,7 @@
 #' set.seed(123)
 #' sim_single_trial(
 #'   prob = 0.3, n = c(5, 10), direction = "greater",
-#'   p = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 5000, N = 25, theta = 0.95
+#'   p = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 50, N = 25, theta = 0.95
 #' )
 #'
 #' # # Two-sample case (not run)
@@ -87,17 +87,17 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       n <- matrix(n, nrow = 1)
     }
 
-    y0 <- stats::rbinom(n = 1, size = n[1, 1], prob = prob[1])
-    y1 <- stats::rbinom(n = 1, size = n[1, 2], prob = prob[2])
+    y0 <- rbinom(n = 1, size = n[1, 1], prob = prob[1])
+    y1 <- rbinom(n = 1, size = n[1, 2], prob = prob[2])
 
     if (length(n) > 2) {
-      for (i in 2:nrow(n)) {
-        y0 <- c(y0, y0[length(y0)] + stats::rbinom(
+      for (i in seq_len(nrow(n))[-1]) {
+        y0 <- c(y0, y0[length(y0)] + rbinom(
           n = 1,
           size = n[i, 1] - n[i - 1, 1],
           prob = prob[1]
         ))
-        y1 <- c(y1, y1[length(y1)] + stats::rbinom(
+        y1 <- c(y1, y1[length(y1)] + rbinom(
           n = 1,
           size = n[i, 2] - n[i - 1, 2],
           prob = prob[2]
@@ -105,7 +105,7 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       }
     }
 
-    pp <- purrr::pmap_dbl(
+    pp <- pmap_dbl(
       list(y0, y1, n[, 1], n[, 2]),
       ~ calc_posterior(
         y = c(..1, ..2),
@@ -115,7 +115,7 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       )
     )
 
-    crossargs <- tibble::tibble(
+    crossargs <- tibble(
       y0 = rep(y0, length(theta)),
       y1 = rep(y1, length(theta)),
       n0 = rep(n[, 1], length(theta)),
@@ -123,7 +123,7 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       pp_threshold = rep(theta, each = length(pp))
     )
 
-    ppp <- purrr::pmap_dbl(
+    ppp <- pmap_dbl(
       crossargs,
       ~ calc_predictive(
         y = c(..1, ..2),
@@ -133,22 +133,22 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       )
     )
 
-    res <- dplyr::arrange(
-      dplyr::select(
-        tibble::add_column(crossargs,
+    res <- arrange(
+      select(
+        add_column(crossargs,
           pp = rep(pp, length(theta)),
           ppp = ppp
         ),
-        pp_threshold, dplyr::everything()
+        pp_threshold, everything()
       ),
       pp_threshold
     )
   } else if (length(prob) == 1) {
-    y1 <- stats::rbinom(n = 1, size = n[1], prob = prob)
+    y1 <- rbinom(n = 1, size = n[1], prob = prob)
 
     if (length(n) > 1) {
-      for (i in 2:length(n)) {
-        y1 <- c(y1, y1[length(y1)] + stats::rbinom(
+      for (i in seq_along(n)[-1]) {
+        y1 <- c(y1, y1[length(y1)] + rbinom(
           n = 1,
           size = n[i] - n[i - 1],
           prob = prob
@@ -156,7 +156,7 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       }
     }
 
-    pp <- purrr::map2_dbl(
+    pp <- map2_dbl(
       y1, n,
       ~ calc_posterior(
         y = .x,
@@ -166,13 +166,13 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       )
     )
 
-    crossargs <- tibble::tibble(
+    crossargs <- tibble(
       y1 = rep(y1, length(theta)),
       n1 = rep(n, length(theta)),
       pp_threshold = rep(theta, each = length(pp))
     )
 
-    ppp <- purrr::pmap_dbl(
+    ppp <- pmap_dbl(
       crossargs,
       ~ calc_predictive(
         y = ..1,
@@ -182,10 +182,10 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       )
     )
 
-    res <- dplyr::arrange(
-      dplyr::select(
-        tibble::add_column(crossargs, pp = rep(pp, length(theta)), ppp = ppp),
-        pp_threshold, dplyr::everything()
+    res <- arrange(
+      select(
+        add_column(crossargs, pp = rep(pp, length(theta)), ppp = ppp),
+        pp_threshold, everything()
       ),
       pp_threshold
     )

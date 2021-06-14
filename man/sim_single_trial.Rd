@@ -74,7 +74,7 @@ given the data available at each interim analysis.
 set.seed(123)
 sim_single_trial(
   prob = 0.3, n = c(5, 10), direction = "greater",
-  p = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 5000, N = 25, theta = 0.95
+  p = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 50, N = 25, theta = 0.95
 )
 
 # # Two-sample case (not run)

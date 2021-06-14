@@ -40,6 +40,23 @@ test_that(
 
 # TODO: need a small example below that returns something
 # TODO: need a two-sample calibrate_thresholds example.
+# TODO: the following is a hack to avoid snapshot issues.
+
+set.seed(123)
+calibrate_thresholds( 
+  prob_null = 0.01, 
+  prob_alt = 0.9, 
+  n = c(5, 25), 
+  direction = "greater", 
+  p0 = 0.1, 
+  delta = NULL,
+  prior = c(0.5, 0.5), 
+  S = 200, 
+  N = 100, 
+  nsim = 100,
+  pp_threshold = c(0.98),
+  ppp_threshold = c(0.01)
+)
 
 test_that(
   "single-sample calibrate thresholds",

@@ -31,42 +31,44 @@
 #' # Two-sample case
 #' sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 #' }
+#' @importFrom stats rbinom
+#' @importFrom tibble tibble
 sim_dat1 <- function(prob, n) {
   if (length(prob) == 2) {
     if (length(n) == 2 & is.matrix(n) == FALSE) {
       n <- matrix(n, nrow = 1)
     }
-    y0 <- stats::rbinom(n = 1, size = n[1, 1], prob = prob[1])
-    y1 <- stats::rbinom(n = 1, size = n[1, 2], prob = prob[2])
+    y0 <- rbinom(n = 1, size = n[1, 1], prob = prob[1])
+    y1 <- rbinom(n = 1, size = n[1, 2], prob = prob[2])
     if (length(n) > 2) {
-      for (i in 2:nrow(n)) {
-        y0 <- c(y0, y0[length(y0)] + stats::rbinom(
+      for (i in seq_len(nrow(n))[-1]) {
+        y0 <- c(y0, y0[length(y0)] + rbinom(
           n = 1,
           size = n[i, 1] - n[i - 1, 1],
           prob = prob[1]
         ))
-        y1 <- c(y1, y1[length(y1)] + stats::rbinom(
+        y1 <- c(y1, y1[length(y1)] + rbinom(
           n = 1,
           size = n[i, 2] - n[i - 1, 2],
           prob = prob[2]
         ))
       }
     }
-    return(tibble::tibble(
+    return(tibble(
       n0 = n[, 1],
       n1 = n[, 2],
       y0 = y0,
       y1 = y1
     ))
   } else if (length(prob) == 1) {
-    y1 <- stats::rbinom(n = 1, size = n[1], prob = prob)
+    y1 <- rbinom(n = 1, size = n[1], prob = prob)
     if (length(n) > 1) {
-      for (i in 2:length(n)) {
+      for (i in seq_along(n)[-1]) {
         y1 <- c(y1, y1[length(y1)] +
-          stats::rbinom(n = 1, size = n[i] - n[i - 1], prob = prob))
+          rbinom(n = 1, size = n[i] - n[i - 1], prob = prob))
       }
     }
-    return(tibble::tibble(n1 = n, y1 = y1))
+    return(tibble(n1 = n, y1 = y1))
   }
 }
 
@@ -115,6 +117,8 @@ sim_dat1 <- function(prob, n) {
 #' dat2 <- sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 #' eval_thresh(dat2, 0.95, 0.3, S = 500, N = c(25, 25))
 #' }
+#' @importFrom tibble add_column
+#' @importFrom dplyr mutate case_when
 eval_thresh <- function(data, pp_threshold, ppp_threshold,
                         direction = "greater", p0 = NULL, delta = 0,
                         prior = c(0.5, 0.5), S = 5000, N) {
@@ -140,7 +144,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
     decision[i] <- ppp[i] < ppp_threshold
     if (decision[i] == TRUE) break
   }
-  res0 <- tibble::add_column(
+  res0 <- add_column(
     data[ifelse(any(decision == TRUE),
       which(decision == TRUE),
       length(decision)
@@ -154,18 +158,18 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
   )
 
   if (ncol(data) == 4) {
-    res <- dplyr::mutate(
+    res <- mutate(
       res0,
-      positive = dplyr::case_when(
+      positive = case_when(
         sum(n0, n1) == sum(N) & ppp > pp_threshold ~ TRUE,
         sum(n0, n1) == sum(N) & ppp < pp_threshold ~ FALSE,
         sum(n0, n1) != sum(N) ~ FALSE
       )
     )
   } else if (ncol(data) == 2) {
-    res <- dplyr::mutate(
+    res <- mutate(
       res0,
-      positive = dplyr::case_when(
+      positive = case_when(
         n1 == N & ppp > pp_threshold ~ TRUE,
         n1 == N & ppp < pp_threshold ~ FALSE,
         n1 != N ~ FALSE
@@ -251,7 +255,9 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' }
 #'
 #' # Two-sample case
-#' @importFrom purrr pmap_dfr
+#' @importFrom purrr pmap_dfr map cross_df
+#' @importFrom furrr future_map furrr_options
+#' @importFrom dplyr bind_rows full_join select rename ungroup summarize
 #' @export
 
 calibrate_thresholds <- function(prob_null, prob_alt, n,
@@ -260,28 +266,28 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
                                  S = 5000, N, nsim = 1000,
                                  pp_threshold, ppp_threshold) {
   sim_dat_null <-
-    purrr::map(1:nsim, ~ sim_dat1(prob = prob_null, n = n))
+    map(seq_len(nsim), ~ sim_dat1(prob = prob_null, n = n))
 
   sim_dat_alt <-
-    purrr::map(1:nsim, ~ sim_dat1(prob = prob_alt, n = n))
+    map(seq_len(nsim), ~ sim_dat1(prob = prob_alt, n = n))
 
   cross_threshold <-
-    purrr::cross_df(list(
+    cross_df(list(
       pp_threshold = pp_threshold,
       ppp_threshold = ppp_threshold
     ))
 
   sim_dat_null <- 
-    purrr::map(1:nsim, ~sim_dat1(prob = prob_null, n = n))
+    map(1:nsim, ~sim_dat1(prob = prob_null, n = n))
   
   sim_dat_alt <- 
-    purrr::map(1:nsim, ~sim_dat1(prob = prob_alt, n = n))
+    map(1:nsim, ~sim_dat1(prob = prob_alt, n = n))
   
   cross_threshold <- 
-    purrr::cross_df(list(pp_threshold = pp_threshold, 
-                         ppp_threshold = ppp_threshold))
+    cross_df(list(pp_threshold = pp_threshold, 
+                  ppp_threshold = ppp_threshold))
   res_null <- 
-    furrr::future_map(
+    future_map(
       sim_dat_null,
       function(x) 
         pmap_dfr(cross_threshold,
@@ -290,11 +296,11 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
                  direction = direction, p0 = p0, 
                  delta = delta, prior = prior, 
                  S = S, N = N)), 
-      .options = furrr::furrr_options(seed = TRUE)
+      .options = furrr_options(seed = TRUE)
     )
   
   res_alt <- 
-    furrr::future_map(
+    future_map(
       sim_dat_alt,
       function(x) 
         pmap_dfr(cross_threshold,
@@ -303,17 +309,17 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
                  direction = direction, p0 = p0, 
                  delta = delta, prior = prior, 
                  S = S, N = N)),
-      .options = furrr::furrr_options(seed = TRUE)
+      .options = furrr_options(seed = TRUE)
     )
 
   res_df_null <-
-    dplyr::bind_rows(
+    bind_rows(
       res_null,
       .id = "sim_num"
     )
 
   res_df_alt <-
-    dplyr::bind_rows(
+    bind_rows(
       res_alt,
       .id = "sim_num"
     )
@@ -321,16 +327,16 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
 
   if (length(prob_null) == 2) {
     res_df <-
-      dplyr::full_join(
-        dplyr::select(
-          dplyr::rename(res_df_null,
+      full_join(
+        select(
+          rename(res_df_null,
             n0_null = n0, n1_null = n1,
             positive_null = positive
           ),
           -ppp, -y0, -y1
         ),
-        dplyr::select(
-          dplyr::rename(res_df_alt,
+        select(
+          rename(res_df_alt,
             n0_alt = n0, n1_alt = n1,
             positive_alt = positive
           ),
@@ -339,9 +345,9 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
       )
 
     res_summary <-
-      dplyr::ungroup(
-        dplyr::summarize(
-          dplyr::group_by(res_df, pp_threshold, ppp_threshold),
+      ungroup(
+        summarize(
+          group_by(res_df, pp_threshold, ppp_threshold),
           mean_n0_null = mean(n0_null),
           mean_n1_null = mean(n1_null),
           prop_pos_null = mean(positive_null),
@@ -354,21 +360,21 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
       )
   } else if (length(prob_null) == 1) {
     res_df <-
-      dplyr::full_join(
-        dplyr::select(
-          dplyr::rename(res_df_null, n1_null = n1, positive_null = positive),
+      full_join(
+        select(
+          rename(res_df_null, n1_null = n1, positive_null = positive),
           -ppp, -y1
         ),
-        dplyr::select(
-          dplyr::rename(res_df_alt, n1_alt = n1, positive_alt = positive),
+        select(
+          rename(res_df_alt, n1_alt = n1, positive_alt = positive),
           -ppp, -y1
         )
       )
 
     res_summary <-
-      dplyr::ungroup(
-        dplyr::summarize(
-          dplyr::group_by(res_df, pp_threshold, ppp_threshold),
+      ungroup(
+        summarize(
+          group_by(res_df, pp_threshold, ppp_threshold),
           mean_n1_null = mean(n1_null),
           prop_pos_null = mean(positive_null),
           prop_stopped_null = mean(n1_null < N),
