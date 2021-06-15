@@ -26,8 +26,8 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0),
-    spelling
+    spelling,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Imports: 
     clinfun,
