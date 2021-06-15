@@ -58,4 +58,5 @@ calc_posterior(y = c(14, 23), n = c(100, 100))
 
 # One-sample case
 calc_posterior(y = 27, n = 100, p0 = 0.2, delta = NULL)
+
 }

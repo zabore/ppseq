@@ -46,7 +46,7 @@
 #' #   S = 5000, theta = c(0.9, 0.95)
 #' # )
 #' @importFrom purrr map_dbl map2_dbl
-#' @importFrom status rbinom
+#' @importFrom stats rbinom
 #' @importFrom tibble tibble
 #' @export
 

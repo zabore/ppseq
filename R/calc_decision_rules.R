@@ -46,8 +46,8 @@ calc_decision_rules <- function(n, direction = "greater", p0,
                                 delta = NULL, prior = c(0.5, 0.5), S = 5000,
                                 N, theta, ppp) {
   if ((is.null(p0) & is.null(delta)) | (!is.null(p0) & !is.null(delta)))
-    stop(paste("Exactly one of delta or p0 must be specified for the", 
-               "two-sample and one-sample case, respectively")
+    stop("Exactly one of delta or p0 must be specified for the ", 
+         "two-sample and one-sample case, respectively")
 
   if (!direction %in% c("greater", "less"))
     stop('direction must be either "greater" or "less"')
