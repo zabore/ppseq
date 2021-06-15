@@ -39,27 +39,31 @@
 #' calc_decision_rules(seq(5, 25, 5), p0 = 0.1, N = 25, theta = 0.86, ppp = 0.2)
 #' }
 #'
+#' @importFrom tibble tibble
 #' @export
 
 calc_decision_rules <- function(n, direction = "greater", p0,
                                 delta = NULL, prior = c(0.5, 0.5), S = 5000,
                                 N, theta, ppp) {
   if ((is.null(p0) & is.null(delta)) | (!is.null(p0) & !is.null(delta)))
-    stop("Exactly one of delta or p0 must be specified for the two-sample and one-sample case, respectively")
+    stop(paste("Exactly one of delta or p0 must be specified for the", 
+               "two-sample and one-sample case, respectively")
 
   if (!direction %in% c("greater", "less"))
     stop('direction must be either "greater" or "less"')
 
   # Set up the results table
-  res <- tibble::tibble(
+  res <- tibble(
     n = n,
     r = rep(NA_integer_, length(n))
   )
 
-  # initialize the ytest parameter (will have 1 added in loop so will really start at 0)
+  # initialize the ytest parameter (will have 1 added in loop so will really 
+  # start at 0)
 
 
-  # Loop over each value of n and for each, continue while the predictive probability for a given ytest is less than the ppp threshold
+  # Loop over each value of n and for each, continue while the predictive 
+  # probability for a given ytest is less than the ppp threshold.
   for (i in n) {
     ytest <- -1
     pred <- 0

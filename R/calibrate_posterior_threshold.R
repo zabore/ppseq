@@ -45,6 +45,9 @@
 #' #   direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5),
 #' #   S = 5000, theta = c(0.9, 0.95)
 #' # )
+#' @importFrom purrr map_dbl map2_dbl
+#' @importFrom status rbinom
+#' @importFrom tibble tibble
 #' @export
 
 calibrate_posterior_threshold <- function(prob, N,
@@ -52,17 +55,17 @@ calibrate_posterior_threshold <- function(prob, N,
                                           delta = 0, prior = c(0.5, 0.5),
                                           S = 5000, theta) {
   if (length(N) == 2) {
-    y0 <- purrr::map_dbl(
-      1:S,
-      ~ stats::rbinom(n = 1, size = N[1], prob = prob[1])
+    y0 <- map_dbl(
+      seq_len(S),
+      ~ rbinom(n = 1, size = N[1], prob = prob[1])
     )
-    y1 <- purrr::map_dbl(
-      1:S,
-      ~ stats::rbinom(n = 1, size = N[2], prob = prob[2])
+    y1 <- map_dbl(
+      seq_len(S),
+      ~ rbinom(n = 1, size = N[2], prob = prob[2])
     )
 
     posts <-
-      purrr::map2_dbl(
+      map2_dbl(
         y0, y1,
         ~ calc_posterior(
           y = c(.x, .y), n = N,
@@ -71,13 +74,13 @@ calibrate_posterior_threshold <- function(prob, N,
         )
       )
   } else if (length(N) == 1) {
-    y1 <- purrr::map_dbl(
-      1:S,
-      ~ stats::rbinom(n = 1, size = N, prob = prob)
+    y1 <- map_dbl(
+      seq_len(S),
+      ~ rbinom(n = 1, size = N, prob = prob)
     )
 
     posts <-
-      purrr::map_dbl(
+      map_dbl(
         y1,
         ~ calc_posterior(
           y = .x, n = N,
@@ -87,9 +90,9 @@ calibrate_posterior_threshold <- function(prob, N,
       )
   }
 
-  proportion_positive <- purrr::map_dbl(theta, ~ mean(posts > .x))
+  proportion_positive <- map_dbl(theta, ~ mean(posts > .x))
 
-  return(tibble::tibble(
+  return(tibble(
     pp_threshold = theta,
     prop_pos = proportion_positive
   ))

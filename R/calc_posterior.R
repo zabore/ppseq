@@ -35,6 +35,8 @@
 #'
 #' # One-sample case
 #' calc_posterior(y = 27, n = 100, p0 = 0.2, delta = NULL)
+#' 
+#' @importFrom stats rbeta
 #' @export
 
 calc_posterior <- function(y, n, direction = "greater", p0 = NULL,
@@ -56,15 +58,15 @@ calc_posterior <- function(y, n, direction = "greater", p0 = NULL,
     stop("delta must be specified for the two-sample case")
 
   if (length(y) == 2) {
-    rb0 <- stats::rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
-    rb1 <- stats::rbeta(S, prior[1] + y[2], prior[2] + n[2] - y[2])
+    rb0 <- rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
+    rb1 <- rbeta(S, prior[1] + y[2], prior[2] + n[2] - y[2])
 
     out <- ifelse(direction == "greater",
       mean(rb1 > rb0 + delta),
       mean(rb1 + delta < rb0)
     )
   } else if (length(y) == 1) {
-    rb1 <- stats::rbeta(S, prior[1] + y, prior[2] + n - y)
+    rb1 <- rbeta(S, prior[1] + y, prior[2] + n - y)
 
     out <- ifelse(direction == "greater", mean(rb1 > p0), mean(rb1 < p0))
   }

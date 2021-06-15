@@ -40,6 +40,8 @@
 #'
 #' # # Two-sample case (not run)
 #' # calc_predictive(y = c(7, 12), n = c(50, 50), N = c(100, 100))
+#' @importFrom stats rbeta rbinom
+#' @importFrom purrr map_dbl map2_dbl
 #' @export
 
 calc_predictive <- function(y, n, direction = "greater", p0 = NULL,
@@ -65,38 +67,38 @@ calc_predictive <- function(y, n, direction = "greater", p0 = NULL,
     stop("y and N must be the same length")
 
   if (length(y) == 2) {
-    rb0 <- stats::rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
-    rb1 <- stats::rbeta(S, prior[1] + y[2], prior[2] + n[2] - y[2])
+    rb0 <- rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
+    rb1 <- rbeta(S, prior[1] + y[2], prior[2] + n[2] - y[2])
 
     if (n[1] < N[1]) {
-      Y0 <- y[1] + purrr::map_dbl(rb0, stats::rbinom, n = 1, size = N[1] - n[1])
+      Y0 <- y[1] + map_dbl(rb0, rbinom, n = 1, size = N[1] - n[1])
     } else {
       Y0 <- rep(y[1], S)
       N[1] <- n[1]
     }
 
     if (n[2] < N[2]) {
-      Y1 <- y[2] + purrr::map_dbl(rb1, stats::rbinom, n = 1, size = N[2] - n[2])
+      Y1 <- y[2] + map_dbl(rb1, rbinom, n = 1, size = N[2] - n[2])
     } else {
       Y1 <- rep(y[2], S)
       N[2] <- n[2]
     }
 
-    post <- purrr::map2_dbl(Y0, Y1, ~ calc_posterior(
+    post <- map2_dbl(Y0, Y1, ~ calc_posterior(
       y = c(.x, .y), n = N,  direction = direction, p0 = p0, delta = delta,
       prior = prior, S = S
     ))
   } else if (length(y) == 1) {
-    rb1 <- stats::rbeta(S, prior[1] + y, prior[2] + n - y)
+    rb1 <- rbeta(S, prior[1] + y, prior[2] + n - y)
 
     if (n < N) {
-      Y <- y + purrr::map_dbl(rb1, stats::rbinom, n = 1, size = N - n)
+      Y <- y + map_dbl(rb1, rbinom, n = 1, size = N - n)
     } else {
       Y <- rep(y, S)
       N <- n
     }
 
-    post <- purrr::map_dbl(Y, calc_posterior,
+    post <- map_dbl(Y, calc_posterior,
       n = N,
       direction = direction, p0 = p0,
       delta = delta, prior = prior, S = S

@@ -48,19 +48,25 @@ optimize_design <- function(x,
 #' optimize_design(cal_tbl)
 #' }
 #'
+#' @importFrom dplyr rename mutate filter slice group_by arrange
 #' @export
 
 optimize_design.calibrate_thresholds <- function(x,
                                                  type1_range = c(0.05, 0.1),
                                                  minimum_power = 0.8, ...) {
   if (any(class(x) == "calibrate_thresholds") == FALSE)
-    stop("x must be class 'calibrate_thresholds', usually an object returned from a call to the function ppseq::calibrate_thresholds()")
+    stop("x must be class 'calibrate_thresholds', usually an object ",
+         "returned from a call to the function ppseq::calibrate_thresholds()")
 
   if (length(type1_range) != 2 & !is.null(type1_range))
-    stop("type1_range must be a vector of length 2 defining the range of acceptable type I error, or can be set equal to NULL to return all values of type I error")
+    stop("type1_range must be a vector of length 2 defining the ", 
+         "range of acceptable type I error, or can be set equal to NULL ",
+         "to return all values of type I error")
 
   if (length(minimum_power) != 1 & !is.null(minimum_power))
-    stop("minimum_power must be a numeric value of length 1 defining the minimum acceptable power, or can be set equal to NULL to return all values of power")
+    stop("minimum_power must be a numeric value of length 1 defining the ",
+         "minimum acceptable power, or can be set equal to NULL to return ",
+         "all values of power")
 
   if (!is.numeric(minimum_power) & !is.null(minimum_power))
     stop("minimum_power must be a numeric value of length 1 or NULL")
@@ -72,9 +78,9 @@ optimize_design.calibrate_thresholds <- function(x,
 
   if (length(x$inputs$prob_null) == 2) {
     opt_x <-
-      dplyr::rename(
-        dplyr::mutate(
-          dplyr::filter(
+      rename(
+        mutate(
+          filter(
             x$res_summary,
             prop_pos_null >= type1_range[1] &
               prop_pos_null <= type1_range[2] &
@@ -96,9 +102,9 @@ optimize_design.calibrate_thresholds <- function(x,
       )
   } else if (length(x$inputs$prob_null) == 1) {
     opt_x <-
-      dplyr::rename(
-        dplyr::mutate(
-          dplyr::filter(
+      rename(
+        mutate(
+          filter(
             x$res_summary,
             prop_pos_null >= type1_range[1] &
               prop_pos_null <= type1_range[2] &
@@ -119,9 +125,9 @@ optimize_design.calibrate_thresholds <- function(x,
   }
 
   opt_ab <-
-    dplyr::slice(
-      dplyr::group_by(
-        dplyr::arrange(
+    slice(
+      group_by(
+        arrange(
           opt_x,
           `Distance to (0, 1)`, -pp_threshold, -ppp_threshold
         ),
@@ -131,9 +137,9 @@ optimize_design.calibrate_thresholds <- function(x,
     )
 
   opt_nn <-
-    dplyr::slice(
-      dplyr::group_by(
-        dplyr::arrange(
+    slice(
+      group_by(
+        arrange(
           opt_x,
           `Distance to min(N under null) and max(N under alt)`,
           -pp_threshold, -ppp_threshold
