@@ -32,10 +32,10 @@
 #' set.seed(123)
 #'
 #' # Two-sample case
-#' calc_posterior(y = c(14, 23), n = c(100, 100))
+#' calc_posterior(y = c(14, 23), n = c(100, 100), p0 = NULL, delta = 0)
 #'
 #' # One-sample case
-#' calc_posterior(y = 27, n = 100, p0 = 0.2, delta = NULL)
+#' calc_posterior(y = 27, n = 100, p0 = 0.2)
 #' 
 #' @importFrom stats rbeta
 #' @export

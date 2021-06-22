@@ -68,8 +68,14 @@ A list containing a
 \enumerate{
 \item a tibble 'res_summary' containing the posterior probability threshold
 (pp_threshold), the predictive probability threshold (ppp_threshold),
-the ceiling of the mean sample size (mean_n0 and mean_n1 for two-sample case;
-mean_n1 for one-sample case), and the proportion of positive trials.
+the mean sample size under the null (mean_n0_null and mean_n1_null
+for two-sample case; mean_n1_null for one-sample case), the proportion of
+positive trials under the null (prop_pos_null), the proportion of trials
+stopped early under the null (prop_stopped_null), the mean sample
+size under the alternative (mean_n0_alt and mean_n1_alt
+for two-sample case; mean_n1_alt for one-sample case), the proportion of
+positive trials under the alternative (prop_pos_alt), the proportion of
+trials stopped early under the alternative (prop_stopped_alt)
 \item 'call_list' containing the original function call
 \item 'calibrate_thresholds_inputs' a list containing the inputs to the
 original function call

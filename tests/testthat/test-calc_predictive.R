@@ -1,10 +1,10 @@
 test_that("no errors or warnings with correct use", {
   expect_error(calc_predictive(
-    y = c(7, 12), n = c(50, 50), N = c(100, 100),
+    y = c(7, 12), n = c(50, 50), N = c(100, 100), p0 = NULL, delta = 0,
     S = 100
   ), NA)
   expect_warning(calc_predictive(
-    y = c(7, 12), n = c(50, 50), N = c(100, 100),
+    y = c(7, 12), n = c(50, 50), N = c(100, 100), p0 = NULL, delta = 0,
     S = 100
   ), NA)
 
