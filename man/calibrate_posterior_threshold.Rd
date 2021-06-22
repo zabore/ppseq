@@ -7,9 +7,9 @@
 calibrate_posterior_threshold(
   p,
   N,
+  p0,
   direction = "greater",
-  p0 = NULL,
-  delta = 0,
+  delta = NULL,
   prior = c(0.5, 0.5),
   S = 5000,
   theta
@@ -23,14 +23,15 @@ integer of event probability for one-sample case}
 \item{N}{vector of length two containing the total sample size c(N0, N1)
 for two-sample case; integer of sample size so far N for one-sample case}
 
+\item{p0}{The target value to compare to in the one-sample case. Set to
+NULL for the two-sample case.}
+
 \item{direction}{"greater" (default) if interest is in p(p1 > p0) and "less"
 if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).}
 
-\item{p0}{The target value to compare to in the one-sample case}
-
 \item{delta}{clinically meaningful difference between groups.
-Typically 0 (default).}
+Typically 0 for the two-sample case. NULL for the one-sample case (default).}
 
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}

@@ -7,12 +7,12 @@
 calc_predictive(
   y,
   n,
+  p0,
+  N,
   direction = "greater",
-  p0 = NULL,
-  delta = 0,
+  delta = NULL,
   prior = c(0.5, 0.5),
   S = 5000,
-  N,
   theta = 0.95
 )
 }
@@ -24,23 +24,24 @@ for one-sample case}
 \item{n}{vector of length two containing the sample size so far c(n0, n1)
 for two-sample case; integer of sample size so far for one-sample case}
 
+\item{p0}{The target value to compare to in the one-sample case. Set to NULL
+for the two-sample case.}
+
+\item{N}{the total planned sample size at the end of the trial, c(N0, N1)
+for two-sample case; integer of total planned sample size at end of trial N
+for one-sample case}
+
 \item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
 if interest is in P(p1 < p0) for two-sample case. For one-sample case,
 "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).}
 
-\item{p0}{The target value to compare to in the one-sample case}
-
 \item{delta}{clinically meaningful difference between groups.
-Typically 0 (default). NULL for one-sample case.}
+Typically 0 for the two-sample case. NULL for one-sample case (default).}
 
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}
 
 \item{S}{number of samples, default is 5000}
-
-\item{N}{the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial N
-for one-sample case}
 
 \item{theta}{The target posterior probability. e.g. Efficacy decision if
 P(p1 > p0) > theta for the two-sample case with greater direction.

@@ -7,9 +7,9 @@
 calc_posterior(
   y,
   n,
+  p0,
   direction = "greater",
-  p0 = NULL,
-  delta = 0,
+  delta = NULL,
   prior = c(0.5, 0.5),
   S = 5000
 )
@@ -21,14 +21,15 @@ two-sample case; integer of total responses y for one-sample case}
 \item{n}{vector of length two containing the sample size so far c(n0, n1)
 for two-sample case; integer of sample size so far n for one-sample case}
 
+\item{p0}{The target value to compare to in the one-sample case. Set to NULL
+in two-sample case.}
+
 \item{direction}{"greater" (default) if interest is in p(p1 > p0) and "less"
 if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).}
 
-\item{p0}{The target value to compare to in the one-sample case}
-
 \item{delta}{clinically meaningful difference between groups.
-Typically 0 (default).}
+Typically 0 for two-sample case. NULL for one-sample case (default).}
 
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}

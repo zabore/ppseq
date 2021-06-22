@@ -14,12 +14,13 @@
 #' two-sample case; integer of total responses y for one-sample case
 #' @param n vector of length two containing the sample size so far c(n0, n1)
 #' for two-sample case; integer of sample size so far n for one-sample case
+#' @param p0 The target value to compare to in the one-sample case. Set to NULL 
+#' in two-sample case.
 #' @param direction "greater" (default) if interest is in p(p1 > p0) and "less"
 #' if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
-#' @param p0 The target value to compare to in the one-sample case
 #' @param delta clinically meaningful difference between groups.
-#' Typically 0 (default).
+#' Typically 0 for two-sample case. NULL for one-sample case (default).
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
@@ -39,8 +40,8 @@
 #' @importFrom stats rbeta
 #' @export
 
-calc_posterior <- function(y, n, direction = "greater", p0 = NULL,
-                           delta = 0, prior = c(0.5, 0.5), S = 5000) {
+calc_posterior <- function(y, n, p0, direction = "greater", delta = NULL, 
+                           prior = c(0.5, 0.5), S = 5000) {
   if (length(y) != length(n))
     stop("y and n must be the same length")
 

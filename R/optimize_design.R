@@ -39,10 +39,11 @@ optimize_design <- function(x,
 #'
 #' cal_tbl <- calibrate_thresholds(
 #'   p_null = 0.1, p_alt = 0.3,
-#'   n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL,
-#'   prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
+#'   n = seq(5, 25, 5), N = 25, 
 #'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#'   ppp_threshold = seq(0.05, 0.2, 0.05)
+#'   ppp_threshold = seq(0.05, 0.2, 0.05),
+#'   direction = "greater", delta = NULL,
+#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
 #' )
 #'
 #' optimize_design(cal_tbl)

@@ -13,12 +13,13 @@
 #' integer of event probability for one-sample case
 #' @param N vector of length two containing the total sample size c(N0, N1)
 #' for two-sample case; integer of sample size so far N for one-sample case
+#' @param p0 The target value to compare to in the one-sample case. Set to 
+#' NULL for the two-sample case.
 #' @param direction "greater" (default) if interest is in p(p1 > p0) and "less"
 #' if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
-#' @param p0 The target value to compare to in the one-sample case
 #' @param delta clinically meaningful difference between groups.
-#' Typically 0 (default).
+#' Typically 0 for the two-sample case. NULL for the one-sample case (default).
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples drawn from the posterior, and number of simulated
@@ -50,9 +51,9 @@
 #' @importFrom tibble tibble
 #' @export
 
-calibrate_posterior_threshold <- function(p, N,
-                                          direction = "greater", p0 = NULL,
-                                          delta = 0, prior = c(0.5, 0.5),
+calibrate_posterior_threshold <- function(p, N, p0,
+                                          direction = "greater", 
+                                          delta = NULL, prior = c(0.5, 0.5),
                                           S = 5000, theta) {
   if (length(N) == 2) {
     y0 <- map_dbl(

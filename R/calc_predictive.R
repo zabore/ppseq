@@ -13,18 +13,19 @@
 #' for one-sample case
 #' @param n vector of length two containing the sample size so far c(n0, n1)
 #' for two-sample case; integer of sample size so far for one-sample case
-#' @param direction "greater" (default) if interest is in P(p1 > p0) and "less"
-#' if interest is in P(p1 < p0) for two-sample case. For one-sample case,
-#' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
-#' @param p0 The target value to compare to in the one-sample case
-#' @param delta clinically meaningful difference between groups.
-#' Typically 0 (default). NULL for one-sample case.
-#' @param prior hyperparameters of prior beta distribution.
-#' Beta(0.5, 0.5) is default
-#' @param S number of samples, default is 5000
+#' @param p0 The target value to compare to in the one-sample case. Set to NULL
+#' for the two-sample case.
 #' @param N the total planned sample size at the end of the trial, c(N0, N1)
 #' for two-sample case; integer of total planned sample size at end of trial N
 #' for one-sample case
+#' @param direction "greater" (default) if interest is in P(p1 > p0) and "less"
+#' if interest is in P(p1 < p0) for two-sample case. For one-sample case,
+#' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
+#' @param delta clinically meaningful difference between groups.
+#' Typically 0 for the two-sample case. NULL for one-sample case (default).
+#' @param prior hyperparameters of prior beta distribution.
+#' Beta(0.5, 0.5) is default
+#' @param S number of samples, default is 5000
 #' @param theta The target posterior probability. e.g. Efficacy decision if
 #' P(p1 > p0) > theta for the two-sample case with greater direction.
 #' Default is 0.95.
@@ -44,9 +45,10 @@
 #' @importFrom purrr map_dbl map2_dbl
 #' @export
 
-calc_predictive <- function(y, n, direction = "greater", p0 = NULL,
-                            delta = 0, prior = c(0.5, 0.5), S = 5000,
-                            N, theta = 0.95) {
+calc_predictive <- function(y, n, p0, N, 
+                            direction = "greater", delta = NULL, 
+                            prior = c(0.5, 0.5), S = 5000,
+                            theta = 0.95) {
   if (length(y) != length(n))
     stop("y and n must be the same length")
 

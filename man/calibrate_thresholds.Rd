@@ -9,14 +9,14 @@ calibrate_thresholds(
   p_null,
   p_alt,
   n,
+  N,
+  pp_threshold,
+  ppp_threshold,
   direction = "greater",
-  delta = 0,
+  delta = NULL,
   prior = c(0.5, 0.5),
   S = 5000,
-  N,
-  nsim = 1000,
-  pp_threshold,
-  ppp_threshold
+  nsim = 1000
 )
 }
 \arguments{
@@ -40,28 +40,28 @@ at the end of the trial, this can be a vector specifying the total sample
 size c(N0, N1) for the two-sample case or an integer specifying the total
 sample size N for the one-sample case}
 
+\item{N}{the total planned sample size at the end of the trial, c(N0, N1)
+for two-sample case; integer of total planned sample size at end of trial N
+for one-sample case}
+
+\item{pp_threshold}{the posterior probability threshold of interest}
+
+\item{ppp_threshold}{the posterior probability threshold of interest for
+futility monitoring}
+
 \item{direction}{"greater" (default) if interest is in p(p1 > p0) and "less"
 if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).}
 
 \item{delta}{clinically meaningful difference between groups.
-Typically 0 (default).}
+Typically 0 for the two-sample case. NULL for the one-sample case (default).}
 
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}
 
 \item{S}{number of samples drawn from the posterior. Default is 5000}
 
-\item{N}{the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial N
-for one-sample case}
-
 \item{nsim}{Number of simulated trial datasets.}
-
-\item{pp_threshold}{the posterior probability threshold of interest}
-
-\item{ppp_threshold}{the posterior probability threshold of interest for
-futility monitoring}
 }
 \value{
 A list containing a
@@ -95,10 +95,11 @@ set.seed(123)
 
 calibrate_thresholds(
   p_null = 0.1, p_alt = 0.3,
-  n = seq(5, 25, 5), direction = "greater", delta = NULL,
-  prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
+  n = seq(5, 25, 5), N = 25, 
   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-  ppp_threshold = seq(0.05, 0.2, 0.05)
+  ppp_threshold = seq(0.05, 0.2, 0.05),
+  direction = "greater", delta = NULL,
+  prior = c(0.5, 0.5), S = 5000, nsim = 1000
 )
 }
 

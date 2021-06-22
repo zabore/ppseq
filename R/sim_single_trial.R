@@ -19,18 +19,18 @@
 #' at the end of the trial, this can be a vector specifying the total sample
 #' size c(N0, N1) for the two-sample case or an integer specifying the total
 #' sample size N for the one-sample case.
-#' @param direction "greater" (default) if interest is in P(p1 > p0) and "less"
-#' if interest is in P(p1 < p0) for two-sample case. For one-sample case,
-#' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
 #' @param p0 The target value to compare to in the one-sample case
-#' @param delta clinically meaningful difference between groups.
-#' Typically 0 (default).
-#' @param prior hyperparameters of prior beta distribution.
-#' Beta(0.5, 0.5) is default
-#' @param S number of samples, default is 5000
 #' @param N the total planned sample size at the end of the trial, c(N0, N1)
 #' for two-sample case; integer of total planned sample size at end of trial N
 #' for one-sample case
+#' @param direction "greater" (default) if interest is in P(p1 > p0) and "less"
+#' if interest is in P(p1 < p0) for two-sample case. For one-sample case,
+#' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
+#' @param delta clinically meaningful difference between groups.
+#' Typically 0 for the two-sample case. NULL for the one-sample case (default).
+#' @param prior hyperparameters of prior beta distribution.
+#' Beta(0.5, 0.5) is default
+#' @param S number of samples, default is 5000
 #' @param theta The target posterior probability. e.g. Efficacy decision if
 #' P(p1 > p0) > theta for the two-sample case with greater direction.
 #' Default is 0.95. Can be a vector if interest is in selecting from among a
@@ -66,9 +66,10 @@
 #' #  )
 #' @export
 
-sim_single_trial <- function(p, n, direction = "greater", p0 = NULL,
-                             delta = 0, prior = c(0.5, 0.5), S = 5000,
-                             N, theta = 0.95) {
+sim_single_trial <- function(p, n, p0, N, 
+                             direction = "greater", delta = NULL, 
+                             prior = c(0.5, 0.5), S = 5000,
+                             theta = 0.95) {
   if ((is.null(p0) & is.null(delta)) | (!is.null(p0) & !is.null(delta)))
     stop("Exactly one of delta or p0 must be specified for the two-sample and
          one-sample case, respectively")

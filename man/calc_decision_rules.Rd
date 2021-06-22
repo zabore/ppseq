@@ -27,8 +27,7 @@ and "less" if interest is in P(p < p0).}
 (i.e. the null response rate)}
 
 \item{delta}{clinically meaningful difference between groups.
-Typically 0. NULL for one-sample case (default). Placeholder for when
-two-sample case is added.}
+Typically 0 for two-sample case. NULL for one-sample case (default).}
 
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}

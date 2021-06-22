@@ -86,18 +86,20 @@ sim_dat1 <- function(p, n) {
 #' @param pp_threshold the posterior probability threshold of interest
 #' @param ppp_threshold the posterior probability threshold of interest for
 #' futility monitoring
-#' @param direction "greater" (default) if interest is in P(p1 > p0) and "less"
-#' if interest is in P(p1 < p0) for two-sample case. For one-sample case,
-#' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
-#' @param p0 The target value to compare to in the one-sample case
-#' @param delta clinically meaningful difference between groups.
-#' Typically 0 (default).
-#' @param prior hyperparameters of prior beta distribution.
-#' Beta(0.5, 0.5) is default
-#' @param S number of samples, default is 5000
+#' @param p0 The target value to compare to in the one-sample case. Set to 
+#' NULL for the two-sample case.
 #' @param N the total planned sample size at the end of the trial, c(N0, N1)
 #' for two-sample case; integer of total planned sample size at end of trial N
 #' for one-sample case
+#' @param direction "greater" (default) if interest is in P(p1 > p0) and "less"
+#' if interest is in P(p1 < p0) for two-sample case. For one-sample case,
+#' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
+#' @param delta clinically meaningful difference between groups.
+#' Typically 0 for the two-sample case. NULL for the one-sample case (default).
+#' @param prior hyperparameters of prior beta distribution.
+#' Beta(0.5, 0.5) is default
+#' @param S number of samples, default is 5000
+
 #'
 #' @return Returns a tibble with the total sample size at the end of the
 #' trial, the number of responses observed at the end of the trial, the
@@ -119,9 +121,9 @@ sim_dat1 <- function(p, n) {
 #' }
 #' @importFrom tibble add_column
 #' @importFrom dplyr mutate case_when
-eval_thresh <- function(data, pp_threshold, ppp_threshold,
-                        direction = "greater", p0 = NULL, delta = 0,
-                        prior = c(0.5, 0.5), S = 5000, N) {
+eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N, 
+                        direction = "greater", delta = NULL,
+                        prior = c(0.5, 0.5), S = 5000) {
   decision <- NULL
   ppp <- NULL
   for (i in 1:nrow(data)) {
@@ -210,26 +212,27 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' at the end of the trial, this can be a vector specifying the total sample
 #' size c(N0, N1) for the two-sample case or an integer specifying the total
 #' sample size N for the one-sample case
+#' @param N the total planned sample size at the end of the trial, c(N0, N1)
+#' for two-sample case; integer of total planned sample size at end of trial N
+#' for one-sample case
+#' @param pp_threshold the posterior probability threshold of interest
+#' @param ppp_threshold the posterior probability threshold of interest for
+#' futility monitoring
 #' @param direction "greater" (default) if interest is in p(p1 > p0) and "less"
 #' if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
 #' @param delta clinically meaningful difference between groups.
-#' Typically 0 (default).
+#' Typically 0 for the two-sample case. NULL for the one-sample case (default).
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples drawn from the posterior. Default is 5000
-#' @param N the total planned sample size at the end of the trial, c(N0, N1)
-#' for two-sample case; integer of total planned sample size at end of trial N
-#' for one-sample case
 #' @param nsim Number of simulated trial datasets.
-#' @param pp_threshold the posterior probability threshold of interest
-#' @param ppp_threshold the posterior probability threshold of interest for
-#' futility monitoring
+
 #'
 #' @return A list containing a
 #' 1) a tibble 'res_summary' containing the posterior probability threshold
 #' (pp_threshold), the predictive probability threshold (ppp_threshold),
-#' the ceiling of the mean sample size (mean_n0 and mean_n1 for two-sample case;
+#' the mean sample size (mean_n0 and mean_n1 for two-sample case;
 #' mean_n1 for one-sample case), and the proportion of positive trials.
 #' 2) 'call_list' containing the original function call
 #' 3) 'calibrate_thresholds_inputs' a list containing the inputs to the
@@ -246,10 +249,11 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #'
 #' calibrate_thresholds(
 #'   p_null = 0.1, p_alt = 0.3,
-#'   n = seq(5, 25, 5), direction = "greater", delta = NULL,
-#'   prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
+#'   n = seq(5, 25, 5), N = 25, 
 #'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#'   ppp_threshold = seq(0.05, 0.2, 0.05)
+#'   ppp_threshold = seq(0.05, 0.2, 0.05),
+#'   direction = "greater", delta = NULL,
+#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
 #' )
 #' }
 #'
@@ -259,11 +263,11 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' @importFrom dplyr bind_rows full_join select rename ungroup summarize
 #' @export
 
-calibrate_thresholds <- function(p_null, p_alt, n,
-                                 direction = "greater", 
-                                 delta = 0, prior = c(0.5, 0.5),
-                                 S = 5000, N, nsim = 1000,
-                                 pp_threshold, ppp_threshold) {
+calibrate_thresholds <- function(p_null, p_alt, n, N,
+                                 pp_threshold, ppp_threshold, 
+                                 direction = "greater", delta = NULL, 
+                                 prior = c(0.5, 0.5),
+                                 S = 5000, nsim = 1000) {
   sim_dat_null <-
     map(seq_len(nsim), ~ sim_dat1(p = p_null, n = n))
 

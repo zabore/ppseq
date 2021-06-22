@@ -14,8 +14,7 @@
 #' @param p0 The target value to compare to in the one-sample case
 #' (i.e. the null response rate)
 #' @param delta clinically meaningful difference between groups.
-#' Typically 0. NULL for one-sample case (default). Placeholder for when
-#' two-sample case is added.
+#' Typically 0 for two-sample case. NULL for one-sample case (default). 
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
