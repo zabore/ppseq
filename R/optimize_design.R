@@ -38,7 +38,7 @@ optimize_design <- function(x,
 #' set.seed(123)
 #'
 #' cal_tbl <- calibrate_thresholds(
-#'   prob_null = 0.1, prob_alt = 0.3,
+#'   p_null = 0.1, p_alt = 0.3,
 #'   n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL,
 #'   prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
 #'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
@@ -76,7 +76,7 @@ optimize_design.calibrate_thresholds <- function(x,
 
   options(tibble.width = Inf)
 
-  if (length(x$inputs$prob_null) == 2) {
+  if (length(x$inputs$p_null) == 2) {
     opt_x <-
       rename(
         mutate(
@@ -97,10 +97,10 @@ optimize_design.calibrate_thresholds <- function(x,
         Power = prop_pos_alt,
         `Average N under the null` = mean_n_null,
         `Average N under the alternative` = mean_n_alt,
-        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
-        `Distance to (0, 1)` = ab_dist_metric
+        `Distance to optimal efficiency` = n_dist_metric,
+        `Distance to optimal accuracy` = ab_dist_metric
       )
-  } else if (length(x$inputs$prob_null) == 1) {
+  } else if (length(x$inputs$p_null) == 1) {
     opt_x <-
       rename(
         mutate(
@@ -119,8 +119,8 @@ optimize_design.calibrate_thresholds <- function(x,
         Power = prop_pos_alt,
         `Average N under the null` = mean_n1_null,
         `Average N under the alternative` = mean_n1_alt,
-        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
-        `Distance to (0, 1)` = ab_dist_metric
+        `Distance to optimal efficiency` = n_dist_metric,
+        `Distance to optimal accuracy` = ab_dist_metric
       )
   }
 
@@ -129,9 +129,9 @@ optimize_design.calibrate_thresholds <- function(x,
       group_by(
         arrange(
           opt_x,
-          `Distance to (0, 1)`, -pp_threshold, -ppp_threshold
+          `Distance to optimal accuracy`, -pp_threshold, -ppp_threshold
         ),
-        `Distance to (0, 1)`
+        `Distance to optimal accuracy`
       ),
       1
     )
@@ -141,10 +141,10 @@ optimize_design.calibrate_thresholds <- function(x,
       group_by(
         arrange(
           opt_x,
-          `Distance to min(N under null) and max(N under alt)`,
+          `Distance to optimal efficiency`,
           -pp_threshold, -ppp_threshold
         ),
-        `Distance to min(N under null) and max(N under alt)`
+        `Distance to optimal efficiency`
       ),
       1
     )
@@ -153,7 +153,7 @@ optimize_design.calibrate_thresholds <- function(x,
   list(
     "Optimal accuracy design:" =
       opt_ab[
-        opt_ab$`Distance to (0, 1)` == min(opt_ab$`Distance to (0, 1)`),
+        opt_ab$`Distance to optimal accuracy` == min(opt_ab$`Distance to optimal accuracy`),
         c(
           "pp_threshold", "ppp_threshold", "Type I error", "Power",
           "Average N under the null", "Average N under the alternative"
@@ -161,8 +161,8 @@ optimize_design.calibrate_thresholds <- function(x,
       ],
     "Optimal efficiency design:" =
       opt_nn[
-        opt_nn$`Distance to min(N under null) and max(N under alt)` ==
-          min(opt_nn$`Distance to min(N under null) and max(N under alt)`),
+        opt_nn$`Distance to optimal efficiency` ==
+          min(opt_nn$`Distance to optimal efficiency`),
         c(
           "pp_threshold", "ppp_threshold", "Type I error", "Power",
           "Average N under the null", "Average N under the alternative"

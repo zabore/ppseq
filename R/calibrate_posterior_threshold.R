@@ -8,7 +8,7 @@
 #' threshold. In an alternative case, this will result in the power at a given
 #' threshold.
 #'
-#' @param prob vector of length two containing the probability of event in
+#' @param p vector of length two containing the probability of event in
 #' the standard of care and experimental arm c(p0, p1) for the two-sample case;
 #' integer of event probability for one-sample case
 #' @param N vector of length two containing the total sample size c(N0, N1)
@@ -35,13 +35,13 @@
 #'
 #' # One-sample case
 #' calibrate_posterior_threshold(
-#'   prob = 0.1, N = 50, direction = "greater",
+#'   p = 0.1, N = 50, direction = "greater",
 #'   p0 = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 5000, theta = c(0.9, 0.95)
 #' )
 #'
 #' # # Two-sample case (not run)
 #' # calibrate_posterior_threshold(
-#' #   prob = c(0.1, 0.1), N = c(50, 50),
+#' #   p = c(0.1, 0.1), N = c(50, 50),
 #' #   direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5),
 #' #   S = 5000, theta = c(0.9, 0.95)
 #' # )
@@ -50,18 +50,18 @@
 #' @importFrom tibble tibble
 #' @export
 
-calibrate_posterior_threshold <- function(prob, N,
+calibrate_posterior_threshold <- function(p, N,
                                           direction = "greater", p0 = NULL,
                                           delta = 0, prior = c(0.5, 0.5),
                                           S = 5000, theta) {
   if (length(N) == 2) {
     y0 <- map_dbl(
       seq_len(S),
-      ~ rbinom(n = 1, size = N[1], prob = prob[1])
+      ~ rbinom(n = 1, size = N[1], prob = p[1])
     )
     y1 <- map_dbl(
       seq_len(S),
-      ~ rbinom(n = 1, size = N[2], prob = prob[2])
+      ~ rbinom(n = 1, size = N[2], prob = p[2])
     )
 
     posts <-
@@ -76,7 +76,7 @@ calibrate_posterior_threshold <- function(prob, N,
   } else if (length(N) == 1) {
     y1 <- map_dbl(
       seq_len(S),
-      ~ rbinom(n = 1, size = N, prob = prob)
+      ~ rbinom(n = 1, size = N, prob = p)
     )
 
     posts <-

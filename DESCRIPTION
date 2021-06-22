@@ -36,10 +36,10 @@ Imports:
     future,
     gt,
     ggplot2,
-    gridExtra,
     here,
     plotly,
     purrr,
-    tibble
+    tibble,
+    patchwork
 Config/testthat/edition: 3
 Language: en-US

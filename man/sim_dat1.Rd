@@ -5,10 +5,10 @@
 \title{Simulate a single dataset based on the response probability(ies), the total
 sample size(s), and the interim look schedule(s)}
 \usage{
-sim_dat1(prob, n)
+sim_dat1(p, n)
 }
 \arguments{
-\item{prob}{vector of length two containing the probability of event in
+\item{p}{vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case;
 integer of event probability for one-sample case}
 
@@ -36,9 +36,9 @@ response probability(ies)
 set.seed(123)
 
 # One-sample case
-sim_dat1(prob = 0.1, n = seq(5, 25, 5))
+sim_dat1(p = 0.1, n = seq(5, 25, 5))
 
 # Two-sample case
-sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
+sim_dat1(p = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 }
 }

@@ -7,7 +7,7 @@
 #' probability of success (or futility) at the end of a trial,
 #' given the data available at each interim analysis.
 #'
-#' @param prob vector of length two containing the probability of event in
+#' @param p vector of length two containing the probability of event in
 #' the standard of care and experimental arm c(p0, p1) for the two-sample case;
 #' integer of event probability for one-sample case
 #' @param n matrix containing the total number of patients accrued so far at
@@ -53,20 +53,20 @@
 #' # One-sample case
 #' set.seed(123)
 #' sim_single_trial(
-#'   prob = 0.3, n = c(5, 10), direction = "greater",
-#'   p = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 50, N = 25, theta = 0.95
+#'   p = 0.3, n = c(5, 10), direction = "greater",
+#'   p0 = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 50, N = 25, theta = 0.95
 #' )
 #'
 #' # # Two-sample case (not run)
 #' # set.seed(123)
 #' #  sim_single_trial(
-#' #    prob = c(0.1, 0.3), n = cbind(c(5, 10), c(5, 10)),
+#' #    p = c(0.1, 0.3), n = cbind(c(5, 10), c(5, 10)),
 #' #    direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5), 
 #' #    S = 5000, N = c(50, 50), theta = 0.95
 #' #  )
 #' @export
 
-sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
+sim_single_trial <- function(p, n, direction = "greater", p0 = NULL,
                              delta = 0, prior = c(0.5, 0.5), S = 5000,
                              N, theta = 0.95) {
   if ((is.null(p0) & is.null(delta)) | (!is.null(p0) & !is.null(delta)))
@@ -76,31 +76,31 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
   if (!direction %in% c("greater", "less"))
     stop('direction must be either "greater" or "less"')
 
-  if (length(prob) == 1 & is.null(p0))
+  if (length(p) == 1 & is.null(p0))
     stop("p0 must be specified for the one-sample case")
 
-  if (length(prob) == 2 & is.null(delta))
+  if (length(p) == 2 & is.null(delta))
     stop("delta must be specified for the two-sample case")
 
-  if (length(prob) == 2) {
+  if (length(p) == 2) {
     if (length(n) == 2 & is.matrix(n) == FALSE) {
       n <- matrix(n, nrow = 1)
     }
 
-    y0 <- rbinom(n = 1, size = n[1, 1], prob = prob[1])
-    y1 <- rbinom(n = 1, size = n[1, 2], prob = prob[2])
+    y0 <- rbinom(n = 1, size = n[1, 1], prob = p[1])
+    y1 <- rbinom(n = 1, size = n[1, 2], prob = p[2])
 
     if (length(n) > 2) {
       for (i in seq_len(nrow(n))[-1]) {
         y0 <- c(y0, y0[length(y0)] + rbinom(
           n = 1,
           size = n[i, 1] - n[i - 1, 1],
-          prob = prob[1]
+          prob = p[1]
         ))
         y1 <- c(y1, y1[length(y1)] + rbinom(
           n = 1,
           size = n[i, 2] - n[i - 1, 2],
-          prob = prob[2]
+          prob = p[2]
         ))
       }
     }
@@ -143,15 +143,15 @@ sim_single_trial <- function(prob, n, direction = "greater", p0 = NULL,
       ),
       pp_threshold
     )
-  } else if (length(prob) == 1) {
-    y1 <- rbinom(n = 1, size = n[1], prob = prob)
+  } else if (length(p) == 1) {
+    y1 <- rbinom(n = 1, size = n[1], prob = p)
 
     if (length(n) > 1) {
       for (i in seq_along(n)[-1]) {
         y1 <- c(y1, y1[length(y1)] + rbinom(
           n = 1,
           size = n[i] - n[i - 1],
-          prob = prob
+          prob = p
         ))
       }
     }

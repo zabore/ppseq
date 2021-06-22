@@ -60,11 +60,11 @@ dataset
 set.seed(123)
 
 # One-sample case
-dat1 <- sim_dat1(prob = 0.1, n = seq(5, 25, 5))
+dat1 <- sim_dat1(p = 0.1, n = seq(5, 25, 5))
 eval_thresh(dat1, 0.95, 0.3, p0 = 0.1, delta = NULL, S = 500, N = 25)
 
 # Two-sample case
-dat2 <- sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
+dat2 <- sim_dat1(p = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 eval_thresh(dat2, 0.95, 0.3, S = 500, N = c(25, 25))
 }
 }

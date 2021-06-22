@@ -20,7 +20,6 @@
 #'                   row_number
 #' @importFrom ggplot2 ggplot aes geom_point xlim ylim labs 
 #'                     scale_color_viridis_c theme_bw theme
-#' @importFrom gridExtra grid.arrange
 #' @importFrom plotly ggplotly
 #' @export
 
@@ -44,7 +43,7 @@ plot.calibrate_thresholds <- function(x,
   if (!is.numeric(type1_range) & !is.null(type1_range))
     stop("type1_range must be a numeric vector of length 2 or NULL")
 
-  if (length(x$inputs$prob_null) == 2) {
+  if (length(x$inputs$p_null) == 2) {
     plot_x <-
       rename(
         mutate(
@@ -72,7 +71,7 @@ plot.calibrate_thresholds <- function(x,
         `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
         `Distance to (0, 1)` = ab_dist_metric
       )
-  } else if (length(x$inputs$prob_null) == 1) {
+  } else if (length(x$inputs$p_null) == 1) {
     plot_x <-
       rename(
         mutate(
@@ -144,7 +143,9 @@ plot.calibrate_thresholds <- function(x,
         x = `Type I error`,
         y = Power,
         color = `Distance to optimal accuracy`,
-        Design = Design
+        Design = Design,
+        `Average N under the null` = `Average N under the null`,
+        `Average N under the alternative` = `Average N under the alternative`
       )
     ) +
     geom_point(
@@ -168,7 +169,9 @@ plot.calibrate_thresholds <- function(x,
         x = `Average N under the null`,
         y = `Average N under the alternative`,
         color = `Distance to optimal efficiency`,
-        Design = Design
+        Design = Design,
+        `Type I error` = `Type I error`,
+        Power = Power
       )
     ) +
     geom_point(
@@ -191,8 +194,8 @@ plot.calibrate_thresholds <- function(x,
     theme_bw() +
     theme(legend.position = "bottom")
 
-  ifelse(plotly == TRUE,
-    list(ggplotly(p1), ggplotly(p2)),
-    grid.arrange(p1, p2, nrow = 1, ncol = 2)
-  )
+  if(plotly == TRUE)
+    list(ggplotly(p1), ggplotly(p2)) else
+      p1 + p2
+  
 }

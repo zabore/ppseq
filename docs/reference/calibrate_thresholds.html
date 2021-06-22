@@ -111,9 +111,6 @@ threshold." />
     <li>
       <a href="../articles/one_sample_expansion.html">One-sample expansion cohort</a>
     </li>
-    <li>
-      <a href="../articles/two_sample_randomized.html">Two-sample randomized phase 2</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -152,11 +149,10 @@ threshold.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calibrate_thresholds</span><span class='op'>(</span>
-  <span class='va'>prob_null</span>,
-  <span class='va'>prob_alt</span>,
+  <span class='va'>p_null</span>,
+  <span class='va'>p_alt</span>,
   <span class='va'>n</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
   delta <span class='op'>=</span> <span class='fl'>0</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>,
@@ -170,14 +166,14 @@ threshold.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>prob_null</th>
+      <th>p_null</th>
       <td><p>vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case
 for the null scenario;
 integer of event probability for one-sample case</p></td>
     </tr>
     <tr>
-      <th>prob_alt</th>
+      <th>p_alt</th>
       <td><p>vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case
 for the alternative scenario;
@@ -200,10 +196,6 @@ sample size N for the one-sample case</p></td>
       <td><p>"greater" (default) if interest is in p(p1 &gt; p0) and "less"
 if interest is in p(p1 &lt; p0) for two-sample case. For one-sample case,
 "greater" if interest is in p(p &gt; p0) and "less" if interest is in p(p &lt; p0).</p></td>
-    </tr>
-    <tr>
-      <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case</p></td>
     </tr>
     <tr>
       <th>delta</th>
@@ -261,15 +253,16 @@ for a null setting, and a measure of the power in the alternative setting.</p>
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
-<span class='fu'>calibrate_thresholds</span><span class='op'>(</span>prob_null <span class='op'>=</span> <span class='fl'>0.1</span>, prob_alt <span class='op'>=</span> <span class='fl'>0.3</span>, 
-n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, p0 <span class='op'>=</span> <span class='fl'>0.1</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, 
-prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, N <span class='op'>=</span> <span class='fl'>25</span>, nsim <span class='op'>=</span> <span class='fl'>1000</span>, 
-pp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>, <span class='fl'>0.95</span>, <span class='fl'>0.96</span>, <span class='fl'>0.98</span><span class='op'>)</span>, 
-ppp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.2</span>, <span class='fl'>0.05</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>calibrate_thresholds</span><span class='op'>(</span>
+  p_null <span class='op'>=</span> <span class='fl'>0.1</span>, p_alt <span class='op'>=</span> <span class='fl'>0.3</span>,
+  n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, N <span class='op'>=</span> <span class='fl'>25</span>, nsim <span class='op'>=</span> <span class='fl'>1000</span>,
+  pp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>, <span class='fl'>0.95</span>, <span class='fl'>0.96</span>, <span class='fl'>0.98</span><span class='op'>)</span>,
+  ppp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.2</span>, <span class='fl'>0.05</span><span class='op'>)</span>
+<span class='op'>)</span>
 <span class='op'>}</span>
 
 <span class='co'># Two-sample case</span>
-
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

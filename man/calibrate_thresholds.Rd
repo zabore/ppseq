@@ -6,11 +6,10 @@
 probability threshold with interim futility monitoring}
 \usage{
 calibrate_thresholds(
-  prob_null,
-  prob_alt,
+  p_null,
+  p_alt,
   n,
   direction = "greater",
-  p0 = NULL,
   delta = 0,
   prior = c(0.5, 0.5),
   S = 5000,
@@ -21,12 +20,12 @@ calibrate_thresholds(
 )
 }
 \arguments{
-\item{prob_null}{vector of length two containing the probability of event in
+\item{p_null}{vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case
 for the null scenario;
 integer of event probability for one-sample case}
 
-\item{prob_alt}{vector of length two containing the probability of event in
+\item{p_alt}{vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case
 for the alternative scenario;
 integer of event probability for one-sample case}
@@ -44,8 +43,6 @@ sample size N for the one-sample case}
 \item{direction}{"greater" (default) if interest is in p(p1 > p0) and "less"
 if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).}
-
-\item{p0}{The target value to compare to in the one-sample case}
 
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 (default).}
@@ -97,8 +94,8 @@ threshold.
 set.seed(123)
 
 calibrate_thresholds(
-  prob_null = 0.1, prob_alt = 0.3,
-  n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL,
+  p_null = 0.1, p_alt = 0.3,
+  n = seq(5, 25, 5), direction = "greater", delta = NULL,
   prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
   ppp_threshold = seq(0.05, 0.2, 0.05)

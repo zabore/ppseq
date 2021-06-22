@@ -5,7 +5,7 @@
 \title{Calibrate the posterior probability threshold}
 \usage{
 calibrate_posterior_threshold(
-  prob,
+  p,
   N,
   direction = "greater",
   p0 = NULL,
@@ -16,7 +16,7 @@ calibrate_posterior_threshold(
 )
 }
 \arguments{
-\item{prob}{vector of length two containing the probability of event in
+\item{p}{vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case;
 integer of event probability for one-sample case}
 
@@ -60,13 +60,13 @@ set.seed(123)
 
 # One-sample case
 calibrate_posterior_threshold(
-  prob = 0.1, N = 50, direction = "greater",
+  p = 0.1, N = 50, direction = "greater",
   p0 = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 5000, theta = c(0.9, 0.95)
 )
 
 # # Two-sample case (not run)
 # calibrate_posterior_threshold(
-#   prob = c(0.1, 0.1), N = c(50, 50),
+#   p = c(0.1, 0.1), N = c(50, 50),
 #   direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5),
 #   S = 5000, theta = c(0.9, 0.95)
 # )

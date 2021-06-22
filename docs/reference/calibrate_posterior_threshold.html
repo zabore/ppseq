@@ -109,9 +109,6 @@ threshold." />
     <li>
       <a href="../articles/one_sample_expansion.html">One-sample expansion cohort</a>
     </li>
-    <li>
-      <a href="../articles/two_sample_randomized.html">Two-sample randomized phase 2</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -149,7 +146,7 @@ threshold.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calibrate_posterior_threshold</span><span class='op'>(</span>
-  <span class='va'>prob</span>,
+  <span class='va'>p</span>,
   <span class='va'>N</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
   p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -163,7 +160,7 @@ threshold.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>prob</th>
+      <th>p</th>
       <td><p>vector of length two containing the probability of event in
 the standard of care and experimental arm c(p0, p1) for the two-sample case;
 integer of event probability for one-sample case</p></td>
@@ -215,23 +212,22 @@ associated proportion of positive trials.</p>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
 <span class='co'># One-sample case</span>
-<span class='fu'>calibrate_posterior_threshold</span><span class='op'>(</span>prob <span class='op'>=</span> <span class='fl'>0.1</span>, N <span class='op'>=</span> <span class='fl'>50</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, 
-p0 <span class='op'>=</span> <span class='fl'>0.1</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>,<span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, theta <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>, <span class='fl'>0.95</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 2</span><span>
+<span class='fu'>calibrate_posterior_threshold</span><span class='op'>(</span>
+  p <span class='op'>=</span> <span class='fl'>0.1</span>, N <span class='op'>=</span> <span class='fl'>50</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>,
+  p0 <span class='op'>=</span> <span class='fl'>0.1</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, theta <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>, <span class='fl'>0.95</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 2</span>
 #&gt;   pp_threshold prop_pos
-#&gt;          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>         0.9    0.116 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>         0.95   0.055</span><span style='text-decoration: underline;'>2</span><span></div><div class='input'>
-<span class='co'># Two-sample case</span>
-<span class='fu'>calibrate_posterior_threshold</span><span class='op'>(</span>prob <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.1</span><span class='op'>)</span>, N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>50</span>, <span class='fl'>50</span><span class='op'>)</span>,
-direction <span class='op'>=</span> <span class='st'>"greater"</span>, p0 <span class='op'>=</span> <span class='cn'>NULL</span>, delta <span class='op'>=</span> <span class='fl'>0</span>, prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>,<span class='fl'>0.5</span><span class='op'>)</span>, 
-S <span class='op'>=</span> <span class='fl'>5000</span>, theta <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>, <span class='fl'>0.95</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 2</span><span>
-#&gt;   pp_threshold prop_pos
-#&gt;          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>         0.9    0.111 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>         0.95   0.061</span><span style='text-decoration: underline;'>6</span><span></div><div class='input'>
-</div></span></pre>
+#&gt;          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span>         0.9    0.116 
+#&gt; <span style='color: #BCBCBC;'>2</span>         0.95   0.055<span style='text-decoration: underline;'>2</span></div><div class='input'>
+<span class='co'># # Two-sample case (not run)</span>
+<span class='co'># calibrate_posterior_threshold(</span>
+<span class='co'>#   p = c(0.1, 0.1), N = c(50, 50),</span>
+<span class='co'>#   direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5),</span>
+<span class='co'>#   S = 5000, theta = c(0.9, 0.95)</span>
+<span class='co'># )</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -27,6 +27,9 @@ To execute the code in this vignette, you first need to install and load the {pp
 # remotes::install_github("zabore/ppseq")
 library(ppseq)
 library(future)
+```
+
+```{r eval = FALSE}
 plan(multisession)
 ```
 
@@ -58,7 +61,7 @@ The `calibrate_thresholds()` function will simulate `nsim` datasets under the nu
 
 Because `calibrate_thresholds()` randomly generates simulated datasets, you will want to set a seed before running the function in order to ensure your results are reproducible.
 
-The inputs to `calibrate_thresholds()` for our case study re-design include `prob_null = 0.1` as the null response rate, `prob_alt = 0.2` as the alternative response rate, `n = seq(5, 95, 5)` indicates interim looks after every 5 patients up to a total of 95, `direction = "greater"` specifies that interest is in whether the alternative response rate exceeds the null response rate, `p0 = 0.1` specifies the target response rate to compare to (this will be the same as `prob_null` in this case), `delta = NULL` because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, `prior = c(0.5, 0.5)` specifies that both hyperparameters of the prior beta distribution be set to 0.5, `S = 5000` specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, `N = 95` indicates the final total sample size of 95, `nsim = 1000` specifies that we will generate 1000 simulated datasets under both the null and the alternative, `pp_threshold` is a vector of the posterior thresholds of interest, and `ppp_threshold` is a vector of predictive thresholds of interest.
+The inputs to `calibrate_thresholds()` for our case study re-design include `p_null = 0.1` as the null response rate, `p_alt = 0.2` as the alternative response rate, `n = seq(5, 95, 5)` indicates interim looks after every 5 patients up to a total of 95, `direction = "greater"` specifies that interest is in whether the alternative response rate exceeds the null response rate, `delta = NULL` because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, `prior = c(0.5, 0.5)` specifies that both hyperparameters of the prior beta distribution be set to 0.5, `S = 5000` specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, `N = 95` indicates the final total sample size of 95, `nsim = 1000` specifies that we will generate 1000 simulated datasets under both the null and the alternative, `pp_threshold` is a vector of the posterior thresholds of interest, and `ppp_threshold` is a vector of predictive thresholds of interest.
 
 ```{r eval = FALSE}
 set.seed(123)
@@ -67,8 +70,8 @@ no_cores <- 76
 future::plan(future::multicore(workers = no_cores))
 
 one_sample_cal_tbl <- 
-  calibrate_thresholds(prob_null = 0.1, prob_alt = 0.2, n = seq(5, 95, 5),
-                       direction = "greater", p0 = 0.1, delta = NULL, 
+  calibrate_thresholds(p_null = 0.1, p_alt = 0.2, n = seq(5, 95, 5),
+                       direction = "greater", delta = NULL, 
                        prior = c(0.5, 0.5), S = 5000, N = 95, nsim = 1000,
                        pp_threshold = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
                                         0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
@@ -110,113 +113,16 @@ plot(one_sample_cal_tbl,
 ```
 
 ```{r echo = FALSE}
-# I need to manually include the plots because otherwise they don't display properly in the vignette
-x <- one_sample_cal_tbl
-type1_range <- c(0.01, 0.2)
-minimum_power <- 0.7
-
-plot_x <- 
-      dplyr::rename(
-        dplyr::mutate(
-          dplyr::filter(
-            x$res_summary, 
-            prop_pos_null >= type1_range[1] & 
-              prop_pos_null <= type1_range[2] &
-              prop_pos_alt >= minimum_power
-          ),
-          Design = paste0("Posterior threshold = ", pp_threshold, 
-                          " and predictive threshold = ", ppp_threshold),
-          ab_dist_metric = ((prop_pos_null - 0)^2 + 
-                              (prop_pos_alt - 1)^2)^(1/2),
-          n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 + 
-                             (mean_n1_alt - max(mean_n1_alt))^2)^(1/2)
-        ),
-        `Type I error` = prop_pos_null,
-        Power = prop_pos_alt,
-        `Average N under the null` = mean_n1_null,
-        `Average N under the alternative` = mean_n1_alt,
-        `Distance to optimal efficiency` = n_dist_metric,
-        `Distance to optimal accuracy` = ab_dist_metric
-      )
-
-plot_ab <- 
-    dplyr::mutate(
-      dplyr::ungroup(
-        dplyr::slice(
-          dplyr::group_by(
-            dplyr::arrange(plot_x, 
-                           `Distance to optimal accuracy`, 
-                           -pp_threshold, 
-                           -ppp_threshold),
-            `Distance to optimal accuracy`), 
-          1)
-      ),
-      optimal_accuracy = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
-    )
-
-plot_nn <-
-    dplyr::mutate(
-      dplyr::ungroup(
-        dplyr::slice(
-          dplyr::group_by(
-            dplyr::arrange(plot_x, 
-                           `Distance to optimal efficiency`, 
-                           -pp_threshold, -ppp_threshold),
-            `Distance to optimal efficiency`),
-          1)
-      ),
-      optimal_efficiency = ifelse(dplyr::row_number() == 1, TRUE, FALSE)
-    )
+ptest <- 
+  plot(one_sample_cal_tbl, 
+     type1_range = c(0.01, 0.2), 
+     minimum_power = 0.7,
+     plotly = TRUE)
 ```
 
 ```{r echo = FALSE, fig.width = 8, fig.height = 6}
-p1 <- 
-    ggplot2::ggplot(plot_ab, 
-                    ggplot2::aes(
-                      x = `Type I error`, 
-                      y = Power, 
-                      color = `Distance to optimal accuracy`,
-                      Design = Design)) + 
-    ggplot2::geom_point(
-      shape = ifelse(plot_ab$optimal_accuracy == TRUE, 18, 19),
-      size = ifelse(plot_ab$optimal_accuracy == TRUE, 4, 2)) +
-    ggplot2::ylim(0, 1) + 
-    ggplot2::xlim(0, 1) +
-    ggplot2::labs(
-      x = "Type I error",
-      y = "Power"
-    ) +
-    ggplot2::scale_color_viridis_c() +
-    ggplot2::theme_bw() + 
-    ggplot2::theme(legend.position = "bottom")
-  
-plotly::ggplotly(p1)
-```
-
-```{r echo = FALSE, fig.width = 8, fig.height = 6}
-p2 <- 
-    ggplot2::ggplot(plot_nn, 
-                    ggplot2::aes(
-                      x = `Average N under the null`, 
-                      y = `Average N under the alternative`,
-                      color = `Distance to optimal efficiency`,
-                      Design = Design)) + 
-    ggplot2::geom_point(
-      shape = ifelse(plot_nn$optimal_efficiency == TRUE, 18, 19), 
-      size = ifelse(plot_nn$optimal_efficiency == TRUE, 4, 2)) +
-    ggplot2::ylim(min(plot_x$`Average N under the null`), 
-                  max(plot_x$`Average N under the alternative`)) +
-    ggplot2::xlim(min(plot_x$`Average N under the null`), 
-                  max(plot_x$`Average N under the alternative`)) +
-    ggplot2::labs(
-      x = "Average N under the null",
-      y = "Average N under the alternative"
-    ) +
-    ggplot2::scale_color_viridis_c() +
-    ggplot2::theme_bw() + 
-    ggplot2::theme(legend.position = "bottom")
-
-plotly::ggplotly(p2)
+ptest[[1]]
+ptest[[2]]
 ```
 
 Note that when points were tied based on optimization criteria, the point with the highest posterior and predictive threshold is selected for plotting.

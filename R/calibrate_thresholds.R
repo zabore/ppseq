@@ -5,7 +5,7 @@
 #' generates a single dataset of n and response count at each look based on the
 #' response probability(ies)
 #'
-#' @param prob vector of length two containing the probability of event in
+#' @param p vector of length two containing the probability of event in
 #' the standard of care and experimental arm c(p0, p1) for the two-sample case;
 #' integer of event probability for one-sample case
 #' @param n matrix containing the total number of patients accrued so far at
@@ -26,31 +26,31 @@
 #' set.seed(123)
 #'
 #' # One-sample case
-#' sim_dat1(prob = 0.1, n = seq(5, 25, 5))
+#' sim_dat1(p = 0.1, n = seq(5, 25, 5))
 #'
 #' # Two-sample case
-#' sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
+#' sim_dat1(p = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 #' }
 #' @importFrom stats rbinom
 #' @importFrom tibble tibble
-sim_dat1 <- function(prob, n) {
-  if (length(prob) == 2) {
+sim_dat1 <- function(p, n) {
+  if (length(p) == 2) {
     if (length(n) == 2 & is.matrix(n) == FALSE) {
       n <- matrix(n, nrow = 1)
     }
-    y0 <- rbinom(n = 1, size = n[1, 1], prob = prob[1])
-    y1 <- rbinom(n = 1, size = n[1, 2], prob = prob[2])
+    y0 <- rbinom(n = 1, size = n[1, 1], prob = p[1])
+    y1 <- rbinom(n = 1, size = n[1, 2], prob = p[2])
     if (length(n) > 2) {
       for (i in seq_len(nrow(n))[-1]) {
         y0 <- c(y0, y0[length(y0)] + rbinom(
           n = 1,
           size = n[i, 1] - n[i - 1, 1],
-          prob = prob[1]
+          prob = p[1]
         ))
         y1 <- c(y1, y1[length(y1)] + rbinom(
           n = 1,
           size = n[i, 2] - n[i - 1, 2],
-          prob = prob[2]
+          prob = p[2]
         ))
       }
     }
@@ -60,12 +60,12 @@ sim_dat1 <- function(prob, n) {
       y0 = y0,
       y1 = y1
     ))
-  } else if (length(prob) == 1) {
-    y1 <- rbinom(n = 1, size = n[1], prob = prob)
+  } else if (length(p) == 1) {
+    y1 <- rbinom(n = 1, size = n[1], prob = p)
     if (length(n) > 1) {
       for (i in seq_along(n)[-1]) {
         y1 <- c(y1, y1[length(y1)] +
-          rbinom(n = 1, size = n[i] - n[i - 1], prob = prob))
+          rbinom(n = 1, size = n[i] - n[i - 1], prob = p))
       }
     }
     return(tibble(n1 = n, y1 = y1))
@@ -110,11 +110,11 @@ sim_dat1 <- function(prob, n) {
 #' set.seed(123)
 #'
 #' # One-sample case
-#' dat1 <- sim_dat1(prob = 0.1, n = seq(5, 25, 5))
+#' dat1 <- sim_dat1(p = 0.1, n = seq(5, 25, 5))
 #' eval_thresh(dat1, 0.95, 0.3, p0 = 0.1, delta = NULL, S = 500, N = 25)
 #'
 #' # Two-sample case
-#' dat2 <- sim_dat1(prob = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
+#' dat2 <- sim_dat1(p = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
 #' eval_thresh(dat2, 0.95, 0.3, S = 500, N = c(25, 25))
 #' }
 #' @importFrom tibble add_column
@@ -193,11 +193,11 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' threshold. In an alternative case, this will result in the power at a given
 #' threshold.
 #'
-#' @param prob_null vector of length two containing the probability of event in
+#' @param p_null vector of length two containing the probability of event in
 #' the standard of care and experimental arm c(p0, p1) for the two-sample case
 #' for the null scenario;
 #' integer of event probability for one-sample case
-#' @param prob_alt vector of length two containing the probability of event in
+#' @param p_alt vector of length two containing the probability of event in
 #' the standard of care and experimental arm c(p0, p1) for the two-sample case
 #' for the alternative scenario;
 #' integer of event probability for one-sample case
@@ -213,7 +213,6 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' @param direction "greater" (default) if interest is in p(p1 > p0) and "less"
 #' if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
-#' @param p0 The target value to compare to in the one-sample case
 #' @param delta clinically meaningful difference between groups.
 #' Typically 0 (default).
 #' @param prior hyperparameters of prior beta distribution.
@@ -246,8 +245,8 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' set.seed(123)
 #'
 #' calibrate_thresholds(
-#'   prob_null = 0.1, prob_alt = 0.3,
-#'   n = seq(5, 25, 5), direction = "greater", p0 = 0.1, delta = NULL,
+#'   p_null = 0.1, p_alt = 0.3,
+#'   n = seq(5, 25, 5), direction = "greater", delta = NULL,
 #'   prior = c(0.5, 0.5), S = 5000, N = 25, nsim = 1000,
 #'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
 #'   ppp_threshold = seq(0.05, 0.2, 0.05)
@@ -260,16 +259,16 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold,
 #' @importFrom dplyr bind_rows full_join select rename ungroup summarize
 #' @export
 
-calibrate_thresholds <- function(prob_null, prob_alt, n,
-                                 direction = "greater", p0 = NULL,
+calibrate_thresholds <- function(p_null, p_alt, n,
+                                 direction = "greater", 
                                  delta = 0, prior = c(0.5, 0.5),
                                  S = 5000, N, nsim = 1000,
                                  pp_threshold, ppp_threshold) {
   sim_dat_null <-
-    map(seq_len(nsim), ~ sim_dat1(prob = prob_null, n = n))
+    map(seq_len(nsim), ~ sim_dat1(p = p_null, n = n))
 
   sim_dat_alt <-
-    map(seq_len(nsim), ~ sim_dat1(prob = prob_alt, n = n))
+    map(seq_len(nsim), ~ sim_dat1(p = p_alt, n = n))
 
   cross_threshold <-
     cross_df(list(
@@ -278,14 +277,19 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
     ))
 
   sim_dat_null <- 
-    map(1:nsim, ~sim_dat1(prob = prob_null, n = n))
+    map(1:nsim, ~sim_dat1(p = p_null, n = n))
   
   sim_dat_alt <- 
-    map(1:nsim, ~sim_dat1(prob = prob_alt, n = n))
+    map(1:nsim, ~sim_dat1(p = p_alt, n = n))
   
   cross_threshold <- 
     cross_df(list(pp_threshold = pp_threshold, 
                   ppp_threshold = ppp_threshold))
+  
+  p0 <- if(length(p_null) == 1) 
+    p_null else if(length(p_null) == 2)
+      NULL
+  
   res_null <- 
     future_map(
       sim_dat_null,
@@ -325,7 +329,7 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
     )
 
 
-  if (length(prob_null) == 2) {
+  if (length(p_null) == 2) {
     res_df <-
       full_join(
         select(
@@ -358,7 +362,7 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
           prop_stopped_alt = mean(sum(n0_alt, n1_alt) < sum(N))
         )
       )
-  } else if (length(prob_null) == 1) {
+  } else if (length(p_null) == 1) {
     res_df <-
       full_join(
         select(
@@ -394,11 +398,10 @@ calibrate_thresholds <- function(prob_null, prob_alt, n,
   # will return call, and all object passed to in table1 call
   # the object func_inputs is a list of every object passed to the function
   calibrate_thresholds_inputs <- list(
-    prob_null = prob_null,
-    prob_alt = prob_alt,
+    p_null = p_null,
+    p_alt = p_alt,
     n = n,
     direction = direction,
-    p0 = p0,
     delta = delta,
     prior = prior,
     S = S,
