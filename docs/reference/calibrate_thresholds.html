@@ -152,14 +152,14 @@ threshold.</p>
   <span class='va'>p_null</span>,
   <span class='va'>p_alt</span>,
   <span class='va'>n</span>,
+  <span class='va'>N</span>,
+  <span class='va'>pp_threshold</span>,
+  <span class='va'>ppp_threshold</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  delta <span class='op'>=</span> <span class='fl'>0</span>,
+  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>,
-  <span class='va'>N</span>,
-  nsim <span class='op'>=</span> <span class='fl'>1000</span>,
-  <span class='va'>pp_threshold</span>,
-  <span class='va'>ppp_threshold</span>
+  nsim <span class='op'>=</span> <span class='fl'>1000</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -192,6 +192,21 @@ size c(N0, N1) for the two-sample case or an integer specifying the total
 sample size N for the one-sample case</p></td>
     </tr>
     <tr>
+      <th>N</th>
+      <td><p>the total planned sample size at the end of the trial, c(N0, N1)
+for two-sample case; integer of total planned sample size at end of trial N
+for one-sample case</p></td>
+    </tr>
+    <tr>
+      <th>pp_threshold</th>
+      <td><p>the posterior probability threshold of interest</p></td>
+    </tr>
+    <tr>
+      <th>ppp_threshold</th>
+      <td><p>the posterior probability threshold of interest for
+futility monitoring</p></td>
+    </tr>
+    <tr>
       <th>direction</th>
       <td><p>"greater" (default) if interest is in p(p1 &gt; p0) and "less"
 if interest is in p(p1 &lt; p0) for two-sample case. For one-sample case,
@@ -200,7 +215,7 @@ if interest is in p(p1 &lt; p0) for two-sample case. For one-sample case,
     <tr>
       <th>delta</th>
       <td><p>clinically meaningful difference between groups.
-Typically 0 (default).</p></td>
+Typically 0 for the two-sample case. NULL for the one-sample case (default).</p></td>
     </tr>
     <tr>
       <th>prior</th>
@@ -212,23 +227,8 @@ Beta(0.5, 0.5) is default</p></td>
       <td><p>number of samples drawn from the posterior. Default is 5000</p></td>
     </tr>
     <tr>
-      <th>N</th>
-      <td><p>the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial N
-for one-sample case</p></td>
-    </tr>
-    <tr>
       <th>nsim</th>
       <td><p>Number of simulated trial datasets.</p></td>
-    </tr>
-    <tr>
-      <th>pp_threshold</th>
-      <td><p>the posterior probability threshold of interest</p></td>
-    </tr>
-    <tr>
-      <th>ppp_threshold</th>
-      <td><p>the posterior probability threshold of interest for
-futility monitoring</p></td>
     </tr>
     </table>
 
@@ -237,8 +237,14 @@ futility monitoring</p></td>
     <p>A list containing a</p><ol>
 <li><p>a tibble 'res_summary' containing the posterior probability threshold
 (pp_threshold), the predictive probability threshold (ppp_threshold),
-the ceiling of the mean sample size (mean_n0 and mean_n1 for two-sample case;
-mean_n1 for one-sample case), and the proportion of positive trials.</p></li>
+the mean sample size under the null (mean_n0_null and mean_n1_null
+for two-sample case; mean_n1_null for one-sample case), the proportion of
+positive trials under the null (prop_pos_null), the proportion of trials
+stopped early under the null (prop_stopped_null), the mean sample
+size under the alternative (mean_n0_alt and mean_n1_alt
+for two-sample case; mean_n1_alt for one-sample case), the proportion of
+positive trials under the alternative (prop_pos_alt), the proportion of
+trials stopped early under the alternative (prop_stopped_alt)</p></li>
 <li><p>'call_list' containing the original function call</p></li>
 <li><p>'calibrate_thresholds_inputs' a list containing the inputs to the
 original function call</p></li>
@@ -255,10 +261,11 @@ for a null setting, and a measure of the power in the alternative setting.</p>
 
 <span class='fu'>calibrate_thresholds</span><span class='op'>(</span>
   p_null <span class='op'>=</span> <span class='fl'>0.1</span>, p_alt <span class='op'>=</span> <span class='fl'>0.3</span>,
-  n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>,
-  prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, N <span class='op'>=</span> <span class='fl'>25</span>, nsim <span class='op'>=</span> <span class='fl'>1000</span>,
+  n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, N <span class='op'>=</span> <span class='fl'>25</span>, 
   pp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>, <span class='fl'>0.95</span>, <span class='fl'>0.96</span>, <span class='fl'>0.98</span><span class='op'>)</span>,
-  ppp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.2</span>, <span class='fl'>0.05</span><span class='op'>)</span>
+  ppp_threshold <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.2</span>, <span class='fl'>0.05</span><span class='op'>)</span>,
+  direction <span class='op'>=</span> <span class='st'>"greater"</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span>, nsim <span class='op'>=</span> <span class='fl'>1000</span>
 <span class='op'>)</span>
 <span class='op'>}</span>
 

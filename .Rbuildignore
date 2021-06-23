@@ -5,8 +5,7 @@
 ^docs$
 ^pkgdown$
 ^Trial-OCs-PhaseIb\.xlsx$
-^.travis\.yml$
-^covid-files$
 ^README\.Rmd$
 ^codecov\.yml$
 ^\.github$
+^inst/ppseq-package-paper$

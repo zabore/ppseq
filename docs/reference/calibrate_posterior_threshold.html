@@ -148,9 +148,9 @@ threshold.</p>
     <pre class="usage"><span class='fu'>calibrate_posterior_threshold</span><span class='op'>(</span>
   <span class='va'>p</span>,
   <span class='va'>N</span>,
+  <span class='va'>p0</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
-  delta <span class='op'>=</span> <span class='fl'>0</span>,
+  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>,
   <span class='va'>theta</span>
@@ -171,19 +171,20 @@ integer of event probability for one-sample case</p></td>
 for two-sample case; integer of sample size so far N for one-sample case</p></td>
     </tr>
     <tr>
+      <th>p0</th>
+      <td><p>The target value to compare to in the one-sample case. Set to
+NULL for the two-sample case.</p></td>
+    </tr>
+    <tr>
       <th>direction</th>
       <td><p>"greater" (default) if interest is in p(p1 &gt; p0) and "less"
 if interest is in p(p1 &lt; p0) for two-sample case. For one-sample case,
 "greater" if interest is in p(p &gt; p0) and "less" if interest is in p(p &lt; p0).</p></td>
     </tr>
     <tr>
-      <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case</p></td>
-    </tr>
-    <tr>
       <th>delta</th>
       <td><p>clinically meaningful difference between groups.
-Typically 0 (default).</p></td>
+Typically 0 for the two-sample case. NULL for the one-sample case (default).</p></td>
     </tr>
     <tr>
       <th>prior</th>

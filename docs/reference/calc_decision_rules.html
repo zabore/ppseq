@@ -148,14 +148,14 @@ optimal design using the functions <code>calibrate_thresholds</code> and
 
     <pre class="usage"><span class='fu'>calc_decision_rules</span><span class='op'>(</span>
   <span class='va'>n</span>,
-  direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  <span class='va'>p0</span>,
-  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
-  prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
-  S <span class='op'>=</span> <span class='fl'>5000</span>,
   <span class='va'>N</span>,
   <span class='va'>theta</span>,
-  <span class='va'>ppp</span>
+  <span class='va'>ppp</span>,
+  <span class='va'>p0</span>,
+  direction <span class='op'>=</span> <span class='st'>"greater"</span>,
+  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
+  S <span class='op'>=</span> <span class='fl'>5000</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -164,31 +164,6 @@ optimal design using the functions <code>calibrate_thresholds</code> and
     <tr>
       <th>n</th>
       <td><p>integer of sample size so far for one-sample case</p></td>
-    </tr>
-    <tr>
-      <th>direction</th>
-      <td><p>For one-sample case, "greater" if interest is in P(p &gt; p0)
-and "less" if interest is in P(p &lt; p0).</p></td>
-    </tr>
-    <tr>
-      <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case
-(i.e. the null response rate)</p></td>
-    </tr>
-    <tr>
-      <th>delta</th>
-      <td><p>clinically meaningful difference between groups.
-Typically 0. NULL for one-sample case (default). Placeholder for when
-two-sample case is added.</p></td>
-    </tr>
-    <tr>
-      <th>prior</th>
-      <td><p>hyperparameters of prior beta distribution.
-Beta(0.5, 0.5) is default</p></td>
-    </tr>
-    <tr>
-      <th>S</th>
-      <td><p>number of samples, default is 5000</p></td>
     </tr>
     <tr>
       <th>N</th>
@@ -204,6 +179,30 @@ P(p &gt; p0) &gt; theta for the one-sample case with greater direction.</p></td>
       <th>ppp</th>
       <td><p>The target predictive probability. e.g. Stop the trial if the
 predictive probability falls below this target.</p></td>
+    </tr>
+    <tr>
+      <th>p0</th>
+      <td><p>The target value to compare to in the one-sample case
+(i.e. the null response rate)</p></td>
+    </tr>
+    <tr>
+      <th>direction</th>
+      <td><p>For one-sample case, "greater" if interest is in P(p &gt; p0)
+and "less" if interest is in P(p &lt; p0).</p></td>
+    </tr>
+    <tr>
+      <th>delta</th>
+      <td><p>clinically meaningful difference between groups.
+Typically 0 for two-sample case. NULL for one-sample case (default).</p></td>
+    </tr>
+    <tr>
+      <th>prior</th>
+      <td><p>hyperparameters of prior beta distribution.
+Beta(0.5, 0.5) is default</p></td>
+    </tr>
+    <tr>
+      <th>S</th>
+      <td><p>number of samples, default is 5000</p></td>
     </tr>
     </table>
 

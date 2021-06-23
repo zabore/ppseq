@@ -146,12 +146,12 @@ given the data available at each interim analysis.</p>
     <pre class="usage"><span class='fu'>sim_single_trial</span><span class='op'>(</span>
   <span class='va'>p</span>,
   <span class='va'>n</span>,
+  <span class='va'>p0</span>,
+  <span class='va'>N</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
-  delta <span class='op'>=</span> <span class='fl'>0</span>,
+  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>,
-  <span class='va'>N</span>,
   theta <span class='op'>=</span> <span class='fl'>0.95</span>
 <span class='op'>)</span></pre>
 
@@ -177,19 +177,25 @@ size c(N0, N1) for the two-sample case or an integer specifying the total
 sample size N for the one-sample case.</p></td>
     </tr>
     <tr>
+      <th>p0</th>
+      <td><p>The target value to compare to in the one-sample case</p></td>
+    </tr>
+    <tr>
+      <th>N</th>
+      <td><p>the total planned sample size at the end of the trial, c(N0, N1)
+for two-sample case; integer of total planned sample size at end of trial N
+for one-sample case</p></td>
+    </tr>
+    <tr>
       <th>direction</th>
       <td><p>"greater" (default) if interest is in P(p1 &gt; p0) and "less"
 if interest is in P(p1 &lt; p0) for two-sample case. For one-sample case,
 "greater" if interest is in P(p &gt; p0) and "less" if interest is in P(p &lt; p0).</p></td>
     </tr>
     <tr>
-      <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case</p></td>
-    </tr>
-    <tr>
       <th>delta</th>
       <td><p>clinically meaningful difference between groups.
-Typically 0 (default).</p></td>
+Typically 0 for the two-sample case. NULL for the one-sample case (default).</p></td>
     </tr>
     <tr>
       <th>prior</th>
@@ -199,12 +205,6 @@ Beta(0.5, 0.5) is default</p></td>
     <tr>
       <th>S</th>
       <td><p>number of samples, default is 5000</p></td>
-    </tr>
-    <tr>
-      <th>N</th>
-      <td><p>the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial N
-for one-sample case</p></td>
     </tr>
     <tr>
       <th>theta</th>

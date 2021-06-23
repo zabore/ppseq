@@ -86,7 +86,7 @@
       <h1 data-toc-skip>One-sample expansion cohort</h1>
                         <h4 class="author">Emily C. Zabor</h4>
             
-            <h4 class="date">Last updated: 2021-06-22</h4>
+            <h4 class="date">Last updated: 2021-06-23</h4>
       
       
       <div class="hidden name"><code>one_sample_expansion.Rmd</code></div>
@@ -103,8 +103,6 @@
 <code class="sourceCode R"><span class="co"># remotes::install_github("zabore/ppseq")</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ppseq</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/HenrikBengtsson/future">future</a></span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/future/man/plan.html">plan</a></span><span class="op">(</span><span class="va">multisession</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
@@ -129,8 +127,8 @@
 <p>To conduct the case study re-design, we use the <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> function from the {ppseq} package. This function is written using the <code>future</code> and <code>furrr</code> packages, but the user will have to set up a call to <code><a href="https://rdrr.io/pkg/future/man/plan.html">future::plan</a></code> that is appropriate for their operating environment and their simulation setup prior to running the function. In this example, we used the following code on a Unix server with 192 cores, with the goal of utilizing 76 cores since our grid of thresholds to consider was 19 posterior thresholds by 4 predictive thresholds.</p>
 <p>The <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> function will simulate <code>nsim</code> datasets under the null hypothesis and <code>nsim</code> datasets under the alternative hypothesis. For each simulated dataset, every combination of posterior and predictive thresholds will be considered and the final sample size and whether or not the trial was positive will be saved. Then across all simulated datasets, <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> will return the average sample size under the null, the average sample size under the alternative, the proportion of positive trials under the null (i.e. the type I error), and the proportion of positive trials under the alternative (i.e. the power).</p>
 <p>Because <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> randomly generates simulated datasets, you will want to set a seed before running the function in order to ensure your results are reproducible.</p>
-<p>The inputs to <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> for our case study re-design include <code>p_null = 0.1</code> as the null response rate, <code>p_alt = 0.2</code> as the alternative response rate, <code>n = seq(5, 95, 5)</code> indicates interim looks after every 5 patients up to a total of 95, <code>direction = "greater"</code> specifies that interest is in whether the alternative response rate exceeds the null response rate, <code>delta = NULL</code> because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, <code>prior = c(0.5, 0.5)</code> specifies that both hyperparameters of the prior beta distribution be set to 0.5, <code>S = 5000</code> specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, <code>N = 95</code> indicates the final total sample size of 95, <code>nsim = 1000</code> specifies that we will generate 1000 simulated datasets under both the null and the alternative, <code>pp_threshold</code> is a vector of the posterior thresholds of interest, and <code>ppp_threshold</code> is a vector of predictive thresholds of interest.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>The inputs to <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> for our case study re-design include <code>p_null = 0.1</code> as the null response rate, <code>p_alt = 0.2</code> as the alternative response rate, <code>n = seq(5, 95, 5)</code> indicates interim looks after every 5 patients up to a total of 95, <code>direction = "greater"</code> specifies that interest is in whether the alternative response rate exceeds the null response rate, <code>delta = NULL</code> because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, <code>prior = c(0.5, 0.5)</code> specifies that both hyperparameters of the prior beta distribution be set to 0.5, <code>S = 5000</code> specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, <code>N = 95</code> indicates the final total sample size of 95, <code>nsim = 1000</code> specifies that we will generate 1000 simulated datasets under both the null and the alternative, <code>pp_threshold</code> is a vector of the posterior thresholds of interest, and <code>ppp_threshold</code> is a vector of predictive thresholds of interest. Note that due to the computational time involved, the object produced from the below example code <code>one_sample_cal_tbl</code> is available as a dataset in the {ppseq} package.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
 <span class="va">no_cores</span> <span class="op">&lt;-</span> <span class="fl">76</span>
@@ -138,12 +136,14 @@
 
 <span class="va">one_sample_cal_tbl</span> <span class="op">&lt;-</span> 
   <span class="fu"><a href="../reference/calibrate_thresholds.html">calibrate_thresholds</a></span><span class="op">(</span>p_null <span class="op">=</span> <span class="fl">0.1</span>, p_alt <span class="op">=</span> <span class="fl">0.2</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">95</span>, <span class="fl">5</span><span class="op">)</span>,
-                       direction <span class="op">=</span> <span class="st">"greater"</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, 
-                       prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, N <span class="op">=</span> <span class="fl">95</span>, nsim <span class="op">=</span> <span class="fl">1000</span>,
+                       N <span class="op">=</span> <span class="fl">95</span>, 
                        pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.7</span>, <span class="fl">0.74</span>, <span class="fl">0.78</span>, <span class="fl">0.82</span>, <span class="fl">0.86</span>, <span class="fl">0.9</span>, 
                                         <span class="fl">0.92</span>, <span class="fl">0.93</span>, <span class="fl">0.94</span>, <span class="fl">0.95</span>, <span class="fl">0.96</span>, <span class="fl">0.97</span>, 
                                         <span class="fl">0.98</span>, <span class="fl">0.99</span>, <span class="fl">0.999</span>, <span class="fl">0.9999</span>, <span class="fl">0.99999</span>, <span class="fl">1</span><span class="op">)</span>,
-                       ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+                       ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span>,
+                       direction <span class="op">=</span> <span class="st">"greater"</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, 
+                       prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>, nsim <span class="op">=</span> <span class="fl">1000</span>
+                       <span class="op">)</span></code></pre></div>
 </div>
 <div id="results" class="section level1">
 <h1 class="hasAnchor">
@@ -154,16 +154,16 @@
 <a href="#print" class="anchor"></a><code>print()</code>
 </h2>
 <p>When you pass the results of <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> to <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> you will get back a table of the resulting design options that satisfy the desired range of type I error, specified as a vector of minimum and maximum passed to the <code>type1_range</code> argument, and minimal power, specified as a numeric value between 0 and 1 passed to the argument <code>minimum_power</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">one_sample_cal_tbl</span>, 
       type1_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.2</span><span class="op">)</span>, 
       minimum_power <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span></code></pre></div>
-<div id="xqglucmkhq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="fnxxjnvzqk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#xqglucmkhq .gt_table {
+#fnxxjnvzqk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -188,7 +188,7 @@
   border-left-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_heading {
+#fnxxjnvzqk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -200,7 +200,7 @@
   border-right-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_title {
+#fnxxjnvzqk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -210,7 +210,7 @@
   border-bottom-width: 0;
 }
 
-#xqglucmkhq .gt_subtitle {
+#fnxxjnvzqk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -220,13 +220,13 @@
   border-top-width: 0;
 }
 
-#xqglucmkhq .gt_bottom_border {
+#fnxxjnvzqk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_col_headings {
+#fnxxjnvzqk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -241,7 +241,7 @@
   border-right-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_col_heading {
+#fnxxjnvzqk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -261,7 +261,7 @@
   overflow-x: hidden;
 }
 
-#xqglucmkhq .gt_column_spanner_outer {
+#fnxxjnvzqk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -273,15 +273,15 @@
   padding-right: 4px;
 }
 
-#xqglucmkhq .gt_column_spanner_outer:first-child {
+#fnxxjnvzqk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#xqglucmkhq .gt_column_spanner_outer:last-child {
+#fnxxjnvzqk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#xqglucmkhq .gt_column_spanner {
+#fnxxjnvzqk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -293,7 +293,7 @@
   width: 100%;
 }
 
-#xqglucmkhq .gt_group_heading {
+#fnxxjnvzqk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -315,7 +315,7 @@
   vertical-align: middle;
 }
 
-#xqglucmkhq .gt_empty_group_heading {
+#fnxxjnvzqk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -330,15 +330,15 @@
   vertical-align: middle;
 }
 
-#xqglucmkhq .gt_from_md > :first-child {
+#fnxxjnvzqk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#xqglucmkhq .gt_from_md > :last-child {
+#fnxxjnvzqk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#xqglucmkhq .gt_row {
+#fnxxjnvzqk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -357,7 +357,7 @@
   overflow-x: hidden;
 }
 
-#xqglucmkhq .gt_stub {
+#fnxxjnvzqk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -369,7 +369,7 @@
   padding-left: 12px;
 }
 
-#xqglucmkhq .gt_summary_row {
+#fnxxjnvzqk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -379,7 +379,7 @@
   padding-right: 5px;
 }
 
-#xqglucmkhq .gt_first_summary_row {
+#fnxxjnvzqk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -389,7 +389,7 @@
   border-top-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_grand_summary_row {
+#fnxxjnvzqk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -399,7 +399,7 @@
   padding-right: 5px;
 }
 
-#xqglucmkhq .gt_first_grand_summary_row {
+#fnxxjnvzqk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -409,11 +409,11 @@
   border-top-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_striped {
+#fnxxjnvzqk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#xqglucmkhq .gt_table_body {
+#fnxxjnvzqk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -422,7 +422,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_footnotes {
+#fnxxjnvzqk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -436,13 +436,13 @@
   border-right-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_footnote {
+#fnxxjnvzqk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#xqglucmkhq .gt_sourcenotes {
+#fnxxjnvzqk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -456,41 +456,41 @@
   border-right-color: #D3D3D3;
 }
 
-#xqglucmkhq .gt_sourcenote {
+#fnxxjnvzqk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#xqglucmkhq .gt_left {
+#fnxxjnvzqk .gt_left {
   text-align: left;
 }
 
-#xqglucmkhq .gt_center {
+#fnxxjnvzqk .gt_center {
   text-align: center;
 }
 
-#xqglucmkhq .gt_right {
+#fnxxjnvzqk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#xqglucmkhq .gt_font_normal {
+#fnxxjnvzqk .gt_font_normal {
   font-weight: normal;
 }
 
-#xqglucmkhq .gt_font_bold {
+#fnxxjnvzqk .gt_font_bold {
   font-weight: bold;
 }
 
-#xqglucmkhq .gt_font_italic {
+#fnxxjnvzqk .gt_font_italic {
   font-style: italic;
 }
 
-#xqglucmkhq .gt_super {
+#fnxxjnvzqk .gt_super {
   font-size: 65%;
 }
 
-#xqglucmkhq .gt_footnote_marks {
+#fnxxjnvzqk .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -868,14 +868,14 @@
 <a href="#plot" class="anchor"></a><code>plot()</code>
 </h2>
 <p>Passing the results of <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> to <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> returns two plots, one of type I error by power, and one of average sample size under the null by average sample size under the alternative. The arguments <code>type1_range</code> and <code>power</code> are used in the same way as for the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> function. The argument <code>plotly</code> defaults to FALSE, which results in a pair of side-by-side ggplots being returned. If set to TRUE, two individual interactive plotly plots will be returned, as demonstrated below.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">one_sample_cal_tbl</span>, 
      type1_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.01</span>, <span class="fl">0.2</span><span class="op">)</span>, 
      minimum_power <span class="op">=</span> <span class="fl">0.7</span>,
      plotly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div id="htmlwidget-9483264f9e9bb7d32ec8" style="width:768px;height:576px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9483264f9e9bb7d32ec8">{"x":{"data":[{"x":[0.0872,0.1815,0.0315,0.0313,0.0315,0.0312,0.199,0.1994,0.1996,0.1998,0.0309,0.0692,0.1389,0.0651,0.0652,0.0661,0.0661,0.0259,0.025],"y":[0.8902,0.9314,0.7984,0.7969,0.7969,0.7959,0.9445,0.9442,0.9438,0.9436,0.7872,0.7802,0.8096,0.7672,0.7666,0.7656,0.7648,0.7093,0.7001],"text":["Type I error: 0.0872<br />Power: 0.8902<br />Distance to optimal accuracy: 0.1402137<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.1<br />Average N under the null: 16.6650<br />Average N under the alternative: 24.3470","Type I error: 0.1815<br />Power: 0.9314<br />Distance to optimal accuracy: 0.1940315<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.15<br />Average N under the null: 16.6650<br />Average N under the alternative: 24.3470","Type I error: 0.0315<br />Power: 0.7984<br />Distance to optimal accuracy: 0.2040461<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.05<br />Average N under the null: 16.6650<br />Average N under the alternative: 24.3470","Type I error: 0.0313<br />Power: 0.7969<br />Distance to optimal accuracy: 0.2054977<br />Design: Posterior threshold = 0.95 and predictive threshold = 0.05<br />Average N under the null: 16.5530<br />Average N under the alternative: 24.3035","Type I error: 0.0315<br />Power: 0.7969<br />Distance to optimal accuracy: 0.2055282<br />Design: Posterior threshold = 0.96 and predictive threshold = 0.05<br />Average N under the null: 16.5090<br />Average N under the alternative: 24.2860","Type I error: 0.0312<br />Power: 0.7959<br />Distance to optimal accuracy: 0.2064709<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.05<br />Average N under the null: 16.5135<br />Average N under the alternative: 24.2840","Type I error: 0.1990<br />Power: 0.9445<br />Distance to optimal accuracy: 0.2065944<br />Design: Posterior threshold = 0.74 and predictive threshold = 0.1<br />Average N under the null: 18.1360<br />Average N under the alternative: 24.5140","Type I error: 0.1994<br />Power: 0.9442<br />Distance to optimal accuracy: 0.2070604<br />Design: Posterior threshold = 0.7 and predictive threshold = 0.1<br />Average N under the null: 18.1540<br />Average N under the alternative: 24.5105","Type I error: 0.1996<br />Power: 0.9438<br />Distance to optimal accuracy: 0.2073610<br />Design: Posterior threshold = 0.78 and predictive threshold = 0.1<br />Average N under the null: 18.1355<br />Average N under the alternative: 24.4995","Type I error: 0.1998<br />Power: 0.9436<br />Distance to optimal accuracy: 0.2076078<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.1<br />Average N under the null: 18.1240<br />Average N under the alternative: 24.5035","Type I error: 0.0309<br />Power: 0.7872<br />Distance to optimal accuracy: 0.2150317<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.1<br />Average N under the null: 15.9895<br />Average N under the alternative: 23.9880","Type I error: 0.0692<br />Power: 0.7802<br />Distance to optimal accuracy: 0.2304358<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.15<br />Average N under the null: 11.5560<br />Average N under the alternative: 21.5450","Type I error: 0.1389<br />Power: 0.8096<br />Distance to optimal accuracy: 0.2356807<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.2<br />Average N under the null: 11.5560<br />Average N under the alternative: 21.5450","Type I error: 0.0651<br />Power: 0.7672<br />Distance to optimal accuracy: 0.2417309<br />Design: Posterior threshold = 0.86 and predictive threshold = 0.2<br />Average N under the null: 11.0045<br />Average N under the alternative: 21.2720","Type I error: 0.0652<br />Power: 0.7666<br />Distance to optimal accuracy: 0.2423357<br />Design: Posterior threshold = 0.92 and predictive threshold = 0.2<br />Average N under the null: 11.0060<br />Average N under the alternative: 21.2605","Type I error: 0.0661<br />Power: 0.7656<br />Distance to optimal accuracy: 0.2435417<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.2<br />Average N under the null: 10.9860<br />Average N under the alternative: 21.2360","Type I error: 0.0661<br />Power: 0.7648<br />Distance to optimal accuracy: 0.2443118<br />Design: Posterior threshold = 0.9 and predictive threshold = 0.2<br />Average N under the null: 11.0060<br />Average N under the alternative: 21.2360","Type I error: 0.0259<br />Power: 0.7093<br />Distance to optimal accuracy: 0.2918515<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.15<br />Average N under the null: 11.4650<br />Average N under the alternative: 21.5095","Type I error: 0.0250<br />Power: 0.7001<br />Distance to optimal accuracy: 0.3009402<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.1<br />Average N under the null: 10.7685<br />Average N under the alternative: 21.2250"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":["rgba(68,1,84,1)","rgba(55,103,140,1)","rgba(43,119,142,1)","rgba(42,121,142,1)","rgba(42,121,142,1)","rgba(43,123,141,1)","rgba(43,123,141,1)","rgba(43,124,141,1)","rgba(43,124,141,1)","rgba(43,125,141,1)","rgba(44,135,139,1)","rgba(39,159,134,1)","rgba(35,167,132,1)","rgba(58,174,125,1)","rgba(60,175,124,1)","rgba(64,177,123,1)","rgba(67,178,121,1)","rgba(219,225,54,1)","rgba(253,231,37,1)"],"opacity":1,"size":[15.1181102362205,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024],"symbol":["diamond","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle"],"line":{"width":1.88976377952756,"color":["rgba(68,1,84,1)","rgba(55,103,140,1)","rgba(43,119,142,1)","rgba(42,121,142,1)","rgba(42,121,142,1)","rgba(43,123,141,1)","rgba(43,123,141,1)","rgba(43,124,141,1)","rgba(43,124,141,1)","rgba(43,125,141,1)","rgba(44,135,139,1)","rgba(39,159,134,1)","rgba(35,167,132,1)","rgba(58,174,125,1)","rgba(60,175,124,1)","rgba(64,177,123,1)","rgba(67,178,121,1)","rgba(219,225,54,1)","rgba(253,231,37,1)"]}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0],"y":[0],"name":"99_c55d934e498a73e40c721b2ff608299f","type":"scatter","mode":"markers","opacity":0,"hoverinfo":"skip","showlegend":false,"marker":{"color":[0,1],"colorscale":[[0,"#440154"],[0.0033444816053512,"#440355"],[0.0066889632107024,"#440456"],[0.0100334448160536,"#440656"],[0.0133779264214046,"#450857"],[0.0167224080267558,"#450958"],[0.020066889632107,"#450B59"],[0.0234113712374582,"#450D5A"],[0.0267558528428094,"#450E5B"],[0.0301003344481604,"#45105B"],[0.0334448160535116,"#45115C"],[0.0367892976588629,"#45135D"],[0.040133779264214,"#45145E"],[0.0434782608695653,"#45155F"],[0.0468227424749164,"#451760"],[0.0501672240802676,"#451860"],[0.0535117056856187,"#451961"],[0.0568561872909699,"#461A62"],[0.0602006688963211,"#461B63"],[0.0635451505016723,"#461D64"],[0.0668896321070235,"#461E65"],[0.0702341137123745,"#461F65"],[0.0735785953177257,"#462066"],[0.0769230769230769,"#462167"],[0.0802675585284281,"#462268"],[0.0836120401337793,"#462369"],[0.0869565217391305,"#46246A"],[0.0903010033444815,"#46256B"],[0.0936454849498327,"#46266B"],[0.0969899665551839,"#46276C"],[0.100334448160535,"#46286D"],[0.103678929765886,"#46296E"],[0.107023411371238,"#462A6F"],[0.110367892976589,"#452B70"],[0.11371237458194,"#452C70"],[0.117056856187291,"#452D71"],[0.120401337792642,"#452E72"],[0.123745819397993,"#452F73"],[0.127090301003345,"#453074"],[0.130434782608696,"#453175"],[0.133779264214047,"#453276"],[0.137123745819398,"#453377"],[0.140468227424749,"#453477"],[0.1438127090301,"#443578"],[0.147157190635452,"#443679"],[0.150501672240803,"#44367A"],[0.153846153846154,"#44377B"],[0.157190635451505,"#44387C"],[0.160535117056856,"#44397D"],[0.163879598662207,"#443A7D"],[0.167224080267559,"#433B7E"],[0.17056856187291,"#433C7F"],[0.173913043478261,"#433D80"],[0.177257525083612,"#433E81"],[0.180602006688963,"#433F82"],[0.183946488294314,"#424083"],[0.187290969899666,"#424184"],[0.190635451505017,"#424185"],[0.193979933110368,"#424285"],[0.197324414715719,"#414386"],[0.20066889632107,"#414487"],[0.204013377926421,"#414587"],[0.207357859531772,"#414687"],[0.210702341137124,"#414787"],[0.214046822742475,"#414888"],[0.217391304347826,"#404988"],[0.220735785953177,"#404A88"],[0.224080267558528,"#404A88"],[0.22742474916388,"#404B88"],[0.230769230769231,"#404C88"],[0.234113712374582,"#404D88"],[0.237458193979933,"#404E88"],[0.240802675585284,"#3F4F89"],[0.244147157190635,"#3F5089"],[0.247491638795987,"#3F5189"],[0.250836120401338,"#3F5289"],[0.254180602006689,"#3F5289"],[0.25752508361204,"#3E5389"],[0.260869565217391,"#3E5489"],[0.264214046822743,"#3E5589"],[0.267558528428094,"#3E568A"],[0.270903010033445,"#3D578A"],[0.274247491638796,"#3D588A"],[0.277591973244147,"#3D598A"],[0.280936454849498,"#3D598A"],[0.28428093645485,"#3C5A8A"],[0.287625418060201,"#3C5B8A"],[0.290969899665552,"#3C5C8A"],[0.294314381270903,"#3B5D8A"],[0.297658862876254,"#3B5E8B"],[0.301003344481605,"#3B5F8B"],[0.304347826086957,"#3A5F8B"],[0.307692307692308,"#3A608B"],[0.311036789297659,"#3A618B"],[0.31438127090301,"#39628B"],[0.317725752508361,"#39638B"],[0.321070234113712,"#38648B"],[0.324414715719064,"#38658C"],[0.327759197324415,"#38658C"],[0.331103678929766,"#37668C"],[0.334448160535117,"#37678C"],[0.337792642140468,"#36688C"],[0.341137123745819,"#36698C"],[0.344481605351171,"#356A8C"],[0.347826086956522,"#356B8C"],[0.351170568561873,"#346B8C"],[0.354515050167224,"#346C8D"],[0.357859531772575,"#336D8D"],[0.361204013377926,"#326E8D"],[0.364548494983278,"#326F8D"],[0.367892976588629,"#31708D"],[0.37123745819398,"#31718D"],[0.374581939799331,"#30718D"],[0.377926421404682,"#2F728D"],[0.381270903010033,"#2F738D"],[0.384615384615385,"#2E748E"],[0.387959866220736,"#2D758E"],[0.391304347826087,"#2C768E"],[0.394648829431438,"#2B778E"],[0.397993311036789,"#2B778E"],[0.40133779264214,"#2A788E"],[0.404682274247492,"#2A798E"],[0.408026755852843,"#2A7A8E"],[0.411371237458194,"#2B7B8E"],[0.414715719063545,"#2B7B8D"],[0.418060200668896,"#2B7C8D"],[0.421404682274247,"#2B7D8D"],[0.424749163879599,"#2B7E8D"],[0.42809364548495,"#2B7F8D"],[0.431438127090301,"#2B7F8D"],[0.434782608695652,"#2B808D"],[0.438127090301003,"#2B818C"],[0.441471571906355,"#2B828C"],[0.444816053511706,"#2B838C"],[0.448160535117057,"#2C838C"],[0.451505016722408,"#2C848C"],[0.454849498327759,"#2C858C"],[0.45819397993311,"#2C868B"],[0.461538461538462,"#2C878B"],[0.464882943143813,"#2C878B"],[0.468227424749164,"#2C888B"],[0.471571906354515,"#2C898B"],[0.474916387959866,"#2C8A8B"],[0.478260869565217,"#2C8B8B"],[0.481605351170569,"#2B8B8A"],[0.48494983277592,"#2B8C8A"],[0.488294314381271,"#2B8D8A"],[0.491638795986622,"#2B8E8A"],[0.494983277591973,"#2B8F8A"],[0.498327759197324,"#2B8F8A"],[0.501672240802676,"#2B9089"],[0.505016722408027,"#2B9189"],[0.508361204013378,"#2B9289"],[0.511705685618729,"#2B9389"],[0.51505016722408,"#2A9389"],[0.518394648829431,"#2A9489"],[0.521739130434783,"#2A9588"],[0.525083612040134,"#2A9688"],[0.528428093645485,"#2A9788"],[0.531772575250836,"#2A9788"],[0.535117056856187,"#299888"],[0.538461538461538,"#299987"],[0.54180602006689,"#299A87"],[0.545150501672241,"#299B87"],[0.548494983277592,"#289B87"],[0.551839464882943,"#289C87"],[0.555183946488294,"#289D87"],[0.558528428093645,"#279E86"],[0.561872909698997,"#279F86"],[0.565217391304348,"#27A086"],[0.568561872909699,"#26A086"],[0.57190635451505,"#26A186"],[0.575250836120401,"#26A285"],[0.578595317725752,"#25A385"],[0.581939799331104,"#25A485"],[0.585284280936455,"#24A485"],[0.588628762541806,"#24A585"],[0.591973244147157,"#23A684"],[0.595317725752508,"#23A784"],[0.598662207357859,"#22A884"],[0.602006688963211,"#24A884"],[0.605351170568562,"#27A983"],[0.608695652173913,"#2AAA82"],[0.612040133779264,"#2DAA81"],[0.615384615384615,"#2FAB81"],[0.618729096989967,"#32AC80"],[0.622073578595318,"#34AC7F"],[0.625418060200669,"#36AD7E"],[0.62876254180602,"#38AE7E"],[0.632107023411371,"#3AAE7D"],[0.635451505016722,"#3CAF7C"],[0.638795986622074,"#3EB07B"],[0.642140468227425,"#40B07B"],[0.645484949832776,"#42B17A"],[0.648829431438127,"#43B279"],[0.652173913043478,"#45B278"],[0.655518394648829,"#47B378"],[0.658862876254181,"#48B477"],[0.662207357859532,"#4AB476"],[0.665551839464883,"#4BB575"],[0.668896321070234,"#4DB675"],[0.672240802675585,"#4EB674"],[0.675585284280936,"#50B773"],[0.678929765886288,"#51B872"],[0.682274247491639,"#53B971"],[0.68561872909699,"#54B971"],[0.688963210702341,"#55BA70"],[0.692307692307692,"#57BB6F"],[0.695652173913043,"#58BB6E"],[0.698996655518395,"#59BC6D"],[0.702341137123746,"#5BBD6C"],[0.705685618729097,"#5CBD6C"],[0.709030100334448,"#5DBE6B"],[0.712374581939799,"#5EBF6A"],[0.715719063545151,"#5FBF69"],[0.719063545150502,"#61C068"],[0.722408026755853,"#62C167"],[0.725752508361204,"#63C166"],[0.729096989966555,"#64C266"],[0.732441471571906,"#65C365"],[0.735785953177257,"#66C464"],[0.739130434782609,"#67C463"],[0.74247491638796,"#69C562"],[0.745819397993311,"#6AC661"],[0.749163879598662,"#6BC660"],[0.752508361204013,"#6CC75F"],[0.755852842809364,"#6DC85E"],[0.759197324414716,"#6EC85D"],[0.762541806020067,"#6FC95C"],[0.765886287625418,"#70CA5B"],[0.769230769230769,"#71CB5A"],[0.77257525083612,"#72CB59"],[0.775919732441471,"#73CC58"],[0.779264214046823,"#74CD57"],[0.782608695652174,"#75CD56"],[0.785953177257525,"#76CE55"],[0.789297658862876,"#77CF54"],[0.792642140468227,"#78CF53"],[0.795986622073579,"#79D052"],[0.79933110367893,"#7AD151"],[0.802675585284281,"#7CD151"],[0.806020066889632,"#7FD250"],[0.809364548494983,"#81D250"],[0.812709030100335,"#84D34F"],[0.816053511705686,"#87D34F"],[0.819397993311037,"#89D34E"],[0.822742474916388,"#8CD44D"],[0.826086956521739,"#8ED44D"],[0.82943143812709,"#91D54C"],[0.832775919732441,"#93D54C"],[0.836120401337792,"#95D54B"],[0.839464882943144,"#98D64B"],[0.842809364548495,"#9AD64A"],[0.846153846153846,"#9DD74A"],[0.849498327759197,"#9FD749"],[0.852842809364548,"#A1D748"],[0.8561872909699,"#A3D848"],[0.859531772575251,"#A6D847"],[0.862876254180602,"#A8D947"],[0.866220735785953,"#AAD946"],[0.869565217391304,"#ACD946"],[0.872909698996655,"#AFDA45"],[0.876254180602007,"#B1DA44"],[0.879598662207358,"#B3DB44"],[0.882943143812709,"#B5DB43"],[0.88628762541806,"#B7DB42"],[0.889632107023411,"#BADC42"],[0.892976588628763,"#BCDC41"],[0.896321070234114,"#BEDC40"],[0.899665551839465,"#C0DD40"],[0.903010033444816,"#C2DD3F"],[0.906354515050167,"#C4DE3E"],[0.909698996655518,"#C6DE3E"],[0.91304347826087,"#C8DE3D"],[0.916387959866221,"#CBDF3C"],[0.919732441471572,"#CDDF3B"],[0.923076923076923,"#CFDF3B"],[0.926421404682274,"#D1E03A"],[0.929765886287625,"#D3E039"],[0.933110367892976,"#D5E038"],[0.936454849498328,"#D7E138"],[0.939799331103679,"#D9E137"],[0.94314381270903,"#DBE136"],[0.946488294314381,"#DDE235"],[0.949832775919732,"#DFE234"],[0.953177257525084,"#E1E233"],[0.956521739130435,"#E3E333"],[0.959866220735786,"#E5E332"],[0.963210702341137,"#E7E331"],[0.966555183946488,"#E9E430"],[0.969899665551839,"#EBE42F"],[0.973244147157191,"#EDE42E"],[0.976588628762542,"#EFE52D"],[0.979933110367893,"#F1E52C"],[0.983277591973244,"#F3E52B"],[0.986622073578595,"#F5E62A"],[0.989966555183947,"#F7E629"],[0.993311036789298,"#F9E627"],[0.996655518394649,"#FBE726"],[1,"#FDE725"]],"colorbar":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"thickness":23.04,"title":"Distance to optimal accuracy","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"tickmode":"array","ticktext":["0.15","0.20","0.25","0.30"],"tickvals":[0.0608879368085492,0.37197537439001,0.683062811971472,0.994150249552933],"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"ticklen":2,"len":0.5}},"xaxis":"x","yaxis":"y","frame":null}],"layout":{"margin":{"t":27.8246364188244,"r":7.30593607305936,"b":41.7789743183678,"l":48.9497716894977},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.05,1.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Type I error","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.05,1.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Power","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"3eb819bd56d4":{"x":{},"y":{},"colour":{},"Design":{},"Average N under the null":{},"Average N under the alternative":{},"type":"scatter"}},"cur_data":"3eb819bd56d4","visdat":{"3eb819bd56d4":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-2fd9a3cd550b92ee9372" style="width:768px;height:576px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2fd9a3cd550b92ee9372">{"x":{"data":[{"x":[11.556,11.465,11.0045,11.006,10.986,11.006,10.7685,15.9895,16.509,16.5135,16.553,16.665,18.124,18.1355,18.136,18.154],"y":[21.545,21.5095,21.272,21.2605,21.236,21.236,21.225,23.988,24.286,24.284,24.3035,24.347,24.5035,24.4995,24.514,24.5105],"text":["Average N under the null: 11.5560<br />Average N under the alternative: 21.5450<br />Distance to optimal efficiency: 3.071664<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.15<br />Type I error: 0.0692<br />Power: 0.7802","Average N under the null: 11.4650<br />Average N under the alternative: 21.5095<br />Distance to optimal efficiency: 3.084175<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.15<br />Type I error: 0.0259<br />Power: 0.7093","Average N under the null: 11.0045<br />Average N under the alternative: 21.2720<br />Distance to optimal efficiency: 3.250578<br />Design: Posterior threshold = 0.86 and predictive threshold = 0.2<br />Type I error: 0.0651<br />Power: 0.7672","Average N under the null: 11.0060<br />Average N under the alternative: 21.2605<br />Distance to optimal efficiency: 3.262157<br />Design: Posterior threshold = 0.92 and predictive threshold = 0.2<br />Type I error: 0.0652<br />Power: 0.7666","Average N under the null: 10.9860<br />Average N under the alternative: 21.2360<br />Distance to optimal efficiency: 3.285208<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.2<br />Type I error: 0.0661<br />Power: 0.7656","Average N under the null: 11.0060<br />Average N under the alternative: 21.2360<br />Distance to optimal efficiency: 3.286592<br />Design: Posterior threshold = 0.9 and predictive threshold = 0.2<br />Type I error: 0.0661<br />Power: 0.7648","Average N under the null: 10.7685<br />Average N under the alternative: 21.2250<br />Distance to optimal efficiency: 3.289000<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.1<br />Type I error: 0.0250<br />Power: 0.7001","Average N under the null: 15.9895<br />Average N under the alternative: 23.9880<br />Distance to optimal efficiency: 5.247430<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.1<br />Type I error: 0.0309<br />Power: 0.7872","Average N under the null: 16.5090<br />Average N under the alternative: 24.2860<br />Distance to optimal efficiency: 5.745026<br />Design: Posterior threshold = 0.96 and predictive threshold = 0.05<br />Type I error: 0.0315<br />Power: 0.7969","Average N under the null: 16.5135<br />Average N under the alternative: 24.2840<br />Distance to optimal efficiency: 5.749602<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.05<br />Type I error: 0.0312<br />Power: 0.7959","Average N under the null: 16.5530<br />Average N under the alternative: 24.3035<br />Distance to optimal efficiency: 5.788329<br />Design: Posterior threshold = 0.95 and predictive threshold = 0.05<br />Type I error: 0.0313<br />Power: 0.7969","Average N under the null: 16.6650<br />Average N under the alternative: 24.3470<br />Distance to optimal efficiency: 5.898864<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.05<br />Type I error: 0.0315<br />Power: 0.7984","Average N under the null: 18.1240<br />Average N under the alternative: 24.5035<br />Distance to optimal efficiency: 7.355507<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.1<br />Type I error: 0.1998<br />Power: 0.9436","Average N under the null: 18.1355<br />Average N under the alternative: 24.4995<br />Distance to optimal efficiency: 7.367014<br />Design: Posterior threshold = 0.78 and predictive threshold = 0.1<br />Type I error: 0.1996<br />Power: 0.9438","Average N under the null: 18.1360<br />Average N under the alternative: 24.5140<br />Distance to optimal efficiency: 7.367500<br />Design: Posterior threshold = 0.74 and predictive threshold = 0.1<br />Type I error: 0.1990<br />Power: 0.9445","Average N under the null: 18.1540<br />Average N under the alternative: 24.5105<br />Distance to optimal efficiency: 7.385501<br />Design: Posterior threshold = 0.7 and predictive threshold = 0.1<br />Type I error: 0.1994<br />Power: 0.9442"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":["rgba(68,1,84,1)","rgba(68,2,85,1)","rgba(69,21,94,1)","rgba(69,22,95,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(43,145,137,1)","rgba(50,172,128,1)","rgba(51,172,127,1)","rgba(57,174,125,1)","rgba(71,179,120,1)","rgba(249,230,40,1)","rgba(250,231,39,1)","rgba(251,231,39,1)","rgba(253,231,37,1)"],"opacity":1,"size":[15.1181102362205,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024],"symbol":["diamond","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle"],"line":{"width":1.88976377952756,"color":["rgba(68,1,84,1)","rgba(68,2,85,1)","rgba(69,21,94,1)","rgba(69,22,95,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(43,145,137,1)","rgba(50,172,128,1)","rgba(51,172,127,1)","rgba(57,174,125,1)","rgba(71,179,120,1)","rgba(249,230,40,1)","rgba(250,231,39,1)","rgba(251,231,39,1)","rgba(253,231,37,1)"]}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[15],"y":[15],"name":"99_64b76976a485821280757b2908e4c766","type":"scatter","mode":"markers","opacity":0,"hoverinfo":"skip","showlegend":false,"marker":{"color":[0,1],"colorscale":[[0,"#440154"],[0.00334448160535115,"#440355"],[0.0066889632107023,"#440456"],[0.0100334448160536,"#440656"],[0.0133779264214047,"#450857"],[0.0167224080267559,"#450958"],[0.020066889632107,"#450B59"],[0.0234113712374582,"#450D5A"],[0.0267558528428094,"#450E5B"],[0.0301003344481606,"#45105B"],[0.0334448160535117,"#45115C"],[0.0367892976588629,"#45135D"],[0.040133779264214,"#45145E"],[0.0434782608695653,"#45155F"],[0.0468227424749164,"#451760"],[0.0501672240802676,"#451860"],[0.0535117056856187,"#451961"],[0.0568561872909699,"#461A62"],[0.0602006688963211,"#461B63"],[0.0635451505016723,"#461D64"],[0.0668896321070234,"#461E65"],[0.0702341137123746,"#461F65"],[0.0735785953177257,"#462066"],[0.0769230769230769,"#462167"],[0.0802675585284281,"#462268"],[0.0836120401337793,"#462369"],[0.0869565217391304,"#46246A"],[0.0903010033444816,"#46256B"],[0.0936454849498327,"#46266B"],[0.0969899665551839,"#46276C"],[0.100334448160535,"#46286D"],[0.103678929765886,"#46296E"],[0.107023411371237,"#462A6F"],[0.110367892976589,"#452B70"],[0.11371237458194,"#452C70"],[0.117056856187291,"#452D71"],[0.120401337792642,"#452E72"],[0.123745819397993,"#452F73"],[0.127090301003344,"#453074"],[0.130434782608696,"#453175"],[0.133779264214047,"#453276"],[0.137123745819398,"#453377"],[0.140468227424749,"#453477"],[0.1438127090301,"#443578"],[0.147157190635451,"#443679"],[0.150501672240803,"#44367A"],[0.153846153846154,"#44377B"],[0.157190635451505,"#44387C"],[0.160535117056856,"#44397D"],[0.163879598662207,"#443A7D"],[0.167224080267559,"#433B7E"],[0.17056856187291,"#433C7F"],[0.173913043478261,"#433D80"],[0.177257525083612,"#433E81"],[0.180602006688963,"#433F82"],[0.183946488294314,"#424083"],[0.187290969899666,"#424184"],[0.190635451505017,"#424185"],[0.193979933110368,"#424285"],[0.197324414715719,"#414386"],[0.20066889632107,"#414487"],[0.204013377926421,"#414587"],[0.207357859531773,"#414687"],[0.210702341137124,"#414787"],[0.214046822742475,"#414888"],[0.217391304347826,"#404988"],[0.220735785953177,"#404A88"],[0.224080267558528,"#404A88"],[0.22742474916388,"#404B88"],[0.230769230769231,"#404C88"],[0.234113712374582,"#404D88"],[0.237458193979933,"#404E88"],[0.240802675585284,"#3F4F89"],[0.244147157190635,"#3F5089"],[0.247491638795987,"#3F5189"],[0.250836120401338,"#3F5289"],[0.254180602006689,"#3F5289"],[0.25752508361204,"#3E5389"],[0.260869565217391,"#3E5489"],[0.264214046822742,"#3E5589"],[0.267558528428094,"#3E568A"],[0.270903010033445,"#3D578A"],[0.274247491638796,"#3D588A"],[0.277591973244147,"#3D598A"],[0.280936454849498,"#3D598A"],[0.28428093645485,"#3C5A8A"],[0.287625418060201,"#3C5B8A"],[0.290969899665552,"#3C5C8A"],[0.294314381270903,"#3B5D8A"],[0.297658862876254,"#3B5E8B"],[0.301003344481605,"#3B5F8B"],[0.304347826086956,"#3A5F8B"],[0.307692307692308,"#3A608B"],[0.311036789297659,"#3A618B"],[0.31438127090301,"#39628B"],[0.317725752508361,"#39638B"],[0.321070234113712,"#38648B"],[0.324414715719064,"#38658C"],[0.327759197324415,"#38658C"],[0.331103678929766,"#37668C"],[0.334448160535117,"#37678C"],[0.337792642140468,"#36688C"],[0.341137123745819,"#36698C"],[0.344481605351171,"#356A8C"],[0.347826086956522,"#356B8C"],[0.351170568561873,"#346B8C"],[0.354515050167224,"#346C8D"],[0.357859531772575,"#336D8D"],[0.361204013377926,"#326E8D"],[0.364548494983278,"#326F8D"],[0.367892976588629,"#31708D"],[0.37123745819398,"#31718D"],[0.374581939799331,"#30718D"],[0.377926421404682,"#2F728D"],[0.381270903010033,"#2F738D"],[0.384615384615385,"#2E748E"],[0.387959866220736,"#2D758E"],[0.391304347826087,"#2C768E"],[0.394648829431438,"#2B778E"],[0.397993311036789,"#2B778E"],[0.40133779264214,"#2A788E"],[0.404682274247492,"#2A798E"],[0.408026755852843,"#2A7A8E"],[0.411371237458194,"#2B7B8E"],[0.414715719063545,"#2B7B8D"],[0.418060200668896,"#2B7C8D"],[0.421404682274247,"#2B7D8D"],[0.424749163879599,"#2B7E8D"],[0.42809364548495,"#2B7F8D"],[0.431438127090301,"#2B7F8D"],[0.434782608695652,"#2B808D"],[0.438127090301003,"#2B818C"],[0.441471571906355,"#2B828C"],[0.444816053511706,"#2B838C"],[0.448160535117057,"#2C838C"],[0.451505016722408,"#2C848C"],[0.454849498327759,"#2C858C"],[0.45819397993311,"#2C868B"],[0.461538461538462,"#2C878B"],[0.464882943143813,"#2C878B"],[0.468227424749164,"#2C888B"],[0.471571906354515,"#2C898B"],[0.474916387959866,"#2C8A8B"],[0.478260869565217,"#2C8B8B"],[0.481605351170569,"#2B8B8A"],[0.48494983277592,"#2B8C8A"],[0.488294314381271,"#2B8D8A"],[0.491638795986622,"#2B8E8A"],[0.494983277591973,"#2B8F8A"],[0.498327759197324,"#2B8F8A"],[0.501672240802675,"#2B9089"],[0.505016722408027,"#2B9189"],[0.508361204013378,"#2B9289"],[0.511705685618729,"#2B9389"],[0.51505016722408,"#2A9389"],[0.518394648829432,"#2A9489"],[0.521739130434783,"#2A9588"],[0.525083612040134,"#2A9688"],[0.528428093645485,"#2A9788"],[0.531772575250836,"#2A9788"],[0.535117056856187,"#299888"],[0.538461538461539,"#299987"],[0.54180602006689,"#299A87"],[0.545150501672241,"#299B87"],[0.548494983277592,"#289B87"],[0.551839464882943,"#289C87"],[0.555183946488294,"#289D87"],[0.558528428093645,"#279E86"],[0.561872909698997,"#279F86"],[0.565217391304348,"#27A086"],[0.568561872909699,"#26A086"],[0.57190635451505,"#26A186"],[0.575250836120402,"#26A285"],[0.578595317725752,"#25A385"],[0.581939799331104,"#25A485"],[0.585284280936455,"#24A485"],[0.588628762541806,"#24A585"],[0.591973244147157,"#23A684"],[0.595317725752508,"#23A784"],[0.59866220735786,"#22A884"],[0.602006688963211,"#24A884"],[0.605351170568562,"#27A983"],[0.608695652173913,"#2AAA82"],[0.612040133779264,"#2DAA81"],[0.615384615384615,"#2FAB81"],[0.618729096989966,"#32AC80"],[0.622073578595318,"#34AC7F"],[0.625418060200669,"#36AD7E"],[0.62876254180602,"#38AE7E"],[0.632107023411371,"#3AAE7D"],[0.635451505016722,"#3CAF7C"],[0.638795986622074,"#3EB07B"],[0.642140468227425,"#40B07B"],[0.645484949832776,"#42B17A"],[0.648829431438127,"#43B279"],[0.652173913043478,"#45B278"],[0.65551839464883,"#47B378"],[0.65886287625418,"#48B477"],[0.662207357859532,"#4AB476"],[0.665551839464883,"#4BB575"],[0.668896321070234,"#4DB675"],[0.672240802675585,"#4EB674"],[0.675585284280937,"#50B773"],[0.678929765886288,"#51B872"],[0.682274247491639,"#53B971"],[0.68561872909699,"#54B971"],[0.688963210702341,"#55BA70"],[0.692307692307692,"#57BB6F"],[0.695652173913043,"#58BB6E"],[0.698996655518395,"#59BC6D"],[0.702341137123746,"#5BBD6C"],[0.705685618729097,"#5CBD6C"],[0.709030100334448,"#5DBE6B"],[0.712374581939799,"#5EBF6A"],[0.71571906354515,"#5FBF69"],[0.719063545150502,"#61C068"],[0.722408026755853,"#62C167"],[0.725752508361204,"#63C166"],[0.729096989966555,"#64C266"],[0.732441471571907,"#65C365"],[0.735785953177257,"#66C464"],[0.739130434782609,"#67C463"],[0.74247491638796,"#69C562"],[0.745819397993311,"#6AC661"],[0.749163879598662,"#6BC660"],[0.752508361204013,"#6CC75F"],[0.755852842809365,"#6DC85E"],[0.759197324414716,"#6EC85D"],[0.762541806020067,"#6FC95C"],[0.765886287625418,"#70CA5B"],[0.769230769230769,"#71CB5A"],[0.77257525083612,"#72CB59"],[0.775919732441471,"#73CC58"],[0.779264214046823,"#74CD57"],[0.782608695652174,"#75CD56"],[0.785953177257525,"#76CE55"],[0.789297658862876,"#77CF54"],[0.792642140468227,"#78CF53"],[0.795986622073579,"#79D052"],[0.79933110367893,"#7AD151"],[0.802675585284281,"#7CD151"],[0.806020066889632,"#7FD250"],[0.809364548494983,"#81D250"],[0.812709030100335,"#84D34F"],[0.816053511705686,"#87D34F"],[0.819397993311037,"#89D34E"],[0.822742474916388,"#8CD44D"],[0.826086956521739,"#8ED44D"],[0.82943143812709,"#91D54C"],[0.832775919732442,"#93D54C"],[0.836120401337793,"#95D54B"],[0.839464882943144,"#98D64B"],[0.842809364548495,"#9AD64A"],[0.846153846153846,"#9DD74A"],[0.849498327759197,"#9FD749"],[0.852842809364548,"#A1D748"],[0.8561872909699,"#A3D848"],[0.859531772575251,"#A6D847"],[0.862876254180602,"#A8D947"],[0.866220735785953,"#AAD946"],[0.869565217391304,"#ACD946"],[0.872909698996655,"#AFDA45"],[0.876254180602007,"#B1DA44"],[0.879598662207358,"#B3DB44"],[0.882943143812709,"#B5DB43"],[0.88628762541806,"#B7DB42"],[0.889632107023412,"#BADC42"],[0.892976588628763,"#BCDC41"],[0.896321070234114,"#BEDC40"],[0.899665551839465,"#C0DD40"],[0.903010033444816,"#C2DD3F"],[0.906354515050167,"#C4DE3E"],[0.909698996655518,"#C6DE3E"],[0.91304347826087,"#C8DE3D"],[0.916387959866221,"#CBDF3C"],[0.919732441471572,"#CDDF3B"],[0.923076923076923,"#CFDF3B"],[0.926421404682274,"#D1E03A"],[0.929765886287626,"#D3E039"],[0.933110367892977,"#D5E038"],[0.936454849498328,"#D7E138"],[0.939799331103679,"#D9E137"],[0.94314381270903,"#DBE136"],[0.946488294314381,"#DDE235"],[0.949832775919732,"#DFE234"],[0.953177257525084,"#E1E233"],[0.956521739130435,"#E3E333"],[0.959866220735786,"#E5E332"],[0.963210702341137,"#E7E331"],[0.966555183946488,"#E9E430"],[0.969899665551839,"#EBE42F"],[0.973244147157191,"#EDE42E"],[0.976588628762542,"#EFE52D"],[0.979933110367893,"#F1E52C"],[0.983277591973244,"#F3E52B"],[0.986622073578595,"#F5E62A"],[0.989966555183946,"#F7E629"],[0.993311036789298,"#F9E627"],[0.996655518394649,"#FBE726"],[1,"#FDE725"]],"colorbar":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"thickness":23.04,"title":"Distance to optimal efficiency","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"tickmode":"array","ticktext":["4","5","6","7"],"tickvals":[0.215199682649958,0.447011859611052,0.678824036572146,0.910636213533241],"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"ticklen":2,"len":0.5}},"xaxis":"x","yaxis":"y","frame":null}],"layout":{"margin":{"t":27.8246364188244,"r":7.30593607305936,"b":41.7789743183678,"l":37.2602739726027},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[10.081225,25.201275],"tickmode":"array","ticktext":["15","20","25"],"tickvals":[15,20,25],"categoryorder":"array","categoryarray":["15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Average N under the null","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[10.081225,25.201275],"tickmode":"array","ticktext":["15","20","25"],"tickvals":[15,20,25],"categoryorder":"array","categoryarray":["15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Average N under the alternative","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"3eb870e07577":{"x":{},"y":{},"colour":{},"Design":{},"Type I error":{},"Power":{},"type":"scatter"}},"cur_data":"3eb870e07577","visdat":{"3eb870e07577":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><p>Note that when points were tied based on optimization criteria, the point with the highest posterior and predictive threshold is selected for plotting.</p>
+<div id="htmlwidget-e36e0f8a15001843fe19" style="width:768px;height:576px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e36e0f8a15001843fe19">{"x":{"data":[{"x":[0.0872,0.1815,0.0315,0.0313,0.0315,0.0312,0.199,0.1994,0.1996,0.1998,0.0309,0.0692,0.1389,0.0651,0.0652,0.0661,0.0661,0.0259,0.025],"y":[0.8902,0.9314,0.7984,0.7969,0.7969,0.7959,0.9445,0.9442,0.9438,0.9436,0.7872,0.7802,0.8096,0.7672,0.7666,0.7656,0.7648,0.7093,0.7001],"text":["Type I error: 0.0872<br />Power: 0.8902<br />Distance to optimal accuracy: 0.1402137<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.1<br />Average N under the null: 16.6650<br />Average N under the alternative: 24.3470","Type I error: 0.1815<br />Power: 0.9314<br />Distance to optimal accuracy: 0.1940315<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.15<br />Average N under the null: 16.6650<br />Average N under the alternative: 24.3470","Type I error: 0.0315<br />Power: 0.7984<br />Distance to optimal accuracy: 0.2040461<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.05<br />Average N under the null: 16.6650<br />Average N under the alternative: 24.3470","Type I error: 0.0313<br />Power: 0.7969<br />Distance to optimal accuracy: 0.2054977<br />Design: Posterior threshold = 0.95 and predictive threshold = 0.05<br />Average N under the null: 16.5530<br />Average N under the alternative: 24.3035","Type I error: 0.0315<br />Power: 0.7969<br />Distance to optimal accuracy: 0.2055282<br />Design: Posterior threshold = 0.96 and predictive threshold = 0.05<br />Average N under the null: 16.5090<br />Average N under the alternative: 24.2860","Type I error: 0.0312<br />Power: 0.7959<br />Distance to optimal accuracy: 0.2064709<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.05<br />Average N under the null: 16.5135<br />Average N under the alternative: 24.2840","Type I error: 0.1990<br />Power: 0.9445<br />Distance to optimal accuracy: 0.2065944<br />Design: Posterior threshold = 0.74 and predictive threshold = 0.1<br />Average N under the null: 18.1360<br />Average N under the alternative: 24.5140","Type I error: 0.1994<br />Power: 0.9442<br />Distance to optimal accuracy: 0.2070604<br />Design: Posterior threshold = 0.7 and predictive threshold = 0.1<br />Average N under the null: 18.1540<br />Average N under the alternative: 24.5105","Type I error: 0.1996<br />Power: 0.9438<br />Distance to optimal accuracy: 0.2073610<br />Design: Posterior threshold = 0.78 and predictive threshold = 0.1<br />Average N under the null: 18.1355<br />Average N under the alternative: 24.4995","Type I error: 0.1998<br />Power: 0.9436<br />Distance to optimal accuracy: 0.2076078<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.1<br />Average N under the null: 18.1240<br />Average N under the alternative: 24.5035","Type I error: 0.0309<br />Power: 0.7872<br />Distance to optimal accuracy: 0.2150317<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.1<br />Average N under the null: 15.9895<br />Average N under the alternative: 23.9880","Type I error: 0.0692<br />Power: 0.7802<br />Distance to optimal accuracy: 0.2304358<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.15<br />Average N under the null: 11.5560<br />Average N under the alternative: 21.5450","Type I error: 0.1389<br />Power: 0.8096<br />Distance to optimal accuracy: 0.2356807<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.2<br />Average N under the null: 11.5560<br />Average N under the alternative: 21.5450","Type I error: 0.0651<br />Power: 0.7672<br />Distance to optimal accuracy: 0.2417309<br />Design: Posterior threshold = 0.86 and predictive threshold = 0.2<br />Average N under the null: 11.0045<br />Average N under the alternative: 21.2720","Type I error: 0.0652<br />Power: 0.7666<br />Distance to optimal accuracy: 0.2423357<br />Design: Posterior threshold = 0.92 and predictive threshold = 0.2<br />Average N under the null: 11.0060<br />Average N under the alternative: 21.2605","Type I error: 0.0661<br />Power: 0.7656<br />Distance to optimal accuracy: 0.2435417<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.2<br />Average N under the null: 10.9860<br />Average N under the alternative: 21.2360","Type I error: 0.0661<br />Power: 0.7648<br />Distance to optimal accuracy: 0.2443118<br />Design: Posterior threshold = 0.9 and predictive threshold = 0.2<br />Average N under the null: 11.0060<br />Average N under the alternative: 21.2360","Type I error: 0.0259<br />Power: 0.7093<br />Distance to optimal accuracy: 0.2918515<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.15<br />Average N under the null: 11.4650<br />Average N under the alternative: 21.5095","Type I error: 0.0250<br />Power: 0.7001<br />Distance to optimal accuracy: 0.3009402<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.1<br />Average N under the null: 10.7685<br />Average N under the alternative: 21.2250"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":["rgba(68,1,84,1)","rgba(55,103,140,1)","rgba(43,119,142,1)","rgba(42,121,142,1)","rgba(42,121,142,1)","rgba(43,123,141,1)","rgba(43,123,141,1)","rgba(43,124,141,1)","rgba(43,124,141,1)","rgba(43,125,141,1)","rgba(44,135,139,1)","rgba(39,159,134,1)","rgba(35,167,132,1)","rgba(58,174,125,1)","rgba(60,175,124,1)","rgba(64,177,123,1)","rgba(67,178,121,1)","rgba(219,225,54,1)","rgba(253,231,37,1)"],"opacity":1,"size":[15.1181102362205,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024],"symbol":["diamond","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle"],"line":{"width":1.88976377952756,"color":["rgba(68,1,84,1)","rgba(55,103,140,1)","rgba(43,119,142,1)","rgba(42,121,142,1)","rgba(42,121,142,1)","rgba(43,123,141,1)","rgba(43,123,141,1)","rgba(43,124,141,1)","rgba(43,124,141,1)","rgba(43,125,141,1)","rgba(44,135,139,1)","rgba(39,159,134,1)","rgba(35,167,132,1)","rgba(58,174,125,1)","rgba(60,175,124,1)","rgba(64,177,123,1)","rgba(67,178,121,1)","rgba(219,225,54,1)","rgba(253,231,37,1)"]}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0],"y":[0],"name":"99_c55d934e498a73e40c721b2ff608299f","type":"scatter","mode":"markers","opacity":0,"hoverinfo":"skip","showlegend":false,"marker":{"color":[0,1],"colorscale":[[0,"#440154"],[0.0033444816053512,"#440355"],[0.0066889632107024,"#440456"],[0.0100334448160536,"#440656"],[0.0133779264214046,"#450857"],[0.0167224080267558,"#450958"],[0.020066889632107,"#450B59"],[0.0234113712374582,"#450D5A"],[0.0267558528428094,"#450E5B"],[0.0301003344481604,"#45105B"],[0.0334448160535116,"#45115C"],[0.0367892976588629,"#45135D"],[0.040133779264214,"#45145E"],[0.0434782608695653,"#45155F"],[0.0468227424749164,"#451760"],[0.0501672240802676,"#451860"],[0.0535117056856187,"#451961"],[0.0568561872909699,"#461A62"],[0.0602006688963211,"#461B63"],[0.0635451505016723,"#461D64"],[0.0668896321070235,"#461E65"],[0.0702341137123745,"#461F65"],[0.0735785953177257,"#462066"],[0.0769230769230769,"#462167"],[0.0802675585284281,"#462268"],[0.0836120401337793,"#462369"],[0.0869565217391305,"#46246A"],[0.0903010033444815,"#46256B"],[0.0936454849498327,"#46266B"],[0.0969899665551839,"#46276C"],[0.100334448160535,"#46286D"],[0.103678929765886,"#46296E"],[0.107023411371238,"#462A6F"],[0.110367892976589,"#452B70"],[0.11371237458194,"#452C70"],[0.117056856187291,"#452D71"],[0.120401337792642,"#452E72"],[0.123745819397993,"#452F73"],[0.127090301003345,"#453074"],[0.130434782608696,"#453175"],[0.133779264214047,"#453276"],[0.137123745819398,"#453377"],[0.140468227424749,"#453477"],[0.1438127090301,"#443578"],[0.147157190635452,"#443679"],[0.150501672240803,"#44367A"],[0.153846153846154,"#44377B"],[0.157190635451505,"#44387C"],[0.160535117056856,"#44397D"],[0.163879598662207,"#443A7D"],[0.167224080267559,"#433B7E"],[0.17056856187291,"#433C7F"],[0.173913043478261,"#433D80"],[0.177257525083612,"#433E81"],[0.180602006688963,"#433F82"],[0.183946488294314,"#424083"],[0.187290969899666,"#424184"],[0.190635451505017,"#424185"],[0.193979933110368,"#424285"],[0.197324414715719,"#414386"],[0.20066889632107,"#414487"],[0.204013377926421,"#414587"],[0.207357859531772,"#414687"],[0.210702341137124,"#414787"],[0.214046822742475,"#414888"],[0.217391304347826,"#404988"],[0.220735785953177,"#404A88"],[0.224080267558528,"#404A88"],[0.22742474916388,"#404B88"],[0.230769230769231,"#404C88"],[0.234113712374582,"#404D88"],[0.237458193979933,"#404E88"],[0.240802675585284,"#3F4F89"],[0.244147157190635,"#3F5089"],[0.247491638795987,"#3F5189"],[0.250836120401338,"#3F5289"],[0.254180602006689,"#3F5289"],[0.25752508361204,"#3E5389"],[0.260869565217391,"#3E5489"],[0.264214046822743,"#3E5589"],[0.267558528428094,"#3E568A"],[0.270903010033445,"#3D578A"],[0.274247491638796,"#3D588A"],[0.277591973244147,"#3D598A"],[0.280936454849498,"#3D598A"],[0.28428093645485,"#3C5A8A"],[0.287625418060201,"#3C5B8A"],[0.290969899665552,"#3C5C8A"],[0.294314381270903,"#3B5D8A"],[0.297658862876254,"#3B5E8B"],[0.301003344481605,"#3B5F8B"],[0.304347826086957,"#3A5F8B"],[0.307692307692308,"#3A608B"],[0.311036789297659,"#3A618B"],[0.31438127090301,"#39628B"],[0.317725752508361,"#39638B"],[0.321070234113712,"#38648B"],[0.324414715719064,"#38658C"],[0.327759197324415,"#38658C"],[0.331103678929766,"#37668C"],[0.334448160535117,"#37678C"],[0.337792642140468,"#36688C"],[0.341137123745819,"#36698C"],[0.344481605351171,"#356A8C"],[0.347826086956522,"#356B8C"],[0.351170568561873,"#346B8C"],[0.354515050167224,"#346C8D"],[0.357859531772575,"#336D8D"],[0.361204013377926,"#326E8D"],[0.364548494983278,"#326F8D"],[0.367892976588629,"#31708D"],[0.37123745819398,"#31718D"],[0.374581939799331,"#30718D"],[0.377926421404682,"#2F728D"],[0.381270903010033,"#2F738D"],[0.384615384615385,"#2E748E"],[0.387959866220736,"#2D758E"],[0.391304347826087,"#2C768E"],[0.394648829431438,"#2B778E"],[0.397993311036789,"#2B778E"],[0.40133779264214,"#2A788E"],[0.404682274247492,"#2A798E"],[0.408026755852843,"#2A7A8E"],[0.411371237458194,"#2B7B8E"],[0.414715719063545,"#2B7B8D"],[0.418060200668896,"#2B7C8D"],[0.421404682274247,"#2B7D8D"],[0.424749163879599,"#2B7E8D"],[0.42809364548495,"#2B7F8D"],[0.431438127090301,"#2B7F8D"],[0.434782608695652,"#2B808D"],[0.438127090301003,"#2B818C"],[0.441471571906355,"#2B828C"],[0.444816053511706,"#2B838C"],[0.448160535117057,"#2C838C"],[0.451505016722408,"#2C848C"],[0.454849498327759,"#2C858C"],[0.45819397993311,"#2C868B"],[0.461538461538462,"#2C878B"],[0.464882943143813,"#2C878B"],[0.468227424749164,"#2C888B"],[0.471571906354515,"#2C898B"],[0.474916387959866,"#2C8A8B"],[0.478260869565217,"#2C8B8B"],[0.481605351170569,"#2B8B8A"],[0.48494983277592,"#2B8C8A"],[0.488294314381271,"#2B8D8A"],[0.491638795986622,"#2B8E8A"],[0.494983277591973,"#2B8F8A"],[0.498327759197324,"#2B8F8A"],[0.501672240802676,"#2B9089"],[0.505016722408027,"#2B9189"],[0.508361204013378,"#2B9289"],[0.511705685618729,"#2B9389"],[0.51505016722408,"#2A9389"],[0.518394648829431,"#2A9489"],[0.521739130434783,"#2A9588"],[0.525083612040134,"#2A9688"],[0.528428093645485,"#2A9788"],[0.531772575250836,"#2A9788"],[0.535117056856187,"#299888"],[0.538461538461538,"#299987"],[0.54180602006689,"#299A87"],[0.545150501672241,"#299B87"],[0.548494983277592,"#289B87"],[0.551839464882943,"#289C87"],[0.555183946488294,"#289D87"],[0.558528428093645,"#279E86"],[0.561872909698997,"#279F86"],[0.565217391304348,"#27A086"],[0.568561872909699,"#26A086"],[0.57190635451505,"#26A186"],[0.575250836120401,"#26A285"],[0.578595317725752,"#25A385"],[0.581939799331104,"#25A485"],[0.585284280936455,"#24A485"],[0.588628762541806,"#24A585"],[0.591973244147157,"#23A684"],[0.595317725752508,"#23A784"],[0.598662207357859,"#22A884"],[0.602006688963211,"#24A884"],[0.605351170568562,"#27A983"],[0.608695652173913,"#2AAA82"],[0.612040133779264,"#2DAA81"],[0.615384615384615,"#2FAB81"],[0.618729096989967,"#32AC80"],[0.622073578595318,"#34AC7F"],[0.625418060200669,"#36AD7E"],[0.62876254180602,"#38AE7E"],[0.632107023411371,"#3AAE7D"],[0.635451505016722,"#3CAF7C"],[0.638795986622074,"#3EB07B"],[0.642140468227425,"#40B07B"],[0.645484949832776,"#42B17A"],[0.648829431438127,"#43B279"],[0.652173913043478,"#45B278"],[0.655518394648829,"#47B378"],[0.658862876254181,"#48B477"],[0.662207357859532,"#4AB476"],[0.665551839464883,"#4BB575"],[0.668896321070234,"#4DB675"],[0.672240802675585,"#4EB674"],[0.675585284280936,"#50B773"],[0.678929765886288,"#51B872"],[0.682274247491639,"#53B971"],[0.68561872909699,"#54B971"],[0.688963210702341,"#55BA70"],[0.692307692307692,"#57BB6F"],[0.695652173913043,"#58BB6E"],[0.698996655518395,"#59BC6D"],[0.702341137123746,"#5BBD6C"],[0.705685618729097,"#5CBD6C"],[0.709030100334448,"#5DBE6B"],[0.712374581939799,"#5EBF6A"],[0.715719063545151,"#5FBF69"],[0.719063545150502,"#61C068"],[0.722408026755853,"#62C167"],[0.725752508361204,"#63C166"],[0.729096989966555,"#64C266"],[0.732441471571906,"#65C365"],[0.735785953177257,"#66C464"],[0.739130434782609,"#67C463"],[0.74247491638796,"#69C562"],[0.745819397993311,"#6AC661"],[0.749163879598662,"#6BC660"],[0.752508361204013,"#6CC75F"],[0.755852842809364,"#6DC85E"],[0.759197324414716,"#6EC85D"],[0.762541806020067,"#6FC95C"],[0.765886287625418,"#70CA5B"],[0.769230769230769,"#71CB5A"],[0.77257525083612,"#72CB59"],[0.775919732441471,"#73CC58"],[0.779264214046823,"#74CD57"],[0.782608695652174,"#75CD56"],[0.785953177257525,"#76CE55"],[0.789297658862876,"#77CF54"],[0.792642140468227,"#78CF53"],[0.795986622073579,"#79D052"],[0.79933110367893,"#7AD151"],[0.802675585284281,"#7CD151"],[0.806020066889632,"#7FD250"],[0.809364548494983,"#81D250"],[0.812709030100335,"#84D34F"],[0.816053511705686,"#87D34F"],[0.819397993311037,"#89D34E"],[0.822742474916388,"#8CD44D"],[0.826086956521739,"#8ED44D"],[0.82943143812709,"#91D54C"],[0.832775919732441,"#93D54C"],[0.836120401337792,"#95D54B"],[0.839464882943144,"#98D64B"],[0.842809364548495,"#9AD64A"],[0.846153846153846,"#9DD74A"],[0.849498327759197,"#9FD749"],[0.852842809364548,"#A1D748"],[0.8561872909699,"#A3D848"],[0.859531772575251,"#A6D847"],[0.862876254180602,"#A8D947"],[0.866220735785953,"#AAD946"],[0.869565217391304,"#ACD946"],[0.872909698996655,"#AFDA45"],[0.876254180602007,"#B1DA44"],[0.879598662207358,"#B3DB44"],[0.882943143812709,"#B5DB43"],[0.88628762541806,"#B7DB42"],[0.889632107023411,"#BADC42"],[0.892976588628763,"#BCDC41"],[0.896321070234114,"#BEDC40"],[0.899665551839465,"#C0DD40"],[0.903010033444816,"#C2DD3F"],[0.906354515050167,"#C4DE3E"],[0.909698996655518,"#C6DE3E"],[0.91304347826087,"#C8DE3D"],[0.916387959866221,"#CBDF3C"],[0.919732441471572,"#CDDF3B"],[0.923076923076923,"#CFDF3B"],[0.926421404682274,"#D1E03A"],[0.929765886287625,"#D3E039"],[0.933110367892976,"#D5E038"],[0.936454849498328,"#D7E138"],[0.939799331103679,"#D9E137"],[0.94314381270903,"#DBE136"],[0.946488294314381,"#DDE235"],[0.949832775919732,"#DFE234"],[0.953177257525084,"#E1E233"],[0.956521739130435,"#E3E333"],[0.959866220735786,"#E5E332"],[0.963210702341137,"#E7E331"],[0.966555183946488,"#E9E430"],[0.969899665551839,"#EBE42F"],[0.973244147157191,"#EDE42E"],[0.976588628762542,"#EFE52D"],[0.979933110367893,"#F1E52C"],[0.983277591973244,"#F3E52B"],[0.986622073578595,"#F5E62A"],[0.989966555183947,"#F7E629"],[0.993311036789298,"#F9E627"],[0.996655518394649,"#FBE726"],[1,"#FDE725"]],"colorbar":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"thickness":23.04,"title":"Distance to optimal accuracy","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"tickmode":"array","ticktext":["0.15","0.20","0.25","0.30"],"tickvals":[0.0608879368085492,0.37197537439001,0.683062811971472,0.994150249552933],"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"ticklen":2,"len":0.5}},"xaxis":"x","yaxis":"y","frame":null}],"layout":{"margin":{"t":27.8246364188244,"r":7.30593607305936,"b":41.7789743183678,"l":48.9497716894977},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.05,1.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Type I error","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.05,1.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Power","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"2eac5b9c72ca":{"x":{},"y":{},"colour":{},"Design":{},"Average N under the null":{},"Average N under the alternative":{},"type":"scatter"}},"cur_data":"2eac5b9c72ca","visdat":{"2eac5b9c72ca":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-4c26cb1254930c12a975" style="width:768px;height:576px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4c26cb1254930c12a975">{"x":{"data":[{"x":[11.556,11.465,11.0045,11.006,10.986,11.006,10.7685,15.9895,16.509,16.5135,16.553,16.665,18.124,18.1355,18.136,18.154],"y":[21.545,21.5095,21.272,21.2605,21.236,21.236,21.225,23.988,24.286,24.284,24.3035,24.347,24.5035,24.4995,24.514,24.5105],"text":["Average N under the null: 11.5560<br />Average N under the alternative: 21.5450<br />Distance to optimal efficiency: 3.071664<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.15<br />Type I error: 0.0692<br />Power: 0.7802","Average N under the null: 11.4650<br />Average N under the alternative: 21.5095<br />Distance to optimal efficiency: 3.084175<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.15<br />Type I error: 0.0259<br />Power: 0.7093","Average N under the null: 11.0045<br />Average N under the alternative: 21.2720<br />Distance to optimal efficiency: 3.250578<br />Design: Posterior threshold = 0.86 and predictive threshold = 0.2<br />Type I error: 0.0651<br />Power: 0.7672","Average N under the null: 11.0060<br />Average N under the alternative: 21.2605<br />Distance to optimal efficiency: 3.262157<br />Design: Posterior threshold = 0.92 and predictive threshold = 0.2<br />Type I error: 0.0652<br />Power: 0.7666","Average N under the null: 10.9860<br />Average N under the alternative: 21.2360<br />Distance to optimal efficiency: 3.285208<br />Design: Posterior threshold = 0.93 and predictive threshold = 0.2<br />Type I error: 0.0661<br />Power: 0.7656","Average N under the null: 11.0060<br />Average N under the alternative: 21.2360<br />Distance to optimal efficiency: 3.286592<br />Design: Posterior threshold = 0.9 and predictive threshold = 0.2<br />Type I error: 0.0661<br />Power: 0.7648","Average N under the null: 10.7685<br />Average N under the alternative: 21.2250<br />Distance to optimal efficiency: 3.289000<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.1<br />Type I error: 0.0250<br />Power: 0.7001","Average N under the null: 15.9895<br />Average N under the alternative: 23.9880<br />Distance to optimal efficiency: 5.247430<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.1<br />Type I error: 0.0309<br />Power: 0.7872","Average N under the null: 16.5090<br />Average N under the alternative: 24.2860<br />Distance to optimal efficiency: 5.745026<br />Design: Posterior threshold = 0.96 and predictive threshold = 0.05<br />Type I error: 0.0315<br />Power: 0.7969","Average N under the null: 16.5135<br />Average N under the alternative: 24.2840<br />Distance to optimal efficiency: 5.749602<br />Design: Posterior threshold = 0.97 and predictive threshold = 0.05<br />Type I error: 0.0312<br />Power: 0.7959","Average N under the null: 16.5530<br />Average N under the alternative: 24.3035<br />Distance to optimal efficiency: 5.788329<br />Design: Posterior threshold = 0.95 and predictive threshold = 0.05<br />Type I error: 0.0313<br />Power: 0.7969","Average N under the null: 16.6650<br />Average N under the alternative: 24.3470<br />Distance to optimal efficiency: 5.898864<br />Design: Posterior threshold = 0.94 and predictive threshold = 0.05<br />Type I error: 0.0315<br />Power: 0.7984","Average N under the null: 18.1240<br />Average N under the alternative: 24.5035<br />Distance to optimal efficiency: 7.355507<br />Design: Posterior threshold = 0.82 and predictive threshold = 0.1<br />Type I error: 0.1998<br />Power: 0.9436","Average N under the null: 18.1355<br />Average N under the alternative: 24.4995<br />Distance to optimal efficiency: 7.367014<br />Design: Posterior threshold = 0.78 and predictive threshold = 0.1<br />Type I error: 0.1996<br />Power: 0.9438","Average N under the null: 18.1360<br />Average N under the alternative: 24.5140<br />Distance to optimal efficiency: 7.367500<br />Design: Posterior threshold = 0.74 and predictive threshold = 0.1<br />Type I error: 0.1990<br />Power: 0.9445","Average N under the null: 18.1540<br />Average N under the alternative: 24.5105<br />Distance to optimal efficiency: 7.385501<br />Design: Posterior threshold = 0.7 and predictive threshold = 0.1<br />Type I error: 0.1994<br />Power: 0.9442"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":["rgba(68,1,84,1)","rgba(68,2,85,1)","rgba(69,21,94,1)","rgba(69,22,95,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(43,145,137,1)","rgba(50,172,128,1)","rgba(51,172,127,1)","rgba(57,174,125,1)","rgba(71,179,120,1)","rgba(249,230,40,1)","rgba(250,231,39,1)","rgba(251,231,39,1)","rgba(253,231,37,1)"],"opacity":1,"size":[15.1181102362205,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024,7.55905511811024],"symbol":["diamond","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle","circle"],"line":{"width":1.88976377952756,"color":["rgba(68,1,84,1)","rgba(68,2,85,1)","rgba(69,21,94,1)","rgba(69,22,95,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(69,24,96,1)","rgba(43,145,137,1)","rgba(50,172,128,1)","rgba(51,172,127,1)","rgba(57,174,125,1)","rgba(71,179,120,1)","rgba(249,230,40,1)","rgba(250,231,39,1)","rgba(251,231,39,1)","rgba(253,231,37,1)"]}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[15],"y":[15],"name":"99_64b76976a485821280757b2908e4c766","type":"scatter","mode":"markers","opacity":0,"hoverinfo":"skip","showlegend":false,"marker":{"color":[0,1],"colorscale":[[0,"#440154"],[0.00334448160535115,"#440355"],[0.0066889632107023,"#440456"],[0.0100334448160536,"#440656"],[0.0133779264214047,"#450857"],[0.0167224080267559,"#450958"],[0.020066889632107,"#450B59"],[0.0234113712374582,"#450D5A"],[0.0267558528428094,"#450E5B"],[0.0301003344481606,"#45105B"],[0.0334448160535117,"#45115C"],[0.0367892976588629,"#45135D"],[0.040133779264214,"#45145E"],[0.0434782608695653,"#45155F"],[0.0468227424749164,"#451760"],[0.0501672240802676,"#451860"],[0.0535117056856187,"#451961"],[0.0568561872909699,"#461A62"],[0.0602006688963211,"#461B63"],[0.0635451505016723,"#461D64"],[0.0668896321070234,"#461E65"],[0.0702341137123746,"#461F65"],[0.0735785953177257,"#462066"],[0.0769230769230769,"#462167"],[0.0802675585284281,"#462268"],[0.0836120401337793,"#462369"],[0.0869565217391304,"#46246A"],[0.0903010033444816,"#46256B"],[0.0936454849498327,"#46266B"],[0.0969899665551839,"#46276C"],[0.100334448160535,"#46286D"],[0.103678929765886,"#46296E"],[0.107023411371237,"#462A6F"],[0.110367892976589,"#452B70"],[0.11371237458194,"#452C70"],[0.117056856187291,"#452D71"],[0.120401337792642,"#452E72"],[0.123745819397993,"#452F73"],[0.127090301003344,"#453074"],[0.130434782608696,"#453175"],[0.133779264214047,"#453276"],[0.137123745819398,"#453377"],[0.140468227424749,"#453477"],[0.1438127090301,"#443578"],[0.147157190635451,"#443679"],[0.150501672240803,"#44367A"],[0.153846153846154,"#44377B"],[0.157190635451505,"#44387C"],[0.160535117056856,"#44397D"],[0.163879598662207,"#443A7D"],[0.167224080267559,"#433B7E"],[0.17056856187291,"#433C7F"],[0.173913043478261,"#433D80"],[0.177257525083612,"#433E81"],[0.180602006688963,"#433F82"],[0.183946488294314,"#424083"],[0.187290969899666,"#424184"],[0.190635451505017,"#424185"],[0.193979933110368,"#424285"],[0.197324414715719,"#414386"],[0.20066889632107,"#414487"],[0.204013377926421,"#414587"],[0.207357859531773,"#414687"],[0.210702341137124,"#414787"],[0.214046822742475,"#414888"],[0.217391304347826,"#404988"],[0.220735785953177,"#404A88"],[0.224080267558528,"#404A88"],[0.22742474916388,"#404B88"],[0.230769230769231,"#404C88"],[0.234113712374582,"#404D88"],[0.237458193979933,"#404E88"],[0.240802675585284,"#3F4F89"],[0.244147157190635,"#3F5089"],[0.247491638795987,"#3F5189"],[0.250836120401338,"#3F5289"],[0.254180602006689,"#3F5289"],[0.25752508361204,"#3E5389"],[0.260869565217391,"#3E5489"],[0.264214046822742,"#3E5589"],[0.267558528428094,"#3E568A"],[0.270903010033445,"#3D578A"],[0.274247491638796,"#3D588A"],[0.277591973244147,"#3D598A"],[0.280936454849498,"#3D598A"],[0.28428093645485,"#3C5A8A"],[0.287625418060201,"#3C5B8A"],[0.290969899665552,"#3C5C8A"],[0.294314381270903,"#3B5D8A"],[0.297658862876254,"#3B5E8B"],[0.301003344481605,"#3B5F8B"],[0.304347826086956,"#3A5F8B"],[0.307692307692308,"#3A608B"],[0.311036789297659,"#3A618B"],[0.31438127090301,"#39628B"],[0.317725752508361,"#39638B"],[0.321070234113712,"#38648B"],[0.324414715719064,"#38658C"],[0.327759197324415,"#38658C"],[0.331103678929766,"#37668C"],[0.334448160535117,"#37678C"],[0.337792642140468,"#36688C"],[0.341137123745819,"#36698C"],[0.344481605351171,"#356A8C"],[0.347826086956522,"#356B8C"],[0.351170568561873,"#346B8C"],[0.354515050167224,"#346C8D"],[0.357859531772575,"#336D8D"],[0.361204013377926,"#326E8D"],[0.364548494983278,"#326F8D"],[0.367892976588629,"#31708D"],[0.37123745819398,"#31718D"],[0.374581939799331,"#30718D"],[0.377926421404682,"#2F728D"],[0.381270903010033,"#2F738D"],[0.384615384615385,"#2E748E"],[0.387959866220736,"#2D758E"],[0.391304347826087,"#2C768E"],[0.394648829431438,"#2B778E"],[0.397993311036789,"#2B778E"],[0.40133779264214,"#2A788E"],[0.404682274247492,"#2A798E"],[0.408026755852843,"#2A7A8E"],[0.411371237458194,"#2B7B8E"],[0.414715719063545,"#2B7B8D"],[0.418060200668896,"#2B7C8D"],[0.421404682274247,"#2B7D8D"],[0.424749163879599,"#2B7E8D"],[0.42809364548495,"#2B7F8D"],[0.431438127090301,"#2B7F8D"],[0.434782608695652,"#2B808D"],[0.438127090301003,"#2B818C"],[0.441471571906355,"#2B828C"],[0.444816053511706,"#2B838C"],[0.448160535117057,"#2C838C"],[0.451505016722408,"#2C848C"],[0.454849498327759,"#2C858C"],[0.45819397993311,"#2C868B"],[0.461538461538462,"#2C878B"],[0.464882943143813,"#2C878B"],[0.468227424749164,"#2C888B"],[0.471571906354515,"#2C898B"],[0.474916387959866,"#2C8A8B"],[0.478260869565217,"#2C8B8B"],[0.481605351170569,"#2B8B8A"],[0.48494983277592,"#2B8C8A"],[0.488294314381271,"#2B8D8A"],[0.491638795986622,"#2B8E8A"],[0.494983277591973,"#2B8F8A"],[0.498327759197324,"#2B8F8A"],[0.501672240802675,"#2B9089"],[0.505016722408027,"#2B9189"],[0.508361204013378,"#2B9289"],[0.511705685618729,"#2B9389"],[0.51505016722408,"#2A9389"],[0.518394648829432,"#2A9489"],[0.521739130434783,"#2A9588"],[0.525083612040134,"#2A9688"],[0.528428093645485,"#2A9788"],[0.531772575250836,"#2A9788"],[0.535117056856187,"#299888"],[0.538461538461539,"#299987"],[0.54180602006689,"#299A87"],[0.545150501672241,"#299B87"],[0.548494983277592,"#289B87"],[0.551839464882943,"#289C87"],[0.555183946488294,"#289D87"],[0.558528428093645,"#279E86"],[0.561872909698997,"#279F86"],[0.565217391304348,"#27A086"],[0.568561872909699,"#26A086"],[0.57190635451505,"#26A186"],[0.575250836120402,"#26A285"],[0.578595317725752,"#25A385"],[0.581939799331104,"#25A485"],[0.585284280936455,"#24A485"],[0.588628762541806,"#24A585"],[0.591973244147157,"#23A684"],[0.595317725752508,"#23A784"],[0.59866220735786,"#22A884"],[0.602006688963211,"#24A884"],[0.605351170568562,"#27A983"],[0.608695652173913,"#2AAA82"],[0.612040133779264,"#2DAA81"],[0.615384615384615,"#2FAB81"],[0.618729096989966,"#32AC80"],[0.622073578595318,"#34AC7F"],[0.625418060200669,"#36AD7E"],[0.62876254180602,"#38AE7E"],[0.632107023411371,"#3AAE7D"],[0.635451505016722,"#3CAF7C"],[0.638795986622074,"#3EB07B"],[0.642140468227425,"#40B07B"],[0.645484949832776,"#42B17A"],[0.648829431438127,"#43B279"],[0.652173913043478,"#45B278"],[0.65551839464883,"#47B378"],[0.65886287625418,"#48B477"],[0.662207357859532,"#4AB476"],[0.665551839464883,"#4BB575"],[0.668896321070234,"#4DB675"],[0.672240802675585,"#4EB674"],[0.675585284280937,"#50B773"],[0.678929765886288,"#51B872"],[0.682274247491639,"#53B971"],[0.68561872909699,"#54B971"],[0.688963210702341,"#55BA70"],[0.692307692307692,"#57BB6F"],[0.695652173913043,"#58BB6E"],[0.698996655518395,"#59BC6D"],[0.702341137123746,"#5BBD6C"],[0.705685618729097,"#5CBD6C"],[0.709030100334448,"#5DBE6B"],[0.712374581939799,"#5EBF6A"],[0.71571906354515,"#5FBF69"],[0.719063545150502,"#61C068"],[0.722408026755853,"#62C167"],[0.725752508361204,"#63C166"],[0.729096989966555,"#64C266"],[0.732441471571907,"#65C365"],[0.735785953177257,"#66C464"],[0.739130434782609,"#67C463"],[0.74247491638796,"#69C562"],[0.745819397993311,"#6AC661"],[0.749163879598662,"#6BC660"],[0.752508361204013,"#6CC75F"],[0.755852842809365,"#6DC85E"],[0.759197324414716,"#6EC85D"],[0.762541806020067,"#6FC95C"],[0.765886287625418,"#70CA5B"],[0.769230769230769,"#71CB5A"],[0.77257525083612,"#72CB59"],[0.775919732441471,"#73CC58"],[0.779264214046823,"#74CD57"],[0.782608695652174,"#75CD56"],[0.785953177257525,"#76CE55"],[0.789297658862876,"#77CF54"],[0.792642140468227,"#78CF53"],[0.795986622073579,"#79D052"],[0.79933110367893,"#7AD151"],[0.802675585284281,"#7CD151"],[0.806020066889632,"#7FD250"],[0.809364548494983,"#81D250"],[0.812709030100335,"#84D34F"],[0.816053511705686,"#87D34F"],[0.819397993311037,"#89D34E"],[0.822742474916388,"#8CD44D"],[0.826086956521739,"#8ED44D"],[0.82943143812709,"#91D54C"],[0.832775919732442,"#93D54C"],[0.836120401337793,"#95D54B"],[0.839464882943144,"#98D64B"],[0.842809364548495,"#9AD64A"],[0.846153846153846,"#9DD74A"],[0.849498327759197,"#9FD749"],[0.852842809364548,"#A1D748"],[0.8561872909699,"#A3D848"],[0.859531772575251,"#A6D847"],[0.862876254180602,"#A8D947"],[0.866220735785953,"#AAD946"],[0.869565217391304,"#ACD946"],[0.872909698996655,"#AFDA45"],[0.876254180602007,"#B1DA44"],[0.879598662207358,"#B3DB44"],[0.882943143812709,"#B5DB43"],[0.88628762541806,"#B7DB42"],[0.889632107023412,"#BADC42"],[0.892976588628763,"#BCDC41"],[0.896321070234114,"#BEDC40"],[0.899665551839465,"#C0DD40"],[0.903010033444816,"#C2DD3F"],[0.906354515050167,"#C4DE3E"],[0.909698996655518,"#C6DE3E"],[0.91304347826087,"#C8DE3D"],[0.916387959866221,"#CBDF3C"],[0.919732441471572,"#CDDF3B"],[0.923076923076923,"#CFDF3B"],[0.926421404682274,"#D1E03A"],[0.929765886287626,"#D3E039"],[0.933110367892977,"#D5E038"],[0.936454849498328,"#D7E138"],[0.939799331103679,"#D9E137"],[0.94314381270903,"#DBE136"],[0.946488294314381,"#DDE235"],[0.949832775919732,"#DFE234"],[0.953177257525084,"#E1E233"],[0.956521739130435,"#E3E333"],[0.959866220735786,"#E5E332"],[0.963210702341137,"#E7E331"],[0.966555183946488,"#E9E430"],[0.969899665551839,"#EBE42F"],[0.973244147157191,"#EDE42E"],[0.976588628762542,"#EFE52D"],[0.979933110367893,"#F1E52C"],[0.983277591973244,"#F3E52B"],[0.986622073578595,"#F5E62A"],[0.989966555183946,"#F7E629"],[0.993311036789298,"#F9E627"],[0.996655518394649,"#FBE726"],[1,"#FDE725"]],"colorbar":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"thickness":23.04,"title":"Distance to optimal efficiency","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"tickmode":"array","ticktext":["4","5","6","7"],"tickvals":[0.215199682649958,0.447011859611052,0.678824036572146,0.910636213533241],"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"ticklen":2,"len":0.5}},"xaxis":"x","yaxis":"y","frame":null}],"layout":{"margin":{"t":27.8246364188244,"r":7.30593607305936,"b":41.7789743183678,"l":37.2602739726027},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[10.081225,25.201275],"tickmode":"array","ticktext":["15","20","25"],"tickvals":[15,20,25],"categoryorder":"array","categoryarray":["15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Average N under the null","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[10.081225,25.201275],"tickmode":"array","ticktext":["15","20","25"],"tickvals":[15,20,25],"categoryorder":"array","categoryarray":["15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Average N under the alternative","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"2eac233d7411":{"x":{},"y":{},"colour":{},"Design":{},"Type I error":{},"Power":{},"type":"scatter"}},"cur_data":"2eac233d7411","visdat":{"2eac233d7411":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><p>Note that when points were tied based on optimization criteria, the point with the highest posterior and predictive threshold is selected for plotting.</p>
 <p>The diamond-shaped point represents the optimal design based on each criteria, which is discussed in more detail below. Using the <code>plotly = TRUE</code> option to <code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code> we can hover over each point to see the x-axis and y-axis values, along with the distance to the top left corner on each plot, and the posterior and predictive thresholds associated with each point.</p>
 </div>
 <div id="optimize_design" class="section level2">
@@ -883,7 +883,7 @@
 <a href="#optimize_design" class="anchor"></a><code>optimize_design()</code>
 </h2>
 <p>Finally, we can pass the results from a call to <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code> to the <code><a href="../reference/optimize_design.html">optimize_design()</a></code> function to list the optimal design with respect to type I error and power, termed the “optimal accuracy” design, and the optimal design with respect to the average sample sizes under the null and alternative, termed the “optimal efficiency” design, within the specified range of acceptable type I error and minimum power.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">one_sample_cal_tbl</span>, 
                 type1_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.1</span><span class="op">)</span>, 
                 minimum_power <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span>
@@ -913,19 +913,21 @@
 <h2 class="hasAnchor">
 <a href="#calc_decision_rules" class="anchor"></a><code>calc_decision_rules()</code>
 </h2>
-<p>Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to <code><a href="../reference/calc_decision_rules.html">calc_decision_rules()</a></code>. The input parameters <code>n</code>, <code>direction</code>, <code>p0</code>, <code>delta</code>, <code>prior</code>, <code>S</code>, and <code>N</code> are the same as in <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code>. The input parameter <code>theta = 0.92</code> specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter <code>ppp = 0.1</code> specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to <code><a href="../reference/calc_decision_rules.html">calc_decision_rules()</a></code>. The input parameters <code>n</code>, <code>direction</code>, <code>p0</code>, <code>delta</code>, <code>prior</code>, <code>S</code>, and <code>N</code> are the same as in <code><a href="../reference/calibrate_thresholds.html">calibrate_thresholds()</a></code>. The input parameter <code>theta = 0.92</code> specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter <code>ppp = 0.1</code> specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above. Note that due to the computational time involved, the object produced from the below example code <code>one_sample_decision_tbl</code> is available as a dataset in the {ppseq} package.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/calc_decision_rules.html">calc_decision_rules</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">95</span>, <span class="fl">5</span><span class="op">)</span>, direction <span class="op">=</span> <span class="st">"greater"</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>, 
-                    delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>,
-                    N <span class="op">=</span> <span class="fl">95</span>, theta <span class="op">=</span> <span class="fl">0.92</span>, ppp <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></code></pre></div>
-<div id="udgpxtoipz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<span class="va">one_sample_decision_tbl</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="../reference/calc_decision_rules.html">calc_decision_rules</a></span><span class="op">(</span>
+    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">95</span>, <span class="fl">5</span><span class="op">)</span>, N <span class="op">=</span> <span class="fl">95</span>, theta <span class="op">=</span> <span class="fl">0.92</span>, ppp <span class="op">=</span> <span class="fl">0.1</span>, p0 <span class="op">=</span> <span class="fl">0.1</span>, 
+    direction <span class="op">=</span> <span class="st">"greater"</span>, delta <span class="op">=</span> <span class="cn">NULL</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">5000</span>
+    <span class="op">)</span></code></pre></div>
+<div id="dopkvaydzm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#udgpxtoipz .gt_table {
+#dopkvaydzm .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -950,7 +952,7 @@
   border-left-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_heading {
+#dopkvaydzm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -962,7 +964,7 @@
   border-right-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_title {
+#dopkvaydzm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -972,7 +974,7 @@
   border-bottom-width: 0;
 }
 
-#udgpxtoipz .gt_subtitle {
+#dopkvaydzm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -982,13 +984,13 @@
   border-top-width: 0;
 }
 
-#udgpxtoipz .gt_bottom_border {
+#dopkvaydzm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_col_headings {
+#dopkvaydzm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1003,7 +1005,7 @@
   border-right-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_col_heading {
+#dopkvaydzm .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1023,7 +1025,7 @@
   overflow-x: hidden;
 }
 
-#udgpxtoipz .gt_column_spanner_outer {
+#dopkvaydzm .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1035,15 +1037,15 @@
   padding-right: 4px;
 }
 
-#udgpxtoipz .gt_column_spanner_outer:first-child {
+#dopkvaydzm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#udgpxtoipz .gt_column_spanner_outer:last-child {
+#dopkvaydzm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#udgpxtoipz .gt_column_spanner {
+#dopkvaydzm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1055,7 +1057,7 @@
   width: 100%;
 }
 
-#udgpxtoipz .gt_group_heading {
+#dopkvaydzm .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1077,7 +1079,7 @@
   vertical-align: middle;
 }
 
-#udgpxtoipz .gt_empty_group_heading {
+#dopkvaydzm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1092,15 +1094,15 @@
   vertical-align: middle;
 }
 
-#udgpxtoipz .gt_from_md > :first-child {
+#dopkvaydzm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#udgpxtoipz .gt_from_md > :last-child {
+#dopkvaydzm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#udgpxtoipz .gt_row {
+#dopkvaydzm .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1119,7 +1121,7 @@
   overflow-x: hidden;
 }
 
-#udgpxtoipz .gt_stub {
+#dopkvaydzm .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1131,7 +1133,7 @@
   padding-left: 12px;
 }
 
-#udgpxtoipz .gt_summary_row {
+#dopkvaydzm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1141,7 +1143,7 @@
   padding-right: 5px;
 }
 
-#udgpxtoipz .gt_first_summary_row {
+#dopkvaydzm .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1151,7 +1153,7 @@
   border-top-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_grand_summary_row {
+#dopkvaydzm .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1161,7 +1163,7 @@
   padding-right: 5px;
 }
 
-#udgpxtoipz .gt_first_grand_summary_row {
+#dopkvaydzm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1171,11 +1173,11 @@
   border-top-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_striped {
+#dopkvaydzm .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#udgpxtoipz .gt_table_body {
+#dopkvaydzm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1184,7 +1186,7 @@
   border-bottom-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_footnotes {
+#dopkvaydzm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1198,13 +1200,13 @@
   border-right-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_footnote {
+#dopkvaydzm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#udgpxtoipz .gt_sourcenotes {
+#dopkvaydzm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1218,41 +1220,41 @@
   border-right-color: #D3D3D3;
 }
 
-#udgpxtoipz .gt_sourcenote {
+#dopkvaydzm .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#udgpxtoipz .gt_left {
+#dopkvaydzm .gt_left {
   text-align: left;
 }
 
-#udgpxtoipz .gt_center {
+#dopkvaydzm .gt_center {
   text-align: center;
 }
 
-#udgpxtoipz .gt_right {
+#dopkvaydzm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#udgpxtoipz .gt_font_normal {
+#dopkvaydzm .gt_font_normal {
   font-weight: normal;
 }
 
-#udgpxtoipz .gt_font_bold {
+#dopkvaydzm .gt_font_bold {
   font-weight: bold;
 }
 
-#udgpxtoipz .gt_font_italic {
+#dopkvaydzm .gt_font_italic {
   font-style: italic;
 }
 
-#udgpxtoipz .gt_super {
+#dopkvaydzm .gt_super {
   font-size: 65%;
 }
 
-#udgpxtoipz .gt_footnote_marks {
+#dopkvaydzm .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;

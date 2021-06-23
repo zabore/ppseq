@@ -7,32 +7,18 @@ design}
 \usage{
 calc_decision_rules(
   n,
-  direction = "greater",
-  p0,
-  delta = NULL,
-  prior = c(0.5, 0.5),
-  S = 5000,
   N,
   theta,
-  ppp
+  ppp,
+  p0,
+  direction = "greater",
+  delta = NULL,
+  prior = c(0.5, 0.5),
+  S = 5000
 )
 }
 \arguments{
 \item{n}{integer of sample size so far for one-sample case}
-
-\item{direction}{For one-sample case, "greater" if interest is in P(p > p0)
-and "less" if interest is in P(p < p0).}
-
-\item{p0}{The target value to compare to in the one-sample case
-(i.e. the null response rate)}
-
-\item{delta}{clinically meaningful difference between groups.
-Typically 0 for two-sample case. NULL for one-sample case (default).}
-
-\item{prior}{hyperparameters of prior beta distribution.
-Beta(0.5, 0.5) is default}
-
-\item{S}{number of samples, default is 5000}
 
 \item{N}{tinteger of total planned sample size at end of trial N
 for one-sample case}
@@ -42,6 +28,20 @@ P(p > p0) > theta for the one-sample case with greater direction.}
 
 \item{ppp}{The target predictive probability. e.g. Stop the trial if the
 predictive probability falls below this target.}
+
+\item{p0}{The target value to compare to in the one-sample case
+(i.e. the null response rate)}
+
+\item{direction}{For one-sample case, "greater" if interest is in P(p > p0)
+and "less" if interest is in P(p < p0).}
+
+\item{delta}{clinically meaningful difference between groups.
+Typically 0 for two-sample case. NULL for one-sample case (default).}
+
+\item{prior}{hyperparameters of prior beta distribution.
+Beta(0.5, 0.5) is default}
+
+\item{S}{number of samples, default is 5000}
 }
 \value{
 Returns a tibble with n at each look and r. Stop the trial at that

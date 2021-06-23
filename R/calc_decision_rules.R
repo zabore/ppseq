@@ -9,21 +9,21 @@
 #' \code{optimize_design}.
 #'
 #' @param n integer of sample size so far for one-sample case
-#' @param direction For one-sample case, "greater" if interest is in P(p > p0)
-#' and "less" if interest is in P(p < p0).
+#' @param N tinteger of total planned sample size at end of trial N
+#' for one-sample case
 #' @param p0 The target value to compare to in the one-sample case
 #' (i.e. the null response rate)
+#' @param theta The target posterior probability. e.g. Efficacy decision if
+#' P(p > p0) > theta for the one-sample case with greater direction.
+#' @param ppp The target predictive probability. e.g. Stop the trial if the
+#' predictive probability falls below this target.
+#' @param direction For one-sample case, "greater" if interest is in P(p > p0)
+#' and "less" if interest is in P(p < p0).
 #' @param delta clinically meaningful difference between groups.
 #' Typically 0 for two-sample case. NULL for one-sample case (default). 
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
-#' @param N tinteger of total planned sample size at end of trial N
-#' for one-sample case
-#' @param theta The target posterior probability. e.g. Efficacy decision if
-#' P(p > p0) > theta for the one-sample case with greater direction.
-#' @param ppp The target predictive probability. e.g. Stop the trial if the
-#' predictive probability falls below this target.
 #'
 #' @return Returns a tibble with n at each look and r. Stop the trial at that
 #' look if the number of observed responses is <=r. At the end of the trial,
@@ -41,9 +41,9 @@
 #' @importFrom tibble tibble
 #' @export
 
-calc_decision_rules <- function(n, direction = "greater", p0,
-                                delta = NULL, prior = c(0.5, 0.5), S = 5000,
-                                N, theta, ppp) {
+calc_decision_rules <- function(n, N, theta, ppp, p0,
+                                direction = "greater", delta = NULL, 
+                                prior = c(0.5, 0.5), S = 5000) {
   if ((is.null(p0) & is.null(delta)) | (!is.null(p0) & !is.null(delta)))
     stop("Exactly one of delta or p0 must be specified for the ", 
          "two-sample and one-sample case, respectively")

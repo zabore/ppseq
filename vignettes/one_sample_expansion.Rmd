@@ -29,10 +29,6 @@ library(ppseq)
 library(future)
 ```
 
-```{r eval = FALSE}
-plan(multisession)
-```
-
 
 # Introduction
 
@@ -61,7 +57,7 @@ The `calibrate_thresholds()` function will simulate `nsim` datasets under the nu
 
 Because `calibrate_thresholds()` randomly generates simulated datasets, you will want to set a seed before running the function in order to ensure your results are reproducible.
 
-The inputs to `calibrate_thresholds()` for our case study re-design include `p_null = 0.1` as the null response rate, `p_alt = 0.2` as the alternative response rate, `n = seq(5, 95, 5)` indicates interim looks after every 5 patients up to a total of 95, `direction = "greater"` specifies that interest is in whether the alternative response rate exceeds the null response rate, `delta = NULL` because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, `prior = c(0.5, 0.5)` specifies that both hyperparameters of the prior beta distribution be set to 0.5, `S = 5000` specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, `N = 95` indicates the final total sample size of 95, `nsim = 1000` specifies that we will generate 1000 simulated datasets under both the null and the alternative, `pp_threshold` is a vector of the posterior thresholds of interest, and `ppp_threshold` is a vector of predictive thresholds of interest.
+The inputs to `calibrate_thresholds()` for our case study re-design include `p_null = 0.1` as the null response rate, `p_alt = 0.2` as the alternative response rate, `n = seq(5, 95, 5)` indicates interim looks after every 5 patients up to a total of 95, `direction = "greater"` specifies that interest is in whether the alternative response rate exceeds the null response rate, `delta = NULL` because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, `prior = c(0.5, 0.5)` specifies that both hyperparameters of the prior beta distribution be set to 0.5, `S = 5000` specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, `N = 95` indicates the final total sample size of 95, `nsim = 1000` specifies that we will generate 1000 simulated datasets under both the null and the alternative, `pp_threshold` is a vector of the posterior thresholds of interest, and `ppp_threshold` is a vector of predictive thresholds of interest. Note that due to the computational time involved, the object produced from the below example code `one_sample_cal_tbl` is available as a dataset in the {ppseq} package.
 
 ```{r eval = FALSE}
 set.seed(123)
@@ -75,7 +71,7 @@ one_sample_cal_tbl <-
                        pp_threshold = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
                                         0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
                                         0.98, 0.99, 0.999, 0.9999, 0.99999, 1),
-                       ppp_threshold = seq(0.05, 0.2, 0.05)
+                       ppp_threshold = seq(0.05, 0.2, 0.05),
                        direction = "greater", delta = NULL, 
                        prior = c(0.5, 0.5), S = 5000, nsim = 1000
                        )
@@ -153,14 +149,16 @@ In this case study, we find that either the optimal accuracy or the optimal effi
 
 ## `calc_decision_rules()`
 
-Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.1` specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above.
+Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.1` specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above. Note that due to the computational time involved, the object produced from the below example code `one_sample_decision_tbl` is available as a dataset in the {ppseq} package.
 
 ```{r eval = FALSE}
 set.seed(123)
 
-calc_decision_rules(n = seq(5, 95, 5), direction = "greater", p0 = 0.1, 
-                    delta = NULL, prior = c(0.5, 0.5), S = 5000,
-                    N = 95, theta = 0.92, ppp = 0.1)
+one_sample_decision_tbl <- 
+  calc_decision_rules(
+    n = seq(5, 95, 5), N = 95, theta = 0.92, ppp = 0.1, p0 = 0.1, 
+    direction = "greater", delta = NULL, prior = c(0.5, 0.5), S = 5000
+    )
 ```
 
 ```{r echo = FALSE}

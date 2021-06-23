@@ -152,9 +152,9 @@ p is greater than (or less than) p0 given the data.</p>
     <pre class="usage"><span class='fu'>calc_posterior</span><span class='op'>(</span>
   <span class='va'>y</span>,
   <span class='va'>n</span>,
+  <span class='va'>p0</span>,
   direction <span class='op'>=</span> <span class='st'>"greater"</span>,
-  p0 <span class='op'>=</span> <span class='cn'>NULL</span>,
-  delta <span class='op'>=</span> <span class='fl'>0</span>,
+  delta <span class='op'>=</span> <span class='cn'>NULL</span>,
   prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>,
   S <span class='op'>=</span> <span class='fl'>5000</span>
 <span class='op'>)</span></pre>
@@ -173,19 +173,20 @@ two-sample case; integer of total responses y for one-sample case</p></td>
 for two-sample case; integer of sample size so far n for one-sample case</p></td>
     </tr>
     <tr>
+      <th>p0</th>
+      <td><p>The target value to compare to in the one-sample case. Set to NULL
+in two-sample case.</p></td>
+    </tr>
+    <tr>
       <th>direction</th>
       <td><p>"greater" (default) if interest is in p(p1 &gt; p0) and "less"
 if interest is in p(p1 &lt; p0) for two-sample case. For one-sample case,
 "greater" if interest is in p(p &gt; p0) and "less" if interest is in p(p &lt; p0).</p></td>
     </tr>
     <tr>
-      <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case</p></td>
-    </tr>
-    <tr>
       <th>delta</th>
       <td><p>clinically meaningful difference between groups.
-Typically 0 (default).</p></td>
+Typically 0 for two-sample case. NULL for one-sample case (default).</p></td>
     </tr>
     <tr>
       <th>prior</th>
@@ -207,10 +208,10 @@ Beta(0.5, 0.5) is default</p></td>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
 <span class='co'># Two-sample case</span>
-<span class='fu'>calc_posterior</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>14</span>, <span class='fl'>23</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>calc_posterior</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>14</span>, <span class='fl'>23</span><span class='op'>)</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>100</span><span class='op'>)</span>, p0 <span class='op'>=</span> <span class='cn'>NULL</span>, delta <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 0.9466</div><div class='input'>
 <span class='co'># One-sample case</span>
-<span class='fu'>calc_posterior</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fl'>27</span>, n <span class='op'>=</span> <span class='fl'>100</span>, p0 <span class='op'>=</span> <span class='fl'>0.2</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
+<span class='fu'>calc_posterior</span><span class='op'>(</span>y <span class='op'>=</span> <span class='fl'>27</span>, n <span class='op'>=</span> <span class='fl'>100</span>, p0 <span class='op'>=</span> <span class='fl'>0.2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 0.9546</div><div class='input'>
 </div></pre>
   </div>
