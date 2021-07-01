@@ -18,22 +18,32 @@ calc_decision_rules(
 )
 }
 \arguments{
-\item{n}{integer of sample size so far for one-sample case}
+\item{n}{matrix containing the total number of patients accrued so far at
+each interim look in the standard of care (column 1) and experimental
+(column 2) arms for two-sample case; vector of sample size accrued so far
+at each interim look for one-sample case. The last value should be equal to
+the total sample size at the end of the trial.
+If only a single look will be done
+at the end of the trial, this can be a vector specifying the total sample
+size c(N0, N1) for the two-sample case or an integer specifying the total
+sample size N for the one-sample case}
 
-\item{N}{tinteger of total planned sample size at end of trial N
+\item{N}{the total planned sample size at the end of the trial, c(N0, N1)
+for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case}
 
 \item{theta}{The target posterior probability. e.g. Efficacy decision if
-P(p > p0) > theta for the one-sample case with greater direction.}
+P(p1 > p0) > theta for the two-sample case with greater direction.}
 
 \item{ppp}{The target predictive probability. e.g. Stop the trial if the
 predictive probability falls below this target.}
 
-\item{p0}{The target value to compare to in the one-sample case
-(i.e. the null response rate)}
+\item{p0}{The target value to compare to in the one-sample case. Set to NULL
+for the two-sample case.}
 
-\item{direction}{For one-sample case, "greater" if interest is in P(p > p0)
-and "less" if interest is in P(p < p0).}
+\item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
+if interest is in P(p1 < p0) for two-sample case. For one-sample case,
+"greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).}
 
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 for two-sample case. NULL for one-sample case (default).}

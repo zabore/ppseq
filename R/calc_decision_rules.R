@@ -8,17 +8,27 @@
 #' optimal design using the functions \code{calibrate_thresholds} and
 #' \code{optimize_design}.
 #'
-#' @param n integer of sample size so far for one-sample case
-#' @param N tinteger of total planned sample size at end of trial N
+#' @param n matrix containing the total number of patients accrued so far at
+#' each interim look in the standard of care (column 1) and experimental
+#' (column 2) arms for two-sample case; vector of sample size accrued so far
+#' at each interim look for one-sample case. The last value should be equal to
+#' the total sample size at the end of the trial.
+#' If only a single look will be done
+#' at the end of the trial, this can be a vector specifying the total sample
+#' size c(N0, N1) for the two-sample case or an integer specifying the total
+#' sample size N for the one-sample case
+#' @param N the total planned sample size at the end of the trial, c(N0, N1)
+#' for two-sample case; integer of total planned sample size at end of trial N
 #' for one-sample case
-#' @param p0 The target value to compare to in the one-sample case
-#' (i.e. the null response rate)
+#' @param p0 The target value to compare to in the one-sample case. Set to NULL
+#' for the two-sample case.
 #' @param theta The target posterior probability. e.g. Efficacy decision if
-#' P(p > p0) > theta for the one-sample case with greater direction.
+#' P(p1 > p0) > theta for the two-sample case with greater direction.
 #' @param ppp The target predictive probability. e.g. Stop the trial if the
 #' predictive probability falls below this target.
-#' @param direction For one-sample case, "greater" if interest is in P(p > p0)
-#' and "less" if interest is in P(p < p0).
+#' @param direction "greater" (default) if interest is in P(p1 > p0) and "less"
+#' if interest is in P(p1 < p0) for two-sample case. For one-sample case,
+#' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
 #' @param delta clinically meaningful difference between groups.
 #' Typically 0 for two-sample case. NULL for one-sample case (default). 
 #' @param prior hyperparameters of prior beta distribution.
@@ -51,38 +61,39 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
   if (!direction %in% c("greater", "less"))
     stop('direction must be either "greater" or "less"')
 
-  # Set up the results table
-  res <- tibble(
-    n = n,
-    r = rep(NA_integer_, length(n))
-  )
-
-  # initialize the ytest parameter (will have 1 added in loop so will really 
-  # start at 0)
-
-
-  # Loop over each value of n and for each, continue while the predictive 
-  # probability for a given ytest is less than the ppp threshold.
-  for (i in n) {
-    ytest <- -1
-    pred <- 0
-    while (pred < ppp) {
-      ytest <- ytest + 1
-      pred <- calc_predictive(
-        y = ytest,
-        n = i,
-        direction = direction,
-        p0 = p0,
-        delta = delta,
-        prior = prior,
-        S = S,
-        N = N,
-        theta = theta
-      )
+  
+  if(length(n) == 2) {
+    
+  } else if(length(n) == 1) {
+    
+    # Set up the results table
+    res <- tibble(
+      n = n,
+      r = rep(NA_integer_, length(n))
+    )
+  
+    ytest <- 0
+    for (i in n) {
+      pred <- 0
+      while (pred < ppp) {
+        pred <- calc_predictive(
+          y = ytest,
+          n = i,
+          direction = direction,
+          p0 = p0,
+          delta = delta,
+          prior = prior,
+          S = S,
+          N = N,
+          theta = theta
+        )
+        ytest <- ytest + 1
+      }
+      
+      res[i == n, 2] <- ifelse(ytest == 0 & pred > ppp, NA, ytest - 1)
+      ytest <- ytest - 1
     }
-
-    # Store the results
-    res[i == n, 2] <- ytest <- ifelse(ytest == 0 & pred > ppp, NA, ytest - 1)
+    
   }
 
   return(res)

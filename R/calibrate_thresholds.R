@@ -254,7 +254,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' set.seed(123)
 #'
 #' calibrate_thresholds(
-#'   p_null = 0.1, p_alt = 0.3,
+#'   p_null = c(0.1, p_alt = 0.3,
 #'   n = seq(5, 25, 5), N = 25, 
 #'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
 #'   ppp_threshold = seq(0.05, 0.2, 0.05),
@@ -264,6 +264,18 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' }
 #'
 #' # Two-sample case
+#' \dontrun{
+#' set.seed(123)
+#'
+#' calibrate_thresholds(
+#'   p_null = c(0.1, 0.1), p_alt = c(0.1, 0.3),
+#'   n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25), 
+#'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+#'   ppp_threshold = seq(0.05, 0.2, 0.05),
+#'   direction = "greater", delta = 0,
+#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
+#' )
+#' }
 #' @importFrom purrr pmap_dfr map cross_df
 #' @importFrom furrr future_map furrr_options
 #' @importFrom dplyr bind_rows full_join select rename ungroup summarize
