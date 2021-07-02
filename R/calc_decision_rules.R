@@ -46,9 +46,14 @@
 #'
 #' # One-sample case
 #' calc_decision_rules(seq(5, 25, 5), p0 = 0.1, N = 25, theta = 0.86, ppp = 0.2)
+#' 
+#' # Two-sample case
+#' calc_decision_rules(n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25),
+#' theta = 0.86, ppp = 0.2, p0 = NULL, direction = "greater", delta = 0,
+#' prior = c(0.5, 0.5), S = 5000)
 #' }
 #'
-#' @importFrom tibble tibble
+#' @importFrom tibble tibble add_row
 #' @export
 
 calc_decision_rules <- function(n, N, theta, ppp, p0,
@@ -62,11 +67,50 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
     stop('direction must be either "greater" or "less"')
 
   
-  if(length(n) == 2) {
+  if(length(N) == 2) {
     
-  } else if(length(n) == 1) {
+    res <- tibble(
+      n0 = as.numeric(),
+      n1 = as.numeric(),
+      r0 = as.numeric(),
+      r1 = as.numeric()
+    )
     
-    # Set up the results table
+    for(i in 1:nrow(n)) {
+      pred <- 0
+      ytest0 <- ytest1 <- 0
+      for (k in ytest0:n[i, 1]) {
+        for (l in ytest1:n[i, 2]) {
+          pred <- calc_predictive(
+            y = c(k, l),
+            n = c(n[i, 1], n[i, 2]),
+            direction = direction,
+            p0 = p0,
+            delta = delta,
+            prior = prior,
+            S = S,
+            N = N,
+            theta = theta
+          )
+          if(pred > ppp) {
+            ytest1 <- l
+            
+            res <- add_row(
+              res,
+              n0 = n[i, 1],
+              n1 = n[i, 2],
+              r0 = k,
+              r1 = l
+            )
+            
+            break
+          }
+        }
+      }
+    }
+    
+  } else if(length(N) == 1) {
+    
     res <- tibble(
       n = n,
       r = rep(NA_integer_, length(n))
