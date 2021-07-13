@@ -54,6 +54,7 @@
 #' }
 #'
 #' @importFrom tibble tibble add_row
+#' @importFrom dplyr arrange group_by slice
 #' @export
 
 calc_decision_rules <- function(n, N, theta, ppp, p0,
@@ -69,42 +70,36 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
   
   if(length(N) == 2) {
     
-    res <- tibble(
-      n0 = as.numeric(),
-      n1 = as.numeric(),
-      r0 = as.numeric(),
-      r1 = as.numeric()
-    )
+    res <- 
+      tibble(
+        n0 = rep(n[, 1], times = n[, 1] + 1),
+        n1 = rep(n[, 2], times = n[, 1] + 1),
+        r0 = unlist(lapply(n[, 1], function(x) seq(from = 0, to = x))),
+        r1 = NA_integer_,
+        ppp = NA_real_
+      )
     
-    for(i in 1:nrow(n)) {
+    
+    ystart1 <- 0
+    for(i in 1:nrow(res)) {
       pred <- 0
-      ytest0 <- ytest1 <- 0
-      for (k in ytest0:n[i, 1]) {
-        for (l in ytest1:n[i, 2]) {
-          pred <- calc_predictive(
-            y = c(k, l),
-            n = c(n[i, 1], n[i, 2]),
-            direction = direction,
-            p0 = p0,
-            delta = delta,
-            prior = prior,
-            S = S,
-            N = N,
-            theta = theta
-          )
-          if(pred > ppp) {
-            ytest1 <- l
-            
-            res <- add_row(
-              res,
-              n0 = n[i, 1],
-              n1 = n[i, 2],
-              r0 = k,
-              r1 = l
-            )
-            
-            break
-          }
+      for (j in ystart1:res[[i, "n1"]]) {
+        pred <- calc_predictive(
+          y = c(res[[i, "r0"]], j),
+          n = c(res[[i, "n0"]], res[[i, "n1"]]),
+          direction = direction,
+          p0 = p0,
+          delta = delta,
+          prior = prior,
+          S = S,
+          N = N,
+          theta = theta
+        )
+        if(pred > ppp) break else {
+          ystart1 <- ifelse(j > 0, j - 1, j)
+          
+          res[i, "r1"] <- j
+          res[i, "ppp"] <- pred
         }
       }
     }
@@ -113,15 +108,16 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
     
     res <- tibble(
       n = n,
-      r = rep(NA_integer_, length(n))
+      r = NA_integer_,
+      ppp = NA_real_
     )
-  
-    ytest <- 0
+    
+    ystart <- 0
     for (i in n) {
       pred <- 0
-      while (pred < ppp) {
+      for(j in ystart:i) {
         pred <- calc_predictive(
-          y = ytest,
+          y = j,
           n = i,
           direction = direction,
           p0 = p0,
@@ -131,11 +127,12 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
           N = N,
           theta = theta
         )
-        ytest <- ytest + 1
+        if(pred > ppp) break else{
+          res[i == n, 2] <- j
+          res[i == n, 3] <- pred
+        }
       }
-      
-      res[i == n, 2] <- ifelse(ytest == 0 & pred > ppp, NA, ytest - 1)
-      ytest <- ytest - 1
+      ystart <- ifelse(j > 0, j - 1, j)
     }
     
   }
