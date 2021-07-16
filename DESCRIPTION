@@ -30,16 +30,15 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Imports: 
-    clinfun,
     dplyr,
     furrr,
     future,
-    gt,
     ggplot2,
-    here,
     plotly,
     purrr,
     tibble,
-    patchwork
+    patchwork,
+    gt,
+    tidyr
 Config/testthat/edition: 3
 Language: en-US

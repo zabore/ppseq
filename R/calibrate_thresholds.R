@@ -131,15 +131,24 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
       ppp[i] <- calc_predictive(
         y = c(data$y0[i], data$y1[i]),
         n = c(data$n0[i], data$n1[i]),
-        direction = direction, p0 = p0, delta = delta,
-        prior = prior, S = S, N = N,
+        direction = direction, 
+        p0 = p0, 
+        delta = delta,
+        prior = prior, 
+        S = S, 
+        N = N,
         theta = pp_threshold
       )
     } else if (ncol(data) == 2) {
       ppp[i] <- calc_predictive(
-        y = data$y1[i], n = data$n1[i],
-        direction = direction, p0 = p0, delta = delta,
-        prior = prior, S = S, N = N,
+        y = data$y1[i], 
+        n = data$n1[i],
+        direction = direction, 
+        p0 = p0, 
+        delta = delta,
+        prior = prior, 
+        S = S, 
+        N = N,
         theta = pp_threshold
       )
     }
@@ -254,7 +263,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' set.seed(123)
 #'
 #' calibrate_thresholds(
-#'   p_null = c(0.1, p_alt = 0.3,
+#'   p_null = 0.1, p_alt = 0.3,
 #'   n = seq(5, 25, 5), N = 25, 
 #'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
 #'   ppp_threshold = seq(0.05, 0.2, 0.05),
@@ -298,16 +307,6 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
       ppp_threshold = ppp_threshold
     ))
 
-  sim_dat_null <- 
-    map(1:nsim, ~sim_dat1(p = p_null, n = n))
-  
-  sim_dat_alt <- 
-    map(1:nsim, ~sim_dat1(p = p_alt, n = n))
-  
-  cross_threshold <- 
-    cross_df(list(pp_threshold = pp_threshold, 
-                  ppp_threshold = ppp_threshold))
-  
   p0 <- if(length(p_null) == 1) 
     p_null else if(length(p_null) == 2)
       NULL
@@ -350,20 +349,21 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
       .id = "sim_num"
     )
 
-
   if (length(p_null) == 2) {
     res_df <-
       full_join(
         select(
           rename(res_df_null,
-            n0_null = n0, n1_null = n1,
+            n0_null = n0, 
+            n1_null = n1,
             positive_null = positive
           ),
           -ppp, -y0, -y1
         ),
         select(
           rename(res_df_alt,
-            n0_alt = n0, n1_alt = n1,
+            n0_alt = n0, 
+            n1_alt = n1,
             positive_alt = positive
           ),
           -ppp, -y0, -y1

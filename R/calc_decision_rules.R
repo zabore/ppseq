@@ -136,6 +136,9 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
     }
     
   }
+  
+  # assign a custom class for S3 plotting methods
+  class(res) <- c("calc_decision_rules", class(res))
 
   return(res)
 }

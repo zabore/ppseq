@@ -22,7 +22,6 @@
 #'                     scale_color_viridis_c theme_bw theme
 #' @importFrom plotly ggplotly
 #' @export
-
 plot.calibrate_thresholds <- function(x,
                                       type1_range = c(0.05, 0.1),
                                       minimum_power = 0.8,
@@ -197,5 +196,148 @@ plot.calibrate_thresholds <- function(x,
   if(plotly == TRUE)
     list(ggplotly(p1), ggplotly(p2)) else
       p1 + p2
+  
+}
+
+
+#' Plot method for \code{calc_decision_rules} objects
+#'
+#' @description Returns a plot of decision rules from the results of 
+#' \code{calc_decision_rules} that can interactively show when to stop and
+#' when to proceed at the various interim analyses
+#' 
+#' @param x an object of class 'calc_decision_rules', usually returned by the
+#' \code{calc_decision_rules} function
+#' @param ... unused
+#' 
+#' @importFrom dplyr mutate filter select rename ungroup group_by 
+#' full_join case_when
+#' @importFrom tibble tibble
+#' @importFrom purrr map2 map
+#' @importFrom tidyr fill
+#' @importFrom ggplot2 ggplot aes facet_wrap geom_tile 
+#' scale_x_continuous scale_y_continuous
+#' @importFrom plotly ggplotly
+#' 
+#' @export
+plot.calc_decision_rules <- function(x, ...) {
+  
+  if(ncol(x) == 5) {
+    
+    x_2 <- 
+      mutate(
+        filter(
+          x, !is.na(r1)
+        ),
+        stop_criteria = r1
+      )
+    
+    ss_tab <- 
+      unique(
+        select(
+          x_2, 
+          n0, 
+          n1
+        )
+      )
+    
+    shell <- 
+      tibble(
+        n0 = unlist(map2(ss_tab$n0, ss_tab$n1, ~rep(.x, (.x + 1) * (.y + 1)))),
+        n1 = unlist(map2(ss_tab$n0, ss_tab$n1, ~rep(.y, (.x + 1) * (.y + 1)))),
+        r0 = unlist(map2(ss_tab$n0, ss_tab$n1, ~rep(seq(from = 0, to = .x), each = .y + 1))),
+        r1 = unlist(map(ss_tab$n1, ~rep(seq(from = 0, to = .x), .x + 1)))
+      )
+    
+    plotdat <- 
+      rename(
+        mutate(
+          ungroup(
+            mutate(
+              fill(
+                group_by(
+                  full_join(
+                    shell, x_2
+                  ),
+                  r0
+                ),
+                stop_criteria, .direction = "updown"
+              ),
+              Decision = case_when(
+                r1 <= stop_criteria ~ "Stop",
+                r1 > stop_criteria ~ "Proceed",
+                is.na(stop_criteria) ~ "Proceed"
+              )
+            )
+          ), 
+          n0 = paste0("N control = ", n0),
+          n1 = paste0("N experimental = ", n1)
+        ),
+        "# responses control" = r0,
+        "# responses experimental" = r1
+      )
+
+    p <- 
+      ggplot(plotdat, aes(x = `# responses control`, 
+                           y = `# responses experimental`, 
+                           fill = Decision)) + 
+      facet_wrap(~n0 + n1, scales = "free") +
+      geom_tile(color = "black") + 
+      scale_x_continuous(expand = c(0,0)) + 
+      scale_y_continuous(expand = c(0, 0))
+    
+  } else if(ncol(x) == 3) {
+    
+    x_2 <- 
+      mutate(
+        filter(
+          x, !is.na(r)
+        ),
+        stop_criteria = r
+      )
+    
+    shell <- 
+      tibble(
+        n = unlist(map(x_2$n, ~rep(.x, (.x + 1)))),
+        r = unlist(map(x_2$n, ~seq(from = 0, to = .x)))
+      )
+    
+    plotdat <- 
+      rename(
+        mutate(
+          ungroup(
+            mutate(
+              fill(
+                group_by(
+                  full_join(
+                    shell, x_2
+                  ),
+                  n
+                ),
+                stop_criteria, .direction = "updown"
+              ),
+              Decision = case_when(
+                r <= stop_criteria ~ "Stop",
+                r > stop_criteria ~ "Proceed",
+                is.na(stop_criteria) ~ "Proceed"
+              )
+            )
+          ),
+          n = paste0("N = ", n)
+        ),
+        "# responses" = r,
+        "N at interim analysis" = n
+      )
+    
+    p <- 
+      ggplot(plotdat, aes(x = `N at interim analysis`, 
+                           y = `# responses`, 
+                           fill = Decision)) + 
+      geom_tile(color = "black") + 
+      scale_y_continuous(breaks = seq(from = 0, to = max(x_2$n), by = 1), 
+                         expand = c(0, 0))
+  }
+  
+  ggplotly(p)
   
 }

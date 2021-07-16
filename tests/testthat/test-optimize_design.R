@@ -1,6 +1,6 @@
 
 test_that(
-  "optimize_design works",
+  "optimize_design works for one-sample case",
   {
     set.seed(123)
     cal_tbl <- calibrate_thresholds(
@@ -11,5 +11,26 @@ test_that(
       ppp_threshold = c(0.05, 0.1)
     )
     expect_snapshot(optimize_design(cal_tbl))
+  }
+)
+
+test_that(
+  "optimize_design works for two-sample case",
+  {
+    set.seed(123)
+    cal_tbl2 <- calibrate_thresholds(
+      p_null = c(0.1, 0.1), 
+      p_alt = c(0.1, 0.5),
+      n = cbind(c(10, 25), c(10, 25)), 
+      N = c(25, 25), 
+      pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+      ppp_threshold = seq(0.05, 0.2, 0.05),
+      direction = "greater", 
+      delta = 0,
+      prior = c(0.5, 0.5), 
+      S = 200, 
+      nsim = 100
+    )
+    expect_snapshot(optimize_design(cal_tbl2))
   }
 )

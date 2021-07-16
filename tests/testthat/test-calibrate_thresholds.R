@@ -39,42 +39,45 @@ test_that(
   }
 )
 
-# TODO: need a small example below that returns something
-# TODO: need a two-sample calibrate_thresholds example.
-# TODO: the following is a hack to avoid snapshot issues.
-
-set.seed(123)
-calibrate_thresholds( 
-  p_null = 0.01, 
-  p_alt = 0.9, 
-  n = c(5, 25), 
-  direction = "greater", 
-  delta = NULL,
-  prior = c(0.5, 0.5), 
-  S = 200, 
-  N = 100, 
-  nsim = 100,
-  pp_threshold = c(0.98),
-  ppp_threshold = c(0.01)
-)
-
 test_that(
   "single-sample calibrate thresholds",
   {
     set.seed(123)
     expect_snapshot(
-      calibrate_thresholds( 
-        p_null = 0.01, 
-        p_alt = 0.9, 
+      calibrate_thresholds(
+        p_null = 0.1, 
+        p_alt = 0.3,
         n = c(5, 25), 
+        N = 25, 
+        pp_threshold = 0.9,
+        ppp_threshold = 0.05,
         direction = "greater", 
         delta = NULL,
         prior = c(0.5, 0.5), 
         S = 200, 
-        N = 100, 
-        nsim = 100,
-        pp_threshold = c(0.98),
-        ppp_threshold = c(0.01)
+        nsim = 100
+      )
+    )
+  }
+)
+
+test_that(
+  "two-sample calibrate thresholds",
+  {
+    set.seed(123)
+    expect_snapshot(
+      calibrate_thresholds(
+        p_null = c(0.1, 0.1), 
+        p_alt = c(0.1, 0.5),
+        n = cbind(c(10, 25), c(10, 25)), 
+        N = c(25, 25), 
+        pp_threshold = 0.9,
+        ppp_threshold = 0.2,
+        direction = "greater", 
+        delta = 0,
+        prior = c(0.5, 0.5), 
+        S = 200, 
+        nsim = 100
       )
     )
   }

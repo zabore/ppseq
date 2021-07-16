@@ -25,6 +25,8 @@ Determines the optimal designs based on a variety of criteria
 }
 \examples{
 \dontrun{
+
+# One-sample case
 set.seed(123)
 
 cal_tbl <- calibrate_thresholds(
@@ -37,6 +39,22 @@ cal_tbl <- calibrate_thresholds(
 )
 
 optimize_design(cal_tbl)
+
+
+# Two-sample case
+set.seed(123)
+
+cal_tbl2 <- 
+calibrate_thresholds(
+  p_null = c(0.1, 0.1), p_alt = c(0.1, 0.3),
+  n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25), 
+  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+  ppp_threshold = seq(0.05, 0.2, 0.05),
+  direction = "greater", delta = 0,
+  prior = c(0.5, 0.5), S = 5000, nsim = 1000
+)
+
+optimize_design(cal_tbl2)
 }
 
 }
