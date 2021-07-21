@@ -45,7 +45,7 @@
 #' set.seed(123)
 #'
 #' # One-sample case
-#' calc_decision_rules(seq(5, 25, 5), p0 = 0.1, N = 25, theta = 0.86, ppp = 0.2)
+#' calc_decision_rules(n = seq(5, 25, 5), N = 25, theta = 0.86, ppp = 0.2, p0 = 0.1)
 #' 
 #' # Two-sample case
 #' calc_decision_rules(n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25),

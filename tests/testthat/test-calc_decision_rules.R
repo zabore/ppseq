@@ -4,11 +4,16 @@ test_that(
     set.seed(123)
     expect_snapshot(
       calc_decision_rules(
-        c(10, 20), 
-        p0 = 0.1, 
+        n = c(10, 20), 
         N = 25, 
         theta = 0.86, 
-        ppp = 0.2)
+        ppp = 0.2,
+        p0 = 0.1, 
+        direction = "greater", 
+        delta = NULL, 
+        prior = c(0.5, 0.5), 
+        S = 100
+        )
     )
   }
 )
@@ -27,7 +32,7 @@ test_that(
         direction = "greater", 
         delta = 0,
         prior = c(0.5, 0.5), 
-        S = 5000)
+        S = 100)
     )
   }
 )

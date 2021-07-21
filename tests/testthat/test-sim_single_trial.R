@@ -1,4 +1,3 @@
-
 test_that(
   "one-sample single trial simulation",
   {

@@ -1,4 +1,3 @@
-
 test_that(
   "one-sample simulate data",
   {
@@ -32,15 +31,15 @@ test_that(
   "evaluate threshold two-sample case",
   {
     set.seed(123)
-    dat2 <- sim_dat1(p = c(0.1, 0.3), 
+    dat2 <- sim_dat1(p = c(0.1, 0.3),
                      n = cbind(c(5, 10), c(5, 10)))
-    expect_snapshot(eval_thresh(dat2, 0.95, 0.3, p0 = NULL, delta = 0, 
+    expect_snapshot(eval_thresh(dat2, 0.95, 0.3, p0 = NULL, delta = 0,
                                 S = 500, N = c(25, 25)))
   }
 )
 
 test_that(
-  "single-sample calibrate thresholds",
+  "one-sample calibrate thresholds",
   {
     set.seed(123)
     expect_snapshot(

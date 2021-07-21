@@ -25,7 +25,7 @@ test_that(
         p0 = 0.1, 
         delta = NULL, 
         prior = c(0.5, 0.5), 
-        S = 5000, 
+        S = 50, 
         theta = c(0.9, 0.95)
       )
     )
