@@ -41,9 +41,6 @@ print.calibrate_thresholds <- function(x,
                                        type1_range = c(0.05, 0.1),
                                        minimum_power = 0.8,
                                        ...) {
-  if (any(class(x) == "calibrate_thresholds") == FALSE)
-    stop("x must be class 'calibrate_thresholds', usually an object returned from a call to the function ppseq::calibrate_thresholds()")
-
   if (length(type1_range) != 2 & !is.null(type1_range))
     stop("type1_range must be a vector of length 2 defining the range of acceptable type I error, or can be set equal to NULL to return all values of type I error")
 
@@ -56,13 +53,20 @@ print.calibrate_thresholds <- function(x,
   if (!is.numeric(type1_range) & !is.null(type1_range))
     stop("type1_range must be a numeric vector of length 2 or NULL")
 
-  if (minimum_power < 0 | minimum_power > 1)
-    stop("minimum_power must be a numeric value between 0 and 1")
+  if (!is.null(minimum_power)) {
+    if (minimum_power < 0 | minimum_power > 1)
+      stop("minimum_power must be a numeric value between 0 and 1")
+    }
 
-  if (type1_range[1] < 0 | type1_range[1] > 1 |
-    type1_range[2] < 0 | type1_range[2] > 1 |
-    type1_range[1] > type1_range[2])
+  if (!is.null(type1_range)) {
+    if (type1_range[1] < 0 | 
+       type1_range[1] > 1 |
+       type1_range[2] < 0 | 
+       type1_range[2] > 1 |
+       type1_range[1] > type1_range[2])
     stop("type1_range must be a vector of numeric values, both between 0 and 1, with the first value less than the second value")
+    }
+  
 
   if (is.null(type1_range) & is.null(minimum_power)) {
     print(x$res_summary)

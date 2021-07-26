@@ -22,8 +22,11 @@ test_that("errors when expected", {
   expect_error(calc_posterior(y = 27, n = 100, delta = NULL), "*")
   expect_error(calc_posterior(y = c(14, 23), n = c(100, 100), 
                delta = NULL), "*")
-
-  expect_error(calc_posterior(y = 27, n = 100, p0 = NULL, delta = NULL))
-  expect_error(calc_posterior(y = c(14, 23), n = c(100, 100), delta = NULL))
+  expect_error(calc_posterior(y = 27, n = 100, p0 = NULL, delta = NULL), "*")
+  expect_error(calc_posterior(y = c(14, 23), n = c(100, 100), delta = NULL), "*")
+  expect_error(calc_posterior(y = 27, n = 100, p0 = 0.2, direction = "south"), 
+               "*")
+  expect_error(calc_posterior(y = 27, n = 100), "*")
+  expect_error(calc_posterior(y = c(14, 23), n = c(100, 100), p0 = NULL), "*")
 })
 

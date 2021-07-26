@@ -13,6 +13,9 @@ test_that(
     expect_snapshot(
       sim_dat1(p = c(0.1, 0.3), n = cbind(c(5, 10), c(5, 10)))
     )
+    expect_snapshot(
+      sim_dat1(p = c(0.1, 0.3), n = c(5, 5))
+    )
   }
 )
 
