@@ -168,7 +168,7 @@ The diamond-shaped point represents the optimal design based on each criteria, w
 
 Passing the results of `calc_decision_rules()` to `plot()` returns one plot. The x-axis indicates the sample size at each interim analysis, and the y-axis indicates the number of possible responses at each interim analysis. The color denotes whether the trial should proceed (green) or stop (red). Hovering over each box will indicate the combination of sample size and responses and the decision at that time. Note that this plot is most useful for the two-sample case, where the number of responses in the control group and the number of responses in the experimental group must be considered simultaneously, resulting in a grid of plots for each interim analysis point.
 
-```{r}
+```{r message = FALSE, fig.width = 8, fig.height = 10}
 plot(one_sample_decision_tbl)
 ```
 
