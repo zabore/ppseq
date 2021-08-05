@@ -99,35 +99,6 @@ gt::gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.01,
 
 We find that 35 of the 76 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
 
-## `plot()` 
-
-Passing the results of `calibrate_thresholds()` to `plot()` returns two plots, one of type I error by power, and one of average sample size under the null by average sample size under the alternative. The arguments `type1_range` and `power` are used in the same way as for the `print()` function. The argument `plotly` defaults to FALSE, which results in a pair of side-by-side ggplots being returned. If set to TRUE, two individual interactive plotly plots will be returned, as demonstrated below.
-
-```{r eval = FALSE}
-plot(one_sample_cal_tbl, 
-     type1_range = c(0.01, 0.2), 
-     minimum_power = 0.7,
-     plotly = TRUE)
-```
-
-```{r echo = FALSE}
-ptest <- 
-  plot(one_sample_cal_tbl, 
-     type1_range = c(0.01, 0.2), 
-     minimum_power = 0.7,
-     plotly = TRUE)
-```
-
-```{r echo = FALSE, fig.width = 8, fig.height = 6}
-ptest[[1]]
-ptest[[2]]
-```
-
-Note that when points were tied based on optimization criteria, the point with the highest posterior and predictive threshold is selected for plotting.
-
-The diamond-shaped point represents the optimal design based on each criteria, which is discussed in more detail below. Using the `plotly = TRUE` option to `plot()` we can hover over each point to see the x-axis and y-axis values, along with the distance to the top left corner on each plot, and the posterior and predictive thresholds associated with each point.
-
-
 ## `optimize_design()` 
 
 Finally, we can pass the results from a call to `calibrate_thresholds()` to the `optimize_design()` function to list the optimal design with respect to type I error and power, termed the "optimal accuracy" design, and the optimal design with respect to the average sample sizes under the null and alternative, termed the "optimal efficiency" design, within the specified range of acceptable type I error and minimum power. 
@@ -167,7 +138,39 @@ gt::gt(one_sample_decision_tbl)
 
 In the results table, `n` indicates the number of enrolled patients at each look for futility and `r` indicates the number of response for which we would stop the trial at a given interim look if the number of observed responses is <=r, or at the end of the trial the treatment would be considered promising if the number of observed responses is >r. So in this case we see that at the first interim futility look after just 5 patients, we would not stop the trial. After the first 10 patients we would stop the trial if there were 0 responses, and so on. At the end of the trial when all 95 patients have accrued, we would declare the treatment promising of further study if there were >=14 responses.
 
+## `plot()` 
 
+Passing the results of `calibrate_thresholds()` to `plot()` returns two plots, one of type I error by power, and one of average sample size under the null by average sample size under the alternative. The arguments `type1_range` and `power` are used in the same way as for the `print()` function. The argument `plotly` defaults to FALSE, which results in a pair of side-by-side ggplots being returned. If set to TRUE, two individual interactive plotly plots will be returned, as demonstrated below.
+
+```{r eval = FALSE}
+plot(one_sample_cal_tbl, 
+     type1_range = c(0.01, 0.2), 
+     minimum_power = 0.7,
+     plotly = TRUE)
+```
+
+```{r echo = FALSE}
+ptest <- 
+  plot(one_sample_cal_tbl, 
+     type1_range = c(0.01, 0.2), 
+     minimum_power = 0.7,
+     plotly = TRUE)
+```
+
+```{r echo = FALSE, fig.width = 8, fig.height = 6}
+ptest[[1]]
+ptest[[2]]
+```
+
+Note that when points were tied based on optimization criteria, the point with the highest posterior and predictive threshold is selected for plotting.
+
+The diamond-shaped point represents the optimal design based on each criteria, which is discussed in more detail below. Using the `plotly = TRUE` option to `plot()` we can hover over each point to see the x-axis and y-axis values, along with the distance to the top left corner on each plot, and the posterior and predictive thresholds associated with each point.
+
+Passing the results of `calc_decision_rules()` to `plot()` returns one plot. The x-axis indicates the sample size at each interim analysis, and the y-axis indicates the number of possible responses at each interim analysis. The color denotes whether the trial should proceed (green) or stop (red). Hovering over each box will indicate the combination of sample size and responses and the decision at that time. Note that this plot is most useful for the two-sample case, where the number of responses in the control group and the number of responses in the experimental group must be considered simultaneously, resulting in a grid of plots for each interim analysis point.
+
+```{r}
+plot(one_sample_decision_tbl)
+```
 
 
 
