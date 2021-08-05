@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Output from a one-sample call to calibrate_thresholds — one_sample_cal_tbl • ppseq</title>
+<title>Plot method for calc_decision_rules objects — plot.calc_decision_rules • ppseq</title>
 
 
 <!-- jquery -->
@@ -39,14 +39,10 @@
 
 
 
-<meta property="og:title" content="Output from a one-sample call to calibrate_thresholds — one_sample_cal_tbl" />
-<meta property="og:description" content="This .rda file contains output from a one-sample call to
-calibrate_thresholds().
-See the vignette titled &quot;One-sample expansion cohort&quot; for a description of
-the input parameters used, or run
-one_sample_cal_tbl$calibrate_thresholds_inputs
-to see a list of the original function inputs. For use in testing
-functions and in vignettes." />
+<meta property="og:title" content="Plot method for calc_decision_rules objects — plot.calc_decision_rules" />
+<meta property="og:description" content="Returns a plot of decision rules from the results of
+calc_decision_rules that can interactively show when to stop and
+when to proceed at the various interim analyses" />
 
 
 
@@ -130,39 +126,33 @@ functions and in vignettes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Output from a one-sample call to <code>calibrate_thresholds</code></h1>
+    <h1>Plot method for <code>calc_decision_rules</code> objects</h1>
     
-    <div class="hidden name"><code>one_sample_cal_tbl.Rd</code></div>
+    <div class="hidden name"><code>plot.calc_decision_rules.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This .rda file contains output from a one-sample call to
-<code><a href='calibrate_thresholds.html'>calibrate_thresholds()</a></code>.
-See the vignette titled "One-sample expansion cohort" for a description of
-the input parameters used, or run
-<code>one_sample_cal_tbl$calibrate_thresholds_inputs</code>
-to see a list of the original function inputs. For use in testing
-functions and in vignettes.</p>
+    <p>Returns a plot of decision rules from the results of
+<code>calc_decision_rules</code> that can interactively show when to stop and
+when to proceed at the various interim analyses</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>one_sample_cal_tbl</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='co'># S3 method for calc_decision_rules</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
-
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
-
-    <p>A list containing a</p><ol>
-<li><p>a tibble 'res_summary' containing the posterior probability threshold
-(pp_threshold), the predictive probability threshold (ppp_threshold),
-the mean sample size (mean_n0 and mean_n1 for two-sample case;
-mean_n1 for one-sample case), and the proportion of positive trials under
-the null and alternative response rates.</p></li>
-<li><p>'call_list' containing the original function call</p></li>
-<li><p>'calibrate_thresholds_inputs' a list containing the inputs to the
-original function call</p></li>
-<li><p>'protocol_res' gives results from the protocol-specified design of
-the atezolizumab case study, as detailed in the vignette titled
-"One-sample expansion cohort"</p></li>
-</ol>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>an object of class 'calc_decision_rules', usually returned by the
+<code>calc_decision_rules</code> function</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>unused</p></td>
+    </tr>
+    </table>
 
 
   </div>

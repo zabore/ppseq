@@ -87,7 +87,7 @@ optimize_design." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home"></span>
+    <span class="fa fa-home"></span>
      
   </a>
 </li>
@@ -163,17 +163,26 @@ optimal design using the functions <code>calibrate_thresholds</code> and
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>n</th>
-      <td><p>integer of sample size so far for one-sample case</p></td>
+      <td><p>matrix containing the total number of patients accrued so far at
+each interim look in the standard of care (column 1) and experimental
+(column 2) arms for two-sample case; vector of sample size accrued so far
+at each interim look for one-sample case. The last value should be equal to
+the total sample size at the end of the trial.
+If only a single look will be done
+at the end of the trial, this can be a vector specifying the total sample
+size c(N0, N1) for the two-sample case or an integer specifying the total
+sample size N for the one-sample case</p></td>
     </tr>
     <tr>
       <th>N</th>
-      <td><p>tinteger of total planned sample size at end of trial N
+      <td><p>the total planned sample size at the end of the trial, c(N0, N1)
+for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case</p></td>
     </tr>
     <tr>
       <th>theta</th>
       <td><p>The target posterior probability. e.g. Efficacy decision if
-P(p &gt; p0) &gt; theta for the one-sample case with greater direction.</p></td>
+P(p1 &gt; p0) &gt; theta for the two-sample case with greater direction.</p></td>
     </tr>
     <tr>
       <th>ppp</th>
@@ -182,13 +191,14 @@ predictive probability falls below this target.</p></td>
     </tr>
     <tr>
       <th>p0</th>
-      <td><p>The target value to compare to in the one-sample case
-(i.e. the null response rate)</p></td>
+      <td><p>The target value to compare to in the one-sample case. Set to NULL
+for the two-sample case.</p></td>
     </tr>
     <tr>
       <th>direction</th>
-      <td><p>For one-sample case, "greater" if interest is in P(p &gt; p0)
-and "less" if interest is in P(p &lt; p0).</p></td>
+      <td><p>"greater" (default) if interest is in P(p1 &gt; p0) and "less"
+if interest is in P(p1 &lt; p0) for two-sample case. For one-sample case,
+"greater" if interest is in P(p &gt; p0) and "less" if interest is in P(p &lt; p0).</p></td>
     </tr>
     <tr>
       <th>delta</th>
@@ -218,7 +228,12 @@ is &gt;r.</p>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
 <span class='co'># One-sample case</span>
-<span class='fu'>calc_decision_rules</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, p0 <span class='op'>=</span> <span class='fl'>0.1</span>, N <span class='op'>=</span> <span class='fl'>25</span>, theta <span class='op'>=</span> <span class='fl'>0.86</span>, ppp <span class='op'>=</span> <span class='fl'>0.2</span><span class='op'>)</span>
+<span class='fu'>calc_decision_rules</span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, N <span class='op'>=</span> <span class='fl'>25</span>, theta <span class='op'>=</span> <span class='fl'>0.86</span>, ppp <span class='op'>=</span> <span class='fl'>0.2</span>, p0 <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
+
+<span class='co'># Two-sample case</span>
+<span class='fu'>calc_decision_rules</span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>, N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>25</span>, <span class='fl'>25</span><span class='op'>)</span>,
+theta <span class='op'>=</span> <span class='fl'>0.86</span>, ppp <span class='op'>=</span> <span class='fl'>0.2</span>, p0 <span class='op'>=</span> <span class='cn'>NULL</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, delta <span class='op'>=</span> <span class='fl'>0</span>,
+prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span><span class='op'>)</span>
 <span class='op'>}</span>
 
 </div></pre>
