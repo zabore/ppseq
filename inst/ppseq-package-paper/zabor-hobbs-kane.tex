@@ -1,6 +1,7 @@
 % !TeX root = RJwrapper.tex
-\title{ppseq: An R Package for Sequential Predictive Probability Monitoring}
-\author{by Emily C. Zabor, Brian P. Hobbs, Alexander M. Kaizer, and Michael J. Kane}
+\title{ppseq: An R Package for Sequential Predictive Probability
+Monitoring}
+\author{by Emily C. Zabor, Brian P. Hobbs, and Michael J. Kane}
 
 \maketitle
 
@@ -21,7 +22,7 @@ interactive plots and optimized based on efficiency or accuracy.
 }
 
 \hypertarget{introduction}{%
-\subsection{Introduction}\label{introduction}}
+\section{Introduction}\label{introduction}}
 
 In the context of cytotoxic treatments, phase 1 trials in oncology
 traditionally have the primary aim of identifying the maximum tolerated
@@ -81,7 +82,7 @@ for decision making, and we suggest optimization criteria for selecting
 the ideal design.
 
 \hypertarget{predictive-probability-monitoring}{%
-\subsection{Predictive probability
+\section{Predictive probability
 monitoring}\label{predictive-probability-monitoring}}
 
 Consider the setting of a binary outcome, such as tumor response as
@@ -132,7 +133,7 @@ at the end of the trial if we were to continue enrolling to the maximum
 planned sample size, based on the data observed in the trial to date.
 
 \hypertarget{package-overview}{%
-\subsection{Package overview}\label{package-overview}}
+\section{Package overview}\label{package-overview}}
 
 The \pkg{ppseq} package facilitates the design of clinical trials
 utilizing sequential predictive probability monitoring. The main
@@ -164,7 +165,7 @@ print the results summary for each combination of thresholds, filtered
 by an acceptable range of type I error and minimum power, if desired.
 
 \hypertarget{optimization}{%
-\subsubsection{Optimization}\label{optimization}}
+\subsection{Optimization}\label{optimization}}
 
 After obtaining results for the all combinations of evaluated posterior
 and predictive thresholds, the next step is to select the ideal design
@@ -180,51 +181,72 @@ on the type I error and power. The \code{optimize\_design()} function
 will return a list that contains the details of each of the two optimal
 designs.
 
-\hypertarget{visualizations}{%
-\subsubsection{Visualizations}\label{visualizations}}
-
-To assist users in comparing the results of the various design options,
-a \code{plot()} option is also available, that allows creation of static
-plots using the \CRANpkg{ggplot2} package \citep{Wickham2016} or
-interactive plots using the \CRANpkg{plotly} package
-\citep{Sievert2020}. Two plots are produced, one plotting type I error
-by power and indicating the optimal accuracy design, and one plotting
-the average sample size under the null by the average sample size under
-the alternative and indicating the optimal efficiency design. The
-motivation for including an interactive graphics option was the utility
-of the additional information available when hovering over each point.
-Instead of simply eyeballing where points fall along the axes, users can
-see the specific type I error, power, average sample size under the
-null, average sample size under the alternative, the posterior and
-predictive thresholds associated with the design, as well as the
-distance to the upper left point on the plot.
-
 \hypertarget{decision-rules}{%
-\subsubsection{Decision rules}\label{decision-rules}}
+\subsection{Decision rules}\label{decision-rules}}
 
-Finally, to ease the implementation of clinical trials designed with
-sequential predictive probability monitoring, once a design has been
-selected, a table of decision rules can be produced using the
-\code{calc\_decision\_rules()} function. The function takes a vector of
-sample sizes at which interim analyses are to be performed \code{n} as
-well as the maximum total sample size \code{N}, the null value to
-compare to in the one-sample case \code{p0}, the posterior threshold of
-the selected design \code{theta}, the predictive threshold of the
-selected design \code{ppp}, the direction of the alternative hypothesis
-\code{direction}, a vector of the two hyperparameters of the prior beta
-distribution \code{prior}, and the number of posterior samples \code{S}.
-The additional argument \code{delta} can specify the clinically
-meaningful difference between groups in the case of a two-sample trial
-design. The function results in a \code{tibble} with the sample size at
-each interim analysis and the decision point \(r\). The trial would stop
-at a given look if the number of observed responses is \(\leq r\)
-otherwise the trial would continue enrolling if the number of observed
-responses is \(>r\). At the end of the trial when the maximum planned
-sample size is reached, the treatment would be considered promising if
-the number of observed responses is \(>r\).
+To ease the implementation of clinical trials designed with sequential
+predictive probability monitoring, once a design has been selected, a
+table of decision rules can be produced using the
+\code{calc\_decision\_rules()} function. The function takes the sample
+sizes \code{n} at which interim analyses are to be performed as well as
+the maximum total sample size \code{N}, the null value to compare to in
+the one-sample case \code{p0} (set to \code{NULL} in the two-sample
+case), the posterior threshold of the selected design \code{theta}, the
+predictive threshold of the selected design \code{ppp}, the direction of
+the alternative hypothesis \code{direction}, a vector of the two
+hyperparameters of the prior beta distribution \code{prior}, and the
+number of posterior samples \code{S}. The additional argument
+\code{delta} can specify the clinically meaningful difference between
+groups in the case of a two-sample trial design (set to \code{NULL} in
+the one-sample case). The function results in a \code{tibble}. In the
+one-sample case, the \code{tibble} includes a column for the sample size
+\code{n} at each interim analysis, a column for the decision point
+\(r\), and a column for the posterior predictive probability associated
+with that decision \code{ppp}. The trial would stop at a given look if
+the number of observed responses is \(\leq r\) otherwise the trial would
+continue enrolling if the number of observed responses is \(>r\). At the
+end of the trial when the maximum planned sample size is reached, the
+treatment would be considered promising if the number of observed
+responses is \(>r\). In the two-sample case, the \code{tibble} includes
+columns for \code{n0} and \code{n1}, the sample size at each interim
+analysis in the control and experimental arms, respectively, columns for
+\code{r0} and \code{r1}, the number of responses in the control arm and
+experimental arm leading to the decision, respectively,and a column for
+the posterior predictive probability associated with that decision
+\code{ppp}.
+
+\hypertarget{visualizations}{%
+\subsection{Visualizations}\label{visualizations}}
+
+Finally, to assist users in comparing the results of the various design
+options, a \code{plot()} option is available for the results of
+\code{calibrate\_thresholds} that allows creation of static plots using
+the \CRANpkg{ggplot2} package \citep{Wickham2016} or interactive plots
+using the \CRANpkg{plotly} package \citep{Sievert2020}. Two plots are
+produced, one plotting type I error by power and indicating the optimal
+accuracy design, and one plotting the average sample size under the null
+by the average sample size under the alternative and indicating the
+optimal efficiency design. The motivation for including an interactive
+graphics option was the utility of the additional information available
+when hovering over each point. Instead of simply eyeballing where points
+fall along the axes, users can see the specific type I error, power,
+average sample size under the null, average sample size under the
+alternative, the posterior and predictive thresholds associated with the
+design, as well as the distance to the upper left point on the plot. A
+\code{plot()} option is also available for the results of
+\code{calc\_decision\_rules}. In the one-sample case it produces a
+single plot showing the sample size at each interim analysis on the
+x-axis and the possible number of responses at each interim analysis on
+the y-axis. In the two-sample case a grid of plots is produced, with one
+plot for each interim analysis. The x-axis shows the number of possible
+responses in the control group and the y-axis shows the number of
+possible responses in the experimental group. In both cases, the boxes
+are colored green for a ``proceed'' decision and red for a ``stop''
+decision for each combination and the hover box produced by
+\CRANpkg{plotly} provides the details.
 
 \hypertarget{case-study}{%
-\subsection{Case study}\label{case-study}}
+\section{Case study}\label{case-study}}
 
 To demonstrate the functionality of the \pkg{ppseq} package, we focus on
 a re-design of a dose-expansion cohort for the study of atezolizumab in
@@ -406,8 +428,8 @@ plot(
 
 \begin{Schunk}
 
-\includegraphics{zabor-ppseq_files/figure-latex/unnamed-chunk-7-1} 
-\includegraphics{zabor-ppseq_files/figure-latex/unnamed-chunk-7-2} \end{Schunk}
+\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-7-1} 
+\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-7-2} \end{Schunk}
 
 In this case we may choose to use the optimal efficiency design, which
 has the desirable trait of a very small average sample size under the
@@ -452,33 +474,40 @@ one_sample_decision_tbl <-
 one_sample_decision_tbl
 \end{Sinput}
 \begin{Soutput}
-#> # A tibble: 19 x 2
-#>        n     r
-#>    <dbl> <int>
-#>  1     5    NA
-#>  2    10     0
-#>  3    15     0
-#>  4    20     1
-#>  5    25     1
-#>  6    30     2
-#>  7    35     2
-#>  8    40     3
-#>  9    45     4
-#> 10    50     4
-#> 11    55     5
-#> 12    60     6
-#> 13    65     7
-#> 14    70     8
-#> 15    75     8
-#> 16    80     9
-#> 17    85    10
-#> 18    90    11
-#> 19    95    13
+#> # A tibble: 19 x 3
+#>        n     r     ppp
+#>    <dbl> <int>   <dbl>
+#>  1     5    NA NA     
+#>  2    10     0  0.0634
+#>  3    15     0  0.022 
+#>  4    20     1  0.0844
+#>  5    25     1  0.0326
+#>  6    30     2  0.0702
+#>  7    35     2  0.0288
+#>  8    40     3  0.0536
+#>  9    45     4  0.0708
+#> 10    50     4  0.0344
+#> 11    55     5  0.0478
+#> 12    60     6  0.0622
+#> 13    65     7  0.0888
+#> 14    70     8  0.095 
+#> 15    75     8  0.033 
+#> 16    80     9  0.0326
+#> 17    85    10  0.0346
+#> 18    90    11  0.0162
+#> 19    95    13  0
 \end{Soutput}
 \end{Schunk}
 
+\begin{Schunk}
+\begin{Sinput}
+plot(one_sample_decision_tbl)
+\end{Sinput}
+
+\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-10-1} \end{Schunk}
+
 \hypertarget{summary}{%
-\subsection{Summary}\label{summary}}
+\section{Summary}\label{summary}}
 
 With the focus of early stage clinical trial research in oncology
 shifting away from the study of cytotoxic treatments and toward
@@ -497,7 +526,7 @@ options are provided to ease comparison of the resulting design options.
 Once an ideal design is selected, a table of decision rules can be
 obtained to make trial conduct simple and straightforward.
 
-\bibliography{zabor-ppseq.bib}
+\bibliography{zabor-hobbs-kane.bib}
 
 \address{%
 Emily C. Zabor\\
@@ -521,17 +550,6 @@ true\\ Austin, TX 78712\\
 }
 
 \address{%
-Alexander M. Kaizer\\
-Department of Biostatistics \& Informatics, University of
-Colorado-Anschutz Medical Campus,\\%
-13001 E. 17th Place Campus Box B119\\ Aurora, CO 80045\\
-%
-%
-\textit{ORCiD: \href{https://orcid.org/0000-0003-2334-5514}{0000-0003-2334-5514}}\\%
-\href{mailto:alex.kaizer@cuanschutz.edu}{\nolinkurl{alex.kaizer@cuanschutz.edu}}%
-}
-
-\address{%
 Michael J. Kane\\
 Department of Biostatistics, Yale University\\%
 22 Mill Pond Drive\\ Guilford, CT 06437\\
@@ -540,4 +558,3 @@ Department of Biostatistics, Yale University\\%
 \textit{ORCiD: \href{https://orcid.org/0000-0003-1899-6662}{0000-0003-1899-6662}}\\%
 \href{mailto:michael.kane@yale.edu}{\nolinkurl{michael.kane@yale.edu}}%
 }
-

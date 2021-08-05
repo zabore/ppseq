@@ -35,10 +35,18 @@
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
 #'
-#' @return Returns a tibble with n at each look and r. Stop the trial at that
-#' look if the number of observed responses is <=r. At the end of the trial,
-#' the treatment is considered promising if the number of observed responses 
-#' is >r.
+#' @return In the one-sample case, returns a tibble with n at each look, r at
+#' each look, and ppp, the associated posterior predictive probability. 
+#' Stop the trial at that look if the number of observed responses is <=r. 
+#' At the end of the trial, the treatment is considered promising if the number 
+#' of observed responses is >r. 
+#' In the two-sample case, returns a tibble with n0 and n1, the number 
+#' enrolled subjects in the control and experimental arms at each look, 
+#' respectively, r0 and r1, the number of possible responses in the control and 
+#' experimental arms at each look, respectively, and ppp, the associated 
+#' posterior predictive probability. Any NA value in either table represents an
+#' interim look where there is no number of responses that would lead to 
+#' stopping the trial.
 #'
 #' @examples
 #' \dontrun{

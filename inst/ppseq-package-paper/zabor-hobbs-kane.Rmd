@@ -1,6 +1,9 @@
 ---
 title: "ppseq: An R Package for Sequential Predictive Probability Monitoring"
-author:
+abstract: >
+  Clinical trials in oncology are making increasing use of larger phase 1 and phase 2 sample sizes with the addition of baskets for different disease sub-types or multiple dosing groups, expansion cohorts to further study safety and obtain preliminary efficacy information, or randomization to further define efficacy or compare across doses, among other design elements. With the enlarged sample sizes come increasing ethical concerns regarding patients who enroll in clinical trials, and the need for rigorous statistical designs to ensure that trials can stop early for futility while maintaining traditional control of type I error and power. The R package \pkg{ppseq} provides a framework for designing early phase clinical trials using sequential monitoring based on the Bayesian predictive probability. Trial designs can be compared using interactive plots and optimized based on efficiency or accuracy.
+draft: true
+author:  
   # see ?rjournal_article for more information
   - name: Emily C. Zabor
     affiliation: Department of Quantitative Health Sciences & Taussig Cancer Institute, Cleveland Clinic
@@ -17,13 +20,6 @@ author:
     address:
     - 1501 Red River Street MC: Z0100
     - Austin, TX 78712
-  - name: Alexander M. Kaizer
-    email: alex.kaizer@cuanschutz.edu
-    orcid: 0000-0003-2334-5514
-    affiliation: Department of Biostatistics & Informatics, University of Colorado-Anschutz Medical Campus,  
-    address:
-    - 13001 E. 17th Place Campus Box B119
-    - Aurora, CO 80045
   - name: Michael J. Kane
     email: michael.kane@yale.edu
     orcid: 0000-0003-1899-6662
@@ -31,19 +27,22 @@ author:
     address:
     - 22 Mill Pond Drive
     - Guilford, CT 06437
-abstract: >
-  Clinical trials in oncology are making increasing use of larger phase 1 and phase 2 sample sizes with the addition of baskets for different disease sub-types or multiple dosing groups, expansion cohorts to further study safety and obtain preliminary efficacy information, or randomization to further define efficacy or compare across doses, among other design elements. With the enlarged sample sizes come increasing ethical concerns regarding patients who enroll in clinical trials, and the need for rigorous statistical designs to ensure that trials can stop early for futility while maintaining traditional control of type I error and power. The R package \pkg{ppseq} provides a framework for designing early phase clinical trials using sequential monitoring based on the Bayesian predictive probability. Trial designs can be compared using interactive plots and optimized based on efficiency or accuracy.
-preamble: |
-  % Any extra LaTeX you need in the preamble
-  
-# per R journal requirement, the bib filename should be the same as the output 
-# tex file. Don't forget to rename the bib file and change this example value.
-bibliography: zabor-ppseq.bib
-
-output: rticles::rjournal_article
+date: "`r Sys.Date()`"
+creative_commons: CC BY
+output: 
+  - rjtools::rjournal_pdf_article
+  - rjtools::rjournal_web_article
+bibliography: zabor-hobbs-kane.bib
+always_allow_html: true
 ---
 
-## Introduction
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(plotly)
+library(ggplot2)
+```
+
+# Introduction
 
 In the context of cytotoxic treatments, phase 1 trials in oncology traditionally have the primary aim of identifying the maximum tolerated dose (MTD), defined as the highest dose that still maintains a certain pre-specified rate of toxicity, most commonly 30\%, in a dose-escalation phase. Designs for dose-escalation trials include the rule-based 3+3 design and the model-based continual reassessment method, among others. But with increasing study focused on non-cytotoxic treatments, such as immunotherapies, the MTD either may not exist or may not be relevant, and toxicities may either develop much later or even be chronic, making these treatments difficult to study with traditional dose-escalation designs. As a result, it is becoming increasingly common to include dose-expansion cohorts, in which additional patients are enrolled in phase 1 after the dose-escalation phase is complete. In this setup, the dose-escalation phase is considered phase 1a and used to assess the initial safety of multiple doses, then the dose-expansion phase is considered phase 1b and can have a variety of aims including to further refine the safety of one or more doses, to assess preliminary efficacy, to explore the treatment in various disease-specific subtypes that all share a common biomarker that the treatment is targeting, or to further characterize the pharmacokinetics and/or pharmacodynamics. The use of dose-expansion cohorts increased from 12\% in 2006 to 38\% in 2011 [@Manji2013] and trials with dose-expansion cohorts led to higher response rates and more frequent success in phase 2 trials [@Bugano2017].
 
@@ -52,31 +51,31 @@ But dose-expansion cohorts are not always planned in advance, and therefore may 
 Bayesian sequential predictive probability monitoring provides a natural framework for early phase oncology trial design, allowing flexibility to stop early for futility or safety concerns while also maintaining traditional levels of power and control of type I error, and has been proposed as an approach to interim monitoring in clinical trials previously [@Dmitrienko2006; Lee2008; Saville2014]. However, in order to be useful to investigators designing such trials, software must be made available that streamlines design. This paper introduces the \pkg{ppseq} package for the R software language [@RCT2020], which provides functions to design one-sample and two-sample early phase clinical trials using sequential predictive probability monitoring. Interactive plots produced using \CRANpkg{ggplot2} and \CRANpkg{plotly} assist investigators in comparing designs based on different thresholds for decision making, and we suggest optimization criteria for selecting the ideal design.
 
 
-## Predictive probability monitoring
+# Predictive probability monitoring
 
 Consider the setting of a binary outcome, such as tumor response as measured by the RECIST criteria in the setting of a study in patients with solid tumors, where each patient, denoted by $i$, enrolled in the trial either has a response such that $x_i = 1$ or does not have a response such that $x_i = 0$. Then $X = \sum_{i=1}^n x_i$ represents the number of responses out of $n$ currently observed patients up to a maximum of $N$ total enrolled patients. Let $p$ represent the probability of response, where $p_0$ represents the null response rate under no treatment or the standard of care treatment and $p_1$ represents the alternative response rate under the experimental treatment. Most dose-expansion studies with an efficacy aim will wish to test the null hypothesis $H_0: p \leq p_0$ versus the alternative hypothesis $H_1: p \geq p_1$. 
 
 The Bayesian paradigm of statistics is founded on Bayes rule, which is a mathematical theory that specifies how to combine the prior distributions that define prior beliefs about parameters, such as the response rate $p$, with the observed data, such as the total number of responses $X$, yielding a posterior distribution. Here the prior distribution of the response rate $\pi(p)$ has a beta distribution $Beta(a_0, b_0)$ and our data $X$ have a binomial distribution $bin(n, p)$. Combining the likelihood function for the observed data $L_x(p) \propto p^x (1-p)^{n-x}$ with the prior, we obtain the posterior distribution of the response rate, which follows the beta distribution $p|x \sim Beta(a_0 + x, b_0 + n - x)$. Using the posterior probability, which represents the probability of success based only on the data accrued so far, we would declare a treatment efficacious if $\Pr(p>p_0 | X) > \theta$, where $\theta$ represents a pre-specified posterior decision threshold. The posterior predictive distribution of the number of future responses $X^*$ in the remaining $n^*=N-n$ future patients follows a beta-binomial distribution $Beta-binomial(n^*, a_0 + x, b_0 + n - x)$. Then the posterior predictive probability (PPP), is calculated as $PPP = \sum_{{x^*}=0}^{n^*} \Pr(X^*=x^*|x) \times I(\Pr(p>p_0 | X, X^*=x^*) > \theta)$. The posterior predictive probability represents the probability that the treatment will be declared efficacious at the end of the trial when full enrollment is reached. We would stop the trial early for futility if the posterior predictive probability dropped below a pre-specified threshold $\theta^*$, i.e. $PPP<\theta^*$. Predictive probability thresholds closer to 0 lead to less frequent stopping for futility whereas thresholds near 1 lead to frequent stopping unless there is almost certain probability of success. Predictive probability provides an intuitive interim monitoring strategy for clinical trials that tells the investigator what the chances are of declaring the treatment efficacious at the end of the trial if we were to continue enrolling to the maximum planned sample size, based on the data observed in the trial to date.
 
 
-## Package overview
+# Package overview
 
 The \pkg{ppseq} package facilitates the design of clinical trials utilizing sequential predictive probability monitoring. The main challenge in designing such a trial is joint calibration of the posterior probability and posterior predictive probability thresholds to be used in the trial in order to maintain the desired level of power and type I error. The \code{calibrate\_thresholds()} function will evaluate a grid of posterior and predictive thresholds provided by the user as vector inputs through the argument \code{pp\_threshold} for posterior thresholds and the argument \code{ppp\_threshold} for predictive thresholds. Other required arguments include the null response rate \code{p\_null}, the alternative response rate \code{p\_alt}, a vector of sample sizes at which interim analyses are to be performed \code{n} as well as the maximum total sample size \code{N}, the direction of the alternative hypothesis \code{direction}, a vector of the two hyperparameters of the prior beta distribution \code{prior}, and the number of posterior samples \code{S} and the number of simulated trial datasets \code{nsim}. The additional argument \code{delta} can specify the clinically meaningful difference between groups in the case of a two-sample trial design. The function returns a list, the first element of which is a \code{tibble} containing the posterior threshold, predictive threshold, the mean sample size under the null and the alternative, the proportion of positive trials under the null and alternative, and the proportion of trials stopped early under the null and alternative. The proportion of positive trials under the null represents the type I error and the proportion of positive trials under the alternative represents the power. The \code{print()} option will print the results summary for each combination of thresholds, filtered by an acceptable range of type I error and minimum power, if desired.
 
-### Optimization
+## Optimization
 
 After obtaining results for the all combinations of evaluated posterior and predictive thresholds, the next step is to select the ideal design from among the various options. The \pkg{ppseq} package introduces two optimization criteria to assist users in making a selection. The first, called the "optimal accuracy" design, identifies the design that minimizes the Euclidean distance to the top left point on a plot of the type I error by the power. The second, called the "optimal efficiency" design, identifies the design that minimizes the Euclidean distance to the top left point on a plot of the average sample size under the null by the average sample size under the alternative, subject to constraints on the type I error and power. The \code{optimize\_design()} function will return a list that contains the details of each of the two optimal designs.
 
-### Visualizations
+## Decision rules
 
-To assist users in comparing the results of the various design options, a \code{plot()} option is also available, that allows creation of static plots using the \CRANpkg{ggplot2} package [@Wickham2016] or interactive plots using the \CRANpkg{plotly} package [@Sievert2020]. Two plots are produced, one plotting type I error by power and indicating the optimal accuracy design, and one plotting the average sample size under the null by the average sample size under the alternative and indicating the optimal efficiency design. The motivation for including an interactive graphics option was the utility of the additional information available when hovering over each point. Instead of simply eyeballing where points fall along the axes, users can see the specific type I error, power, average sample size under the null, average sample size under the alternative, the posterior and predictive thresholds associated with the design, as well as the distance to the upper left point on the plot.
+To ease the implementation of clinical trials designed with sequential predictive probability monitoring, once a design has been selected, a table of decision rules can be produced using the \code{calc\_decision\_rules()} function. The function takes the sample sizes \code{n} at which interim analyses are to be performed as well as the maximum total sample size \code{N}, the null value to compare to in the one-sample case \code{p0} (set to \code{NULL} in the two-sample case), the posterior threshold of the selected design \code{theta}, the predictive threshold of the selected design \code{ppp}, the direction of the alternative hypothesis \code{direction}, a vector of the two hyperparameters of the prior beta distribution \code{prior}, and the number of posterior samples \code{S}. The additional argument \code{delta} can specify the clinically meaningful difference between groups in the case of a two-sample trial design (set to \code{NULL} in the one-sample case). The function results in a \code{tibble}. In the one-sample case, the \code{tibble} includes a column for the sample size \code{n} at each interim analysis, a column for the decision point $r$, and a column for the posterior predictive probability associated with that decision \code{ppp}. The trial would stop at a given look if the number of observed responses is $\leq r$ otherwise the trial would continue enrolling if the number of observed responses is $>r$. At the end of the trial when the maximum planned sample size is reached, the treatment would be considered promising if the number of observed responses is $>r$. In the two-sample case, the \code{tibble} includes columns for \code{n0} and \code{n1}, the sample size at each interim analysis in the control and experimental arms, respectively, columns for \code{r0} and \code{r1}, the number of responses in the control arm and experimental arm leading to the decision, respectively,and a column for the posterior predictive probability associated with that decision \code{ppp}.
 
-### Decision rules
+## Visualizations
 
-Finally, to ease the implementation of clinical trials designed with sequential predictive probability monitoring, once a design has been selected, a table of decision rules can be produced using the \code{calc\_decision\_rules()} function. The function takes a vector of sample sizes at which interim analyses are to be performed \code{n} as well as the maximum total sample size \code{N}, the null value to compare to in the one-sample case \code{p0}, the posterior threshold of the selected design \code{theta}, the predictive threshold of the selected design \code{ppp}, the direction of the alternative hypothesis \code{direction}, a vector of the two hyperparameters of the prior beta distribution \code{prior}, and the number of posterior samples \code{S}. The additional argument \code{delta} can specify the clinically meaningful difference between groups in the case of a two-sample trial design. The function results in a \code{tibble} with the sample size at each interim analysis and the decision point $r$. The trial would stop at a given look if the number of observed responses is $\leq r$ otherwise the trial would continue enrolling if the number of observed responses is $>r$. At the end of the trial when the maximum planned sample size is reached, the treatment would be considered promising if the number of observed responses is $>r$.
+Finally, to assist users in comparing the results of the various design options, a \code{plot()} option is available for the results of \code{calibrate\_thresholds} that allows creation of static plots using the \CRANpkg{ggplot2} package [@Wickham2016] or interactive plots using the \CRANpkg{plotly} package [@Sievert2020]. Two plots are produced, one plotting type I error by power and indicating the optimal accuracy design, and one plotting the average sample size under the null by the average sample size under the alternative and indicating the optimal efficiency design. The motivation for including an interactive graphics option was the utility of the additional information available when hovering over each point. Instead of simply eyeballing where points fall along the axes, users can see the specific type I error, power, average sample size under the null, average sample size under the alternative, the posterior and predictive thresholds associated with the design, as well as the distance to the upper left point on the plot. A \code{plot()} option is also available for the results of \code{calc\_decision\_rules}. In the one-sample case it produces a single plot showing the sample size at each interim analysis on the x-axis and the possible number of responses at each interim analysis on the y-axis. In the two-sample case a grid of plots is produced, with one plot for each interim analysis. The x-axis shows the number of possible responses in the control group and the y-axis shows the number of possible responses in the experimental group. In both cases, the boxes are colored green for a "proceed" decision and red for a "stop" decision for each combination and the hover box produced by \CRANpkg{plotly} provides the details.
 
 
-## Case study
+# Case study
 
 To demonstrate the functionality of the \pkg{ppseq} package, we focus on a re-design of a dose-expansion cohort for the study of atezolizumab in metastatic urothelial carcinoma patients (mUC) using sequential predictive probability monitoring. Atezolizumab is an anti-PD-L1 treatment that was originally tested in the phase 1 setting in a basket trial across a variety of cancer sites harboring PD-L1 mutations. The atezolizumab expansion study in mUC had the primary aim of further evaluating safety, pharmacodynamics and pharmacokinetics and therefore was not designed to meet any specific criteria for type I error or power. An expansion cohort in mUC was not part of the original protocol design, but was rather added later through a protocol amendment. The expansion cohort in mUC ultimately enrolled a total of 95 participants [@Powles2014]. Other expansion cohorts that were included in the original protocol, including in renal-cell carcinoma, non-small-cell lung cancer, and melanoma, were planned to have a sample size of 40. These pre-planned expansion cohorts were designed with a single interim analysis for futility that would stop the trial if 0 responses were seen in the first 14 patients enrolled. According to the trial protocol, this futility rule is associated with at most a 4.4\% chance of observing no responses in 14 patients if the true response rate is 20\% or higher. The protocol also states the widths of the 90\% confidence intervals for a sample size of 40 if the observed response rate is 30\%. There was no stated decision rule for efficacy since efficacy was not an explicit aim of the expansion cohorts. In the re-design we assume a null, or unacceptable, response rate of 0.1 and an alternative, or acceptable, response rate of 0.2. We plan a study with up to a total of 95 participants. In our sequential predictive probability design we will check for futility after every 5 patients are enrolled. We consider posterior thresholds of 0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, and 1, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2.
 
@@ -183,9 +182,12 @@ one_sample_decision_tbl <-
 one_sample_decision_tbl
 ```
 
+```{r message = FALSE, fig.height = 10, fig.width = 8}
+plot(one_sample_decision_tbl)
+```
 
-## Summary
+
+
+# Summary
 
 With the focus of early stage clinical trial research in oncology shifting away from the study of cytotoxic treatments and toward immunotherapies and other non-cytotoxic treatments, new approaches to clinical trial design are needed that move beyond the traditional search for the maximum tolerated dose. Bayesian sequential predictive probability monitoring provides a natural and flexible way to expand the number of patients studied in phase 1 or to design phase 2 trials that allow for efficient early stopping for futility while maintaining control of type I error and power. The \pkg{ppseq} package implements functionality to consider a range of posterior and predictive thresholds for a given study design and identify the optimal design based on accuracy (i.e. type I error and power) or efficiency (i.e. average sample sizes under the null and alternative). Interactive visualization options are provided to ease comparison of the resulting design options. Once an ideal design is selected, a table of decision rules can be obtained to make trial conduct simple and straightforward.
-
-

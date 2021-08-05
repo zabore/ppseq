@@ -1,3 +1,9 @@
+## ----setup, include=FALSE-----------------------------------------------------
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(plotly)
+library(ggplot2)
+
+
 ## ----eval = FALSE-------------------------------------------------------------
 #> install.packages("ppseq")
 
@@ -87,4 +93,8 @@ p[[2]]
 
 ## -----------------------------------------------------------------------------
 one_sample_decision_tbl
+
+
+## ----message = FALSE, fig.height = 10, fig.width = 8--------------------------
+plot(one_sample_decision_tbl)
 
