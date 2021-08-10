@@ -4,11 +4,13 @@
 \alias{plot.calc_decision_rules}
 \title{Plot method for \code{calc_decision_rules} objects}
 \usage{
-\method{plot}{calc_decision_rules}(x, ...)
+\method{plot}{calc_decision_rules}(x, plotly = TRUE, ...)
 }
 \arguments{
 \item{x}{an object of class 'calc_decision_rules', usually returned by the
 \code{calc_decision_rules} function}
+
+\item{plotly}{should the plot be rendered in plotly? (Default is TRUE)}
 
 \item{...}{unused}
 }

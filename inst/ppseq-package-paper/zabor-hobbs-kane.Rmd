@@ -25,8 +25,8 @@ author:
     orcid: 0000-0003-1899-6662
     affiliation: Department of Biostatistics, Yale University
     address:
-    - 22 Mill Pond Drive
-    - Guilford, CT 06437
+    - 60 College Street
+    - New Haven, CT 06511
 date: "`r Sys.Date()`"
 creative_commons: CC BY
 output: 

@@ -93,8 +93,10 @@ print(one_sample_cal_tbl,
 ```
 
 ```{r echo = FALSE}
-gt::gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.01, 
-                     prop_pos_null <= 0.2, prop_pos_alt >= 0.7))
+library(gt)
+
+gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.01, 
+                 prop_pos_null <= 0.2, prop_pos_alt >= 0.7))
 ```
 
 We find that 35 of the 76 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.

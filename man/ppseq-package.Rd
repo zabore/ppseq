@@ -14,7 +14,7 @@ This package provides functions to design clinical trials using sequential predi
 Authors:
 \itemize{
   \item Brian P. Hobbs
-  \item Michael J. Kane
+  \item Michael J. Kane \email{michael.kane@yale.edu} (\href{https://orcid.org/0000-0003-1899-6662}{ORCID})
 }
 
 }

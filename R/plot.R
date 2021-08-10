@@ -21,6 +21,7 @@
 #' @importFrom ggplot2 ggplot aes geom_point xlim ylim labs 
 #'                     scale_color_viridis_c theme_bw theme
 #' @importFrom plotly ggplotly
+#' @import patchwork
 #' @export
 plot.calibrate_thresholds <- function(x,
                                       type1_range = c(0.05, 0.1),
@@ -208,6 +209,7 @@ plot.calibrate_thresholds <- function(x,
 #' 
 #' @param x an object of class 'calc_decision_rules', usually returned by the
 #' \code{calc_decision_rules} function
+#' @param plotly should the plot be rendered in plotly? (Default is TRUE)
 #' @param ... unused
 #' 
 #' @importFrom dplyr mutate filter select rename ungroup group_by 
@@ -221,7 +223,7 @@ plot.calibrate_thresholds <- function(x,
 #' @importFrom plotly ggplotly
 #' 
 #' @export
-plot.calc_decision_rules <- function(x, ...) {
+plot.calc_decision_rules <- function(x, plotly = TRUE, ...) {
   
   if (any(class(x) == "calc_decision_rules") == FALSE)
     stop("x must be class 'calc_decision_rules', usually an object returned from a call to the function ppseq::calc_decision_rules()")
@@ -342,7 +344,9 @@ plot.calc_decision_rules <- function(x, ...) {
       theme_bw() +
       xlab("N at interim analysis")
   }
-  
-  ggplotly(p)
+
+  if (plotly) {  
+    ggplotly(p)
+  }
   
 }
