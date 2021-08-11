@@ -7,13 +7,13 @@
 #' @param x an object of class 'calibrate_thresholds', usually returned by the
 #' \code{calibrate_thresholds} function
 #' @param type1_range a vector specifying the minimum and maximum acceptable
-#' type I error. Specify NULL to return the full range of resulting type I
+#' type I error. Specify c(0, 1) to return the full range of resulting type I
 #' error. Defaults to c(0.05, 0.1)
 #' @param minimum_power a numeric between 0 and 1 specifying the minimum
-#' acceptable power. Specify NULL to return the full range of resulting power.
+#' acceptable power. Specify 0 to return the full range of resulting power.
 #' Defaults to 0.8.
 #' @param plotly a logical indicator of whether you want the plots returned as
-#' interactive plotly plots or non-interactive ggplots
+#' interactive plotly plots or non-interactive ggplots. Defaults to FALSE.
 #' @param ... unused
 #'
 #' @importFrom dplyr rename mutate filter ungroup slice group_by arrange
@@ -38,10 +38,10 @@ plot.calibrate_thresholds <- function(x,
     stop("minimum_power must be a numeric value of length 1 defining the minimum acceptable power, or can be set equal to NULL to return all values of power")
 
   if (!is.numeric(minimum_power) & !is.null(minimum_power))
-    stop("minimum_power must be a numeric value of length 1 or NULL")
+    stop("minimum_power must be a numeric value of length 1")
 
   if (!is.numeric(type1_range) & !is.null(type1_range))
-    stop("type1_range must be a numeric vector of length 2 or NULL")
+    stop("type1_range must be a numeric vector of length 2")
 
   if (length(x$inputs$p_null) == 2) {
     plot_x <-
@@ -68,8 +68,8 @@ plot.calibrate_thresholds <- function(x,
         Power = prop_pos_alt,
         `Average N under the null` = mean_n_null,
         `Average N under the alternative` = mean_n_alt,
-        `Distance to min(N under null) and max(N under alt)` = n_dist_metric,
-        `Distance to (0, 1)` = ab_dist_metric
+        `Distance to optimal efficiency` = n_dist_metric,
+        `Distance to optimal accuracy` = ab_dist_metric
       )
   } else if (length(x$inputs$p_null) == 1) {
     plot_x <-

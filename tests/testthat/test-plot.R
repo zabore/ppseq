@@ -38,29 +38,29 @@ test_that(
 )
 
 # Emily, can you provide an example where this works and plots?
-#test_that(
-#  "two-sample calibrate threshold plotting",
-#  {
-#    set.seed(123)
-#    two_sample_cal_tbl <- 
-#      calibrate_thresholds(
-#          p_null = c(0.1, 0.1),
-#          p_alt = c(0.5, 0.6),
-#          n = cbind(c(50, 75), c(50, 75)),
-#          N = c(100, 100),
-#          pp_threshold = 0.4,
-#          ppp_threshold = 0.2,
-#          direction = "greater",
-#          delta = 0,
-#          prior = c(0.5, 0.5),
-#          S = 200,
-#          nsim = 200
-#      )
-#
-#    expect_doppelganger('plot_two_sample_cal_tbl', plot(two_sample_cal_tbl))
-#
-#  }
-#)
+test_that(
+ "two-sample calibrate threshold plotting",
+ {
+   set.seed(123)
+   two_sample_cal_tbl <-
+     calibrate_thresholds(
+         p_null = c(0.1, 0.1), 
+         p_alt = c(0.1, 0.5),
+         n = cbind(c(10, 25), c(10, 25)), 
+         N = c(25, 25), 
+         pp_threshold = 0.9,
+         ppp_threshold = 0.2,
+         direction = "greater", 
+         delta = 0,
+         prior = c(0.5, 0.5), 
+         S = 200, 
+         nsim = 100
+       )
+
+   expect_doppelganger('plot_two_sample_cal_tbl', plot(two_sample_cal_tbl))
+
+ }
+)
 
 test_that(
   'plot one-sample decision rules works',

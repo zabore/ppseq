@@ -11,15 +11,15 @@
 \code{calibrate_thresholds} function}
 
 \item{type1_range}{a vector specifying the minimum and maximum acceptable
-type I error. Specify NULL to return the full range of resulting type I
+type I error. Specify c(0, 1) to return the full range of resulting type I
 error. Defaults to c(0.05, 0.1)}
 
 \item{minimum_power}{a numeric between 0 and 1 specifying the minimum
-acceptable power. Specify NULL to return the full range of resulting power.
+acceptable power. Specify 0 to return the full range of resulting power.
 Defaults to 0.8.}
 
 \item{plotly}{a logical indicator of whether you want the plots returned as
-interactive plotly plots or non-interactive ggplots}
+interactive plotly plots or non-interactive ggplots. Defaults to FALSE.}
 
 \item{...}{unused}
 }
