@@ -4,19 +4,19 @@
 \alias{print.calibrate_thresholds}
 \title{Print method for \code{calibrate_thresholds} objects}
 \usage{
-\method{print}{calibrate_thresholds}(x, type1_range = c(0.05, 0.1), minimum_power = 0.8, ...)
+\method{print}{calibrate_thresholds}(x, type1_range = c(0, 1), minimum_power = 0, ...)
 }
 \arguments{
 \item{x}{an object of class 'calibrate_thresholds', usually returned by the
 \code{calibrate_thresholds} function}
 
 \item{type1_range}{a vector specifying the minimum and maximum acceptable
-type I error. Specify NULL to return the full range of resulting type I
-error. Defaults to c(0.05, 0.1)}
+type I error. Specify c(0, 1) to return the full range of resulting type I
+error. Defaults to c(0, 1)}
 
 \item{minimum_power}{a numeric between 0 and 1 specifying the minimum
-acceptable power. Specify NULL to return the full range of resulting power.
-Defaults to 0.8.}
+acceptable power. Specify 0 to return the full range of resulting power.
+Defaults to 0.}
 
 \item{...}{ignored}
 }

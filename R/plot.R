@@ -8,10 +8,10 @@
 #' \code{calibrate_thresholds} function
 #' @param type1_range a vector specifying the minimum and maximum acceptable
 #' type I error. Specify c(0, 1) to return the full range of resulting type I
-#' error. Defaults to c(0.05, 0.1)
+#' error. Defaults to c(0, 1)
 #' @param minimum_power a numeric between 0 and 1 specifying the minimum
 #' acceptable power. Specify 0 to return the full range of resulting power.
-#' Defaults to 0.8.
+#' Defaults to 0.
 #' @param plotly a logical indicator of whether you want the plots returned as
 #' interactive plotly plots or non-interactive ggplots. Defaults to FALSE.
 #' @param ... unused
@@ -24,8 +24,8 @@
 #' @import patchwork
 #' @export
 plot.calibrate_thresholds <- function(x,
-                                      type1_range = c(0.05, 0.1),
-                                      minimum_power = 0.8,
+                                      type1_range = c(0, 1),
+                                      minimum_power = 0,
                                       plotly = FALSE,
                                       ...) {
   if (any(class(x) == "calibrate_thresholds") == FALSE)

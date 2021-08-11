@@ -14,27 +14,6 @@ cal_tbl <- calibrate_thresholds(
 )
 
 test_that(
-  "print calibrate thresh NULL, NULL works both NULL",
-  {
-    expect_snapshot(print(cal_tbl, type1_range = NULL, minimum_power = NULL))
-  }
-)
-
-test_that(
-  "print calibrate thresh minimum_power == NULL works",
-  {
-    expect_snapshot(print.calibrate_thresholds(cal_tbl, minimum_power = NULL))
-  }
-)
-
-test_that(
-  "print calibrate thresh type1_range == NULL works",
-  {
-    expect_snapshot(print.calibrate_thresholds(cal_tbl, type1_range = NULL))
-  }
-)
-
-test_that(
   "print calibrate thresh works",
   {
     expect_snapshot(print.calibrate_thresholds(cal_tbl))
@@ -43,19 +22,19 @@ test_that(
 
 
 test_that("errors when expected", {
-  expect_error(print(cal_tbl, type1_range = 0.1, minimum_power = NULL), "*")
-  expect_error(print(cal_tbl, type1_range = NULL, minimum_power = c(0.7, 0.8)), 
+  expect_error(print(cal_tbl, type1_range = 0.1, minimum_power = 0), "*")
+  expect_error(print(cal_tbl, type1_range = c(0, 1), minimum_power = c(0.7, 0.8)), 
                "*")
-  expect_error(print(cal_tbl, type1_range = NULL, minimum_power = "A"), "*")
-  expect_error(print(cal_tbl, type1_range = c("A", "B"), minimum_power = NULL), 
+  expect_error(print(cal_tbl, type1_range = c(0, 1), minimum_power = "A"), "*")
+  expect_error(print(cal_tbl, type1_range = c("A", "B"), minimum_power = 0), 
                "*")
-  expect_error(print(cal_tbl, type1_range = NULL, minimum_power = 2), "*")
-  expect_error(print(cal_tbl, type1_range = c(-0.1, 0.1), minimum_power = NULL), 
+  expect_error(print(cal_tbl, type1_range = c(0, 1), minimum_power = 2), "*")
+  expect_error(print(cal_tbl, type1_range = c(-0.1, 0.1), minimum_power = 0), 
                "*")
-  expect_error(print(cal_tbl, type1_range = c(1.2, 0.1), minimum_power = NULL), 
+  expect_error(print(cal_tbl, type1_range = c(1.2, 0.1), minimum_power = 0), 
                "*")
-  expect_error(print(cal_tbl, type1_range = c(0.05, -0.1), minimum_power = NULL), 
+  expect_error(print(cal_tbl, type1_range = c(0.05, -0.1), minimum_power = 0), 
                "*")
-  expect_error(print(cal_tbl, type1_range = c(0.05, 1.2), minimum_power = NULL), 
+  expect_error(print(cal_tbl, type1_range = c(0.05, 1.2), minimum_power = 0), 
                "*")
 })

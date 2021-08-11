@@ -436,9 +436,11 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
   # create other objects to return
   x$call_list <- list(calibrate_thresholds = match.call())
   x$inputs <- calibrate_thresholds_inputs
-
-  # assign a custom class for S3 plotting methods
+  
+  # assign a custom class for S3 plotting and printing methods
   class(x) <- c("calibrate_thresholds", class(x))
+  
   x
+  
 }
 
