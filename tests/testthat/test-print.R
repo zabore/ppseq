@@ -1,7 +1,7 @@
 set.seed(123)
 cal_tbl <- calibrate_thresholds(
   p_null = 0.1, 
-  p_alt = 0.3,
+  p_alt = 0.4,
   n = c(5, 25), 
   N = 25, 
   pp_threshold = 0.9,
@@ -10,16 +10,34 @@ cal_tbl <- calibrate_thresholds(
   delta = NULL,
   prior = c(0.5, 0.5), 
   S = 200, 
-  nsim = 100
+  nsim = 400
 )
 
 test_that(
-  "print works",
+  "print calibrate thresh NULL, NULL works both NULL",
   {
     expect_snapshot(print(cal_tbl, type1_range = NULL, minimum_power = NULL))
-    expect_snapshot(print(cal_tbl, minimum_power = NULL))
-    expect_snapshot(print(cal_tbl, type1_range = NULL))
-    expect_snapshot(print(cal_tbl))
+  }
+)
+
+test_that(
+  "print calibrate thresh minimum_power == NULL works",
+  {
+    expect_snapshot(print.calibrate_thresholds(cal_tbl, minimum_power = NULL))
+  }
+)
+
+test_that(
+  "print calibrate thresh type1_range == NULL works",
+  {
+    expect_snapshot(print.calibrate_thresholds(cal_tbl, type1_range = NULL))
+  }
+)
+
+test_that(
+  "print calibrate thresh works",
+  {
+    expect_snapshot(print.calibrate_thresholds(cal_tbl))
   }
 )
 

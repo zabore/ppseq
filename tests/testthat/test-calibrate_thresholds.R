@@ -41,6 +41,9 @@ test_that(
   }
 )
 
+# Note that as.data.frame is being used because tibble formatting in the test()
+# environment appears to be slightly different than that in the check() 
+# environment.
 test_that(
   "one-sample calibrate thresholds",
   {
