@@ -10,3 +10,4 @@
 ^codecov\.yml$
 ^\.github$
 ^inst/ppseq-package-paper$
+cran-comments.md

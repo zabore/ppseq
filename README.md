@@ -2,7 +2,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![R-CMD-check](https://github.com/zabore/ppseq/workflows/R-CMD-check/badge.svg)](https://github.com/zabore/ppseq/actions)
 [![Codecov test coverage](https://codecov.io/gh/zabore/ppseq/branch/main/graph/badge.svg)](https://codecov.io/gh/zabore/ppseq?branch=main)
 <!-- badges: end -->
