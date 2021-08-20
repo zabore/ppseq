@@ -61,17 +61,25 @@ optimize_design(
 #>   )
 
 
-## ----echo = FALSE, fig.width = 9, fig.height = 6------------------------------
-# Note that the above code does not render properly in R Markdown, though it does produce the plots correctly in an interactive session
+## ----echo = FALSE, fig.width = 7, fig.height = 5, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with ggplot. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."----
 p <- plot(
-  one_sample_cal_tbl, 
-  type1_range = c(0.01, 0.2), 
+  one_sample_cal_tbl,
+  type1_range = c(0.01, 0.2),
   minimum_power = 0.7,
-  plotly = TRUE
+  plotly = FALSE
   )
+p
 
-p[[1]]
-p[[2]]
+
+## ----echo = FALSE, fig.width = 6, fig.height = 4, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of design options made with plotly. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."----
+#> p <- plot(
+#>   one_sample_cal_tbl,
+#>   type1_range = c(0.01, 0.2),
+#>   minimum_power = 0.7,
+#>   plotly = TRUE
+#>   )
+#> p[[1]]
+#> p[[2]]
 
 
 ## ----eval = FALSE-------------------------------------------------------------
@@ -95,6 +103,12 @@ p[[2]]
 one_sample_decision_tbl
 
 
-## ----message = FALSE, fig.height = 10, fig.width = 8--------------------------
-plot(one_sample_decision_tbl)
+## ----message = FALSE, fig.height = 8, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
+plot(one_sample_decision_tbl, plotly = FALSE)
 
+
+## ----message = FALSE, fig.height = 8, fig.width = 6, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with plotly. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
+#> plot(one_sample_decision_tbl)
+
+```{.r .distill-force-highlighting-css}
+```

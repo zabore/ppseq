@@ -12,5 +12,3 @@
 ^inst/ppseq-package-paper$
 cran-comments.md$
 ^CRAN-RELEASE$
-^data/generate_one_sample_cal_tbl.R$
-^data/generate_one_sample_decision_tbl.R$

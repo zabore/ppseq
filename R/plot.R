@@ -325,7 +325,8 @@ plot.calc_decision_rules <- function(x, plotly = TRUE, ...) {
               r <= stop_criteria ~ "Stop",
               r > stop_criteria ~ "Proceed",
               is.na(stop_criteria) ~ "Proceed"
-              )
+              ), 
+            n = as.factor(n)
             )
           ),
         "# responses" = r,
@@ -333,7 +334,7 @@ plot.calc_decision_rules <- function(x, plotly = TRUE, ...) {
       )
     
     p <- 
-      ggplot(plotdat, aes(x = as.factor(`N at interim analysis`), 
+      ggplot(plotdat, aes(x = `N at interim analysis`, 
                            y = `# responses`, 
                            fill = Decision)) + 
       geom_tile(color = "black") + 
@@ -347,6 +348,6 @@ plot.calc_decision_rules <- function(x, plotly = TRUE, ...) {
 
   if (plotly) {  
     ggplotly(p)
-  }
+  } else p
   
 }

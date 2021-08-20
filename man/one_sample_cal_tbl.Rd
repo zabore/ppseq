@@ -15,9 +15,6 @@ the null and alternative response rates.
 \item 'call_list' containing the original function call
 \item 'calibrate_thresholds_inputs' a list containing the inputs to the
 original function call
-\item 'protocol_res' gives results from the protocol-specified design of
-the atezolizumab case study, as detailed in the vignette titled
-"One-sample expansion cohort"
 }
 }
 \usage{

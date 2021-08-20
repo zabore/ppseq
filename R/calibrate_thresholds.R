@@ -173,7 +173,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
       res0,
       positive = case_when(
         sum(n0, n1) == sum(N) & ppp > pp_threshold ~ TRUE,
-        sum(n0, n1) == sum(N) & ppp < pp_threshold ~ FALSE,
+        sum(n0, n1) == sum(N) & ppp <= pp_threshold ~ FALSE,
         sum(n0, n1) != sum(N) ~ FALSE
       )
     )
@@ -182,7 +182,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
       res0,
       positive = case_when(
         n1 == N & ppp > pp_threshold ~ TRUE,
-        n1 == N & ppp < pp_threshold ~ FALSE,
+        n1 == N & ppp <= pp_threshold ~ FALSE,
         n1 != N ~ FALSE
       )
     )

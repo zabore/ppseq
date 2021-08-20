@@ -39,6 +39,3 @@ vignettes/*.pdf
 .Renviron
 .Rproj.user
 inst/doc
-
-# code to generate data examples
-data/*.R
