@@ -39,7 +39,7 @@ library(ppseq)
 ## -----------------------------------------------------------------------------
 print(
   one_sample_cal_tbl,
-  type1_range = c(0.01, 0.2),
+  type1_range = c(0.05, 0.1),
   minimum_power = 0.7
   )
 
@@ -55,16 +55,16 @@ optimize_design(
 ## ----eval = FALSE-------------------------------------------------------------
 #> plot(
 #>   one_sample_cal_tbl,
-#>   type1_range = c(0.01, 0.2),
+#>   type1_range = c(0.05, 0.1),
 #>   minimum_power = 0.7,
 #>   plotly = TRUE
 #>   )
 
 
-## ----echo = FALSE, fig.width = 7, fig.height = 5, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with ggplot. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."----
+## ----echo = FALSE, fig.width = 6, fig.height = 4, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with ggplot. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."----
 p <- plot(
   one_sample_cal_tbl,
-  type1_range = c(0.01, 0.2),
+  type1_range = c(0.05, 0.1),
   minimum_power = 0.7,
   plotly = FALSE
   )
@@ -74,7 +74,7 @@ p
 ## ----echo = FALSE, fig.width = 6, fig.height = 4, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of design options made with plotly. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."----
 #> p <- plot(
 #>   one_sample_cal_tbl,
-#>   type1_range = c(0.01, 0.2),
+#>   type1_range = c(0.05, 0.1),
 #>   minimum_power = 0.7,
 #>   plotly = TRUE
 #>   )
@@ -103,11 +103,11 @@ p
 one_sample_decision_tbl
 
 
-## ----message = FALSE, fig.height = 8, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
+## ----message = FALSE, fig.height = 9, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
 plot(one_sample_decision_tbl, plotly = FALSE)
 
 
-## ----message = FALSE, fig.height = 8, fig.width = 6, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with plotly. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
+## ----message = FALSE, fig.height = 9, fig.width = 6, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with plotly. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
 #> plot(one_sample_decision_tbl)
 
 ```{.r .distill-force-highlighting-css}

@@ -115,12 +115,12 @@ one_sample_cal_tbl <-
     )
 ```
 
-Next we print the results table using the \code{print()} option, and limited to designs with type I error between 0.01 and 0.2, and a minimum power of 0.7. We find that 35 of the 76 designs meet these criteria for type I error and power.
+Next we print the results table using the \code{print()} option, and limited to designs with type I error between 0.05 and 0.1, and a minimum power of 0.7. We find that 35 of the 76 designs meet these criteria for type I error and power.
 
 ```{r}
 print(
   one_sample_cal_tbl,
-  type1_range = c(0.01, 0.2),
+  type1_range = c(0.05, 0.1),
   minimum_power = 0.7
   )
 ```
@@ -140,7 +140,7 @@ To compare these optimal designs with all other designs, we can use the \code{pl
 ```{r eval = FALSE}
 plot(
   one_sample_cal_tbl, 
-  type1_range = c(0.01, 0.2), 
+  type1_range = c(0.05, 0.1), 
   minimum_power = 0.7,
   plotly = TRUE
   )
@@ -149,7 +149,7 @@ plot(
 ```{r echo = FALSE, fig.width = 6, fig.height = 4, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with ggplot. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."}
 p <- plot(
   one_sample_cal_tbl,
-  type1_range = c(0.01, 0.2),
+  type1_range = c(0.05, 0.1),
   minimum_power = 0.7,
   plotly = FALSE
   )
@@ -160,7 +160,7 @@ p
 ```{r echo = FALSE, fig.width = 6, fig.height = 4, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of design options made with plotly. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."}
 p <- plot(
   one_sample_cal_tbl,
-  type1_range = c(0.01, 0.2),
+  type1_range = c(0.05, 0.1),
   minimum_power = 0.7,
   plotly = TRUE
   )
@@ -191,12 +191,12 @@ one_sample_decision_tbl <-
 one_sample_decision_tbl
 ```
 
-```{r message = FALSE, fig.height = 8, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
+```{r message = FALSE, fig.height = 9, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
 plot(one_sample_decision_tbl, plotly = FALSE)
 ```
 
 
-```{r message = FALSE, fig.height = 8, fig.width = 6, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with plotly. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
+```{r message = FALSE, fig.height = 9, fig.width = 6, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with plotly. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
 plot(one_sample_decision_tbl)
 ```
 

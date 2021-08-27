@@ -347,7 +347,7 @@ one_sample_cal_tbl <-
 \end{Schunk}
 
 Next we print the results table using the \code{print()} option, and
-limited to designs with type I error between 0.01 and 0.2, and a minimum
+limited to designs with type I error between 0.05 and 0.1, and a minimum
 power of 0.7. We find that 35 of the 76 designs meet these criteria for
 type I error and power.
 
@@ -355,37 +355,44 @@ type I error and power.
 \begin{Sinput}
 print(
   one_sample_cal_tbl,
-  type1_range = c(0.01, 0.2),
+  type1_range = c(0.05, 0.1),
   minimum_power = 0.7
   )
 \end{Sinput}
 \begin{Soutput}
-#> # A tibble: 35 x 8
+#> # A tibble: 14 x 8
 #>    pp_threshold ppp_threshold mean_n1_null prop_pos_null
 #>           <dbl>         <dbl>        <dbl>         <dbl>
-#>  1         0.7           0.1          18.2         0.199
-#>  2         0.7           0.15         16.7         0.182
-#>  3         0.7           0.2          11.6         0.139
-#>  4         0.74          0.1          18.1         0.199
-#>  5         0.74          0.15         16.7         0.182
-#>  6         0.74          0.2          11.6         0.139
-#>  7         0.78          0.1          18.1         0.200
-#>  8         0.78          0.15         16.7         0.182
-#>  9         0.78          0.2          11.6         0.139
-#> 10         0.82          0.1          18.1         0.200
+#>  1         0.82          0.1          42.9         0.096
+#>  2         0.82          0.15         39.1         0.081
+#>  3         0.82          0.2          35.3         0.076
+#>  4         0.86          0.1          42.8         0.096
+#>  5         0.86          0.15         39.1         0.081
+#>  6         0.86          0.2          35.0         0.073
+#>  7         0.9           0.05         51.1         0.072
+#>  8         0.9           0.1          38.6         0.061
+#>  9         0.9           0.15         35.0         0.057
+#> 10         0.92          0.05         50.8         0.071
+#> 11         0.92          0.1          38.6         0.061
+#> 12         0.92          0.15         35.1         0.058
+#> 13         0.93          0.05         50.1         0.05 
+#> 14         0.95          0.05         46.2         0.05 
 #>    prop_stopped_null mean_n1_alt prop_pos_alt prop_stopped_alt
 #>                <dbl>       <dbl>        <dbl>            <dbl>
-#>  1             0.543        24.5        0.944           0.0369
-#>  2             0.728        24.3        0.931           0.0591
-#>  3             0.801        21.5        0.810           0.184 
-#>  4             0.544        24.5        0.944           0.0368
-#>  5             0.728        24.3        0.931           0.0591
-#>  6             0.801        21.5        0.810           0.184 
-#>  7             0.544        24.5        0.944           0.0382
-#>  8             0.728        24.3        0.931           0.0591
-#>  9             0.801        21.5        0.810           0.184 
-#> 10             0.544        24.5        0.944           0.0379
-#> # ... with 25 more rows
+#>  1             0.852        83.2        0.829            0.16 
+#>  2             0.904        81.6        0.806            0.189
+#>  3             0.912        79.4        0.782            0.214
+#>  4             0.853        83.1        0.828            0.161
+#>  5             0.904        81.5        0.804            0.191
+#>  6             0.915        79.5        0.782            0.214
+#>  7             0.879        90.2        0.882            0.097
+#>  8             0.906        81.5        0.795            0.191
+#>  9             0.931        79.7        0.769            0.224
+#> 10             0.88         90.1        0.881            0.098
+#> 11             0.906        81.6        0.796            0.19 
+#> 12             0.93         79.8        0.771            0.225
+#> 13             0.881        89.9        0.839            0.099
+#> 14             0.92         88.8        0.828            0.131
 \end{Soutput}
 \end{Schunk}
 
@@ -417,19 +424,19 @@ optimize_design(
 #> # A tibble: 1 x 6
 #>   pp_threshold ppp_threshold `Type I error` Power
 #>          <dbl>         <dbl>          <dbl> <dbl>
-#> 1         0.93           0.1         0.0872 0.890
+#> 1          0.9          0.05          0.072 0.882
 #>   `Average N under the null` `Average N under the alternative`
 #>                        <dbl>                             <dbl>
-#> 1                       16.7                              24.3
+#> 1                       51.1                              90.2
 #> 
 #> $`Optimal efficiency design:`
 #> # A tibble: 1 x 6
 #>   pp_threshold ppp_threshold `Type I error` Power
 #>          <dbl>         <dbl>          <dbl> <dbl>
-#> 1         0.93          0.15         0.0692 0.780
+#> 1         0.92           0.1          0.061 0.796
 #>   `Average N under the null` `Average N under the alternative`
 #>                        <dbl>                             <dbl>
-#> 1                       11.6                              21.5
+#> 1                       38.6                              81.6
 \end{Soutput}
 \end{Schunk}
 
@@ -441,7 +448,7 @@ interactive visualizations.
 \begin{Sinput}
 plot(
   one_sample_cal_tbl, 
-  type1_range = c(0.01, 0.2), 
+  type1_range = c(0.05, 0.1), 
   minimum_power = 0.7,
   plotly = TRUE
   )
