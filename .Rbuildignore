@@ -12,3 +12,4 @@
 ^inst/ppseq-package-paper$
 cran-comments.md$
 ^CRAN-RELEASE$
+^data-raw$
