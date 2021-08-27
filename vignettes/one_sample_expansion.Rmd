@@ -80,7 +80,7 @@ one_sample_cal_tbl <-
 
 # Results
 
-We will limit our consideration to designs with type I error between 0.01 and 0.2, and a minimum power of 0.7.
+We will limit our consideration to designs with type I error between 0.05 and 0.1, and a minimum power of 0.7.
 
 ## `print()` 
 
@@ -88,18 +88,18 @@ When you pass the results of `calibrate_thresholds()` to `print()` you will get 
 
 ```{r eval = FALSE}
 print(one_sample_cal_tbl, 
-      type1_range = c(0.01, 0.2), 
+      type1_range = c(0.05, 0.1), 
       minimum_power = 0.7)
 ```
 
 ```{r echo = FALSE}
 library(gt)
 
-gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.01, 
-                 prop_pos_null <= 0.2, prop_pos_alt >= 0.7))
+gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.05, 
+                 prop_pos_null <= 0.1, prop_pos_alt >= 0.7))
 ```
 
-We find that 35 of the 76 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
+We find that 14 of the 76 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
 
 ## `optimize_design()` 
 
@@ -111,7 +111,7 @@ optimize_design(one_sample_cal_tbl,
                 minimum_power = 0.7)
 ```
 
-The optimal accuracy design is the one with posterior threshold 0.9 and predictive threshold 0.05. It has a type I error of 0.072, power of 0.883, average sample size under the null of 51, and average sample size under the alternative of 91. 
+The optimal accuracy design is the one with posterior threshold 0.9 and predictive threshold 0.05. It has a type I error of 0.072, power of 0.882, average sample size under the null of 51, and average sample size under the alternative of 91. 
 
 The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.1. It has a type I error of 0.06, power of 0.796, average sample size under the null of 39, and average sample size under the alternative of 82.
 

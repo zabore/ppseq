@@ -21,6 +21,9 @@
 #' 2) 'call_list' containing the original function call
 #' 3) 'calibrate_thresholds_inputs' a list containing the inputs to the
 #' original function call
+#' 4) 'protocol_res' gives results from the protocol-specified design of the 
+#' atezolizumab case study, as detailed in the vignette titled "One-sample 
+#' expansion cohort"
 #'
 #' @keywords datasets
 "one_sample_cal_tbl"
