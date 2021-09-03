@@ -1,5 +1,5 @@
 Package: ppseq
-Title: Design a clinical trial using sequential predictive probablity monitoring
+Title: Design Clinical Trials using Sequential Predictive Probability Monitoring
 Version: 0.1.1
 Authors@R: 
   c(person(given = "Emily C.",
@@ -16,7 +16,7 @@ Authors@R:
           email = "michael.kane@yale.edu",
           comment = c(ORCID = "0000-0003-1899-6662"))
   )
-Description: This package provides functions to design clinical trials using sequential predictive probability monitoring. Functions are available to calibrate designs over a range of posterior and predictive thresholds, to plot the various design options, and to obtain the operating characteristics of optimal accuracy and optimal efficiency designs.
+Description: Design clinical trials using sequential predictive probability monitoring. Functions are available to calibrate designs over a range of posterior and predictive thresholds, to plot the various design options, and to obtain the operating characteristics of optimal accuracy and optimal efficiency designs.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

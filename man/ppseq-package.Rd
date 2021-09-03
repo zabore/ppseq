@@ -4,7 +4,7 @@
 \name{ppseq-package}
 \alias{ppseq}
 \alias{ppseq-package}
-\title{ppseq: Design a clinical trial using sequential predictive probablity monitoring}
+\title{ppseq: Design Clinical Trials using Sequential Predictive Probablity Monitoring}
 \description{
 This package provides functions to design clinical trials using sequential predictive probability monitoring. Functions are available to calibrate designs over a range of posterior and predictive thresholds, to plot the various design options, and to obtain the operating characteristics of optimal accuracy and optimal efficiency designs.
 }
