@@ -232,7 +232,7 @@ interim look where there is no number of responses that would lead to
 stopping the trial.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><span class='co'># \donttest{</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 
 <span class='co'># One-sample case</span>
@@ -242,9 +242,9 @@ stopping the trial.</p>
 <span class='fu'>calc_decision_rules</span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>25</span>, <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>, N <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>25</span>, <span class='fl'>25</span><span class='op'>)</span>,
 theta <span class='op'>=</span> <span class='fl'>0.86</span>, ppp <span class='op'>=</span> <span class='fl'>0.2</span>, p0 <span class='op'>=</span> <span class='cn'>NULL</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>, delta <span class='op'>=</span> <span class='fl'>0</span>,
 prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>5000</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='co'># }</span>
 
-</div></pre>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -14,8 +14,38 @@
 
 \item{...}{unused}
 }
+\value{
+In the one-sample case, a heatmap plot with number enrolled on the
+x-axis and number of responses on the y-axis. In the two-sample case, a
+grid of heatmap plots. Each plot is a combination of the number enrolled so
+far in the experimental and control arms. The x-axis is the number of
+responses in the control arm and the y-axis is the number of responses in
+the experimental arm.
+Green indicates combinations where the trial would proceed and red indicates
+combinations where the trial would stop.
+}
 \description{
 Returns a plot of decision rules from the results of
 \code{calc_decision_rules} that can interactively show when to stop and
 when to proceed at the various interim analyses
+}
+\examples{
+\donttest{
+set.seed(123)
+
+# Two-sample case
+dec_tbl <- calc_decision_rules(
+n = cbind(seq(5, 25, 5), seq(5, 25, 5)), 
+N = c(25, 25),
+theta = 0.86, 
+ppp = 0.2, 
+p0 = NULL, 
+direction = "greater", 
+delta = 0,
+prior = c(0.5, 0.5), 
+S = 5000)
+
+plot(dec_tbl)
+}
+
 }

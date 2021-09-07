@@ -223,18 +223,14 @@ posterior probability, and posterior predictive probability at each
 look</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
+    <pre class="examples">
 <span class='co'># One-sample case</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 <span class='fu'>sim_single_trial</span><span class='op'>(</span>
   p <span class='op'>=</span> <span class='fl'>0.3</span>, n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>10</span><span class='op'>)</span>, direction <span class='op'>=</span> <span class='st'>"greater"</span>,
   p0 <span class='op'>=</span> <span class='fl'>0.1</span>, delta <span class='op'>=</span> <span class='cn'>NULL</span>, prior <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>0.5</span><span class='op'>)</span>, S <span class='op'>=</span> <span class='fl'>50</span>, N <span class='op'>=</span> <span class='fl'>25</span>, theta <span class='op'>=</span> <span class='fl'>0.95</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 5</span>
-#&gt;   pp_threshold    y1    n1    pp   ppp
-#&gt;          <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>         0.95     1     5  0.84  0.48
-#&gt; <span style='color: #BCBCBC;'>2</span>         0.95     3    10  0.98  0.84</div><div class='input'>
+
 <span class='co'># # Two-sample case (not run)</span>
 <span class='co'># set.seed(123)</span>
 <span class='co'>#  sim_single_trial(</span>
@@ -242,7 +238,7 @@ look</p>
 <span class='co'>#    direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5), </span>
 <span class='co'>#    S = 5000, N = c(50, 50), theta = 0.95</span>
 <span class='co'>#  )</span>
-</div></pre>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

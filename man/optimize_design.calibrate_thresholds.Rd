@@ -20,11 +20,20 @@ Defaults to 0.8.}
 
 \item{...}{ignored}
 }
+\value{
+A list of length two containing details of the optimal efficiency
+and optimal accuracy designs
+}
 \description{
-Determines the optimal designs based on a variety of criteria
+Determines the optimal designs based on a variety of criteria.
+The optimal efficiency design is the one with the shortest Euclidean
+distance to the upper left point on a plot of the average sample size under
+the null by the average sample size under the alternative. The optimal
+accuracy design is the one with the shortest Euclidean distance to the
+upper left point on a plot of the type I error by the power.
 }
 \examples{
-\dontrun{
+\donttest{
 
 # One-sample case
 set.seed(123)

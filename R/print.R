@@ -19,7 +19,7 @@
 #' Returns a tibble
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' set.seed(123)
 #'
 #' cal_tbl <- calibrate_thresholds(

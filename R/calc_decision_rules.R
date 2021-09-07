@@ -49,7 +49,7 @@
 #' stopping the trial.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' set.seed(123)
 #'
 #' # One-sample case

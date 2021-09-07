@@ -1,6 +1,7 @@
 #' Plot method for \code{calibrate_thresholds} objects
 #'
-#' @description Returns two interactive \code{plotly} plots to compare results
+#' @description Returns two interactive \code{plotly} plots (if plotly=TRUE)
+#' or two static \code{ggplot2} plots (if plotly=FALSE) to compare results
 #' from various designs generated from a call to \code{calibrate_thresholds}
 #' based on various criteria, and to assist in selecting an optimal design.
 #'
@@ -15,6 +16,28 @@
 #' @param plotly a logical indicator of whether you want the plots returned as
 #' interactive plotly plots or non-interactive ggplots. Defaults to FALSE.
 #' @param ... unused
+#' 
+#' @return Plots of the average sample size under the null by the average
+#' sample size under the alternative, and the type I error by the power for 
+#' designs meeting the specified \code{type1_range} and 
+#' \code{minimum_power}
+#' 
+#' @examples
+#'
+#' \donttest{
+#' set.seed(123)
+#'
+#' cal_tbl <- calibrate_thresholds(
+#'   p_null = 0.1, p_alt = 0.3,
+#'   n = seq(5, 25, 5), N = 25, 
+#'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+#'   ppp_threshold = seq(0.05, 0.2, 0.05),
+#'   direction = "greater", delta = NULL,
+#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
+#' )
+#' 
+#' plot(cal_tbl, type1_range = c(0.01, 0.2), minimum_power = 0.7)
+#' }
 #'
 #' @importFrom dplyr rename mutate filter ungroup slice group_by arrange
 #'                   row_number
@@ -211,6 +234,34 @@ plot.calibrate_thresholds <- function(x,
 #' \code{calc_decision_rules} function
 #' @param plotly should the plot be rendered in plotly? (Default is TRUE)
 #' @param ... unused
+#' 
+#' @return In the one-sample case, a heatmap plot with number enrolled on the 
+#' x-axis and number of responses on the y-axis. In the two-sample case, a 
+#' grid of heatmap plots. Each plot is a combination of the number enrolled so 
+#' far in the experimental and control arms. The x-axis is the number of 
+#' responses in the control arm and the y-axis is the number of responses in
+#' the experimental arm.
+#' Green indicates combinations where the trial would proceed and red indicates 
+#' combinations where the trial would stop.
+#' 
+#' @examples
+#' \donttest{
+#' set.seed(123)
+#' 
+#' # Two-sample case
+#' dec_tbl <- calc_decision_rules(
+#' n = cbind(seq(5, 25, 5), seq(5, 25, 5)), 
+#' N = c(25, 25),
+#' theta = 0.86, 
+#' ppp = 0.2, 
+#' p0 = NULL, 
+#' direction = "greater", 
+#' delta = 0,
+#' prior = c(0.5, 0.5), 
+#' S = 5000)
+#' 
+#' plot(dec_tbl)
+#' }
 #' 
 #' @importFrom dplyr mutate filter select rename ungroup group_by 
 #' full_join case_when

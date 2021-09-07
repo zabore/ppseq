@@ -23,8 +23,33 @@ interactive plotly plots or non-interactive ggplots. Defaults to FALSE.}
 
 \item{...}{unused}
 }
+\value{
+Plots of the average sample size under the null by the average
+sample size under the alternative, and the type I error by the power for
+designs meeting the specified \code{type1_range} and
+\code{minimum_power}
+}
 \description{
-Returns two interactive \code{plotly} plots to compare results
+Returns two interactive \code{plotly} plots (if plotly=TRUE)
+or two static \code{ggplot2} plots (if plotly=FALSE) to compare results
 from various designs generated from a call to \code{calibrate_thresholds}
 based on various criteria, and to assist in selecting an optimal design.
+}
+\examples{
+
+\donttest{
+set.seed(123)
+
+cal_tbl <- calibrate_thresholds(
+  p_null = 0.1, p_alt = 0.3,
+  n = seq(5, 25, 5), N = 25, 
+  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
+  ppp_threshold = seq(0.05, 0.2, 0.05),
+  direction = "greater", delta = NULL,
+  prior = c(0.5, 0.5), S = 5000, nsim = 1000
+)
+
+plot(cal_tbl, type1_range = c(0.01, 0.2), minimum_power = 0.7)
+}
+
 }

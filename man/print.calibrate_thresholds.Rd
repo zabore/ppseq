@@ -30,7 +30,7 @@ error and a minimum value of power using the arguments 'type1_range' and
 'minimum_power' respectively.
 }
 \examples{
-\dontrun{
+\donttest{
 set.seed(123)
 
 cal_tbl <- calibrate_thresholds(

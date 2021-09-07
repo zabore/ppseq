@@ -33,15 +33,21 @@
 #' @return Returns the posterior predictive probability of interest
 #'
 #' @examples
-#'
+#' \donttest{
 #' set.seed(123)
 #'
-#' # One-sample case (not run)
-#' # calc_predictive(y = 14, n = 50, p0 = 0.2, N = 100)
+#' # One-sample case 
+#' calc_predictive(y = 14, n = 50, p0 = 0.2, N = 100)
 #'
-#' # # Two-sample case (not run)
-#' # calc_predictive(y = c(7, 12), n = c(50, 50), p0 = NULL, N = c(100, 100),
-#' # delta = 0)
+#' # Two-sample case 
+#' calc_predictive(
+#'   y = c(7, 12), 
+#'   n = c(50, 50), 
+#'   p0 = NULL, 
+#'   N = c(100, 100),
+#'   delta = 0)
+#'}
+#'
 #' @importFrom stats rbeta rbinom
 #' @importFrom purrr map_dbl map2_dbl
 #' @export

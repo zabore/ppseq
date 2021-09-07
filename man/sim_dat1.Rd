@@ -31,14 +31,3 @@ Helper function for calibrate_thresholds() function that
 generates a single dataset of n and response count at each look based on the
 response probability(ies)
 }
-\examples{
-\dontrun{
-set.seed(123)
-
-# One-sample case
-sim_dat1(p = 0.1, n = seq(5, 25, 5))
-
-# Two-sample case
-sim_dat1(p = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
-}
-}

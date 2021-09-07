@@ -96,7 +96,7 @@ threshold.
 \examples{
 
 # One-sample case
-\dontrun{
+\donttest{
 set.seed(123)
 
 calibrate_thresholds(
@@ -110,7 +110,7 @@ calibrate_thresholds(
 }
 
 # Two-sample case
-\dontrun{
+\donttest{
 set.seed(123)
 
 calibrate_thresholds(

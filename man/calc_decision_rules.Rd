@@ -76,7 +76,7 @@ optimal design using the functions \code{calibrate_thresholds} and
 \code{optimize_design}.
 }
 \examples{
-\dontrun{
+\donttest{
 set.seed(123)
 
 # One-sample case

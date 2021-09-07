@@ -9,6 +9,8 @@
 #' acceptable power. Specify NULL to return the full range of resulting power.
 #' Defaults to 0 to return all results.
 #' @param ... ignored
+#' 
+#' @return No return value, called for side effects 
 #'
 #' @export
 
@@ -21,7 +23,12 @@ optimize_design <- function(x,
 
 #' Custom optimization method for \code{calibrate_thresholds} objects
 #'
-#' @description Determines the optimal designs based on a variety of criteria
+#' @description Determines the optimal designs based on a variety of criteria.
+#' The optimal efficiency design is the one with the shortest Euclidean 
+#' distance to the upper left point on a plot of the average sample size under
+#' the null by the average sample size under the alternative. The optimal
+#' accuracy design is the one with the shortest Euclidean distance to the 
+#' upper left point on a plot of the type I error by the power.
 #'
 #' @param x an object of class 'calibrate_thresholds', usually returned by the
 #' \code{calibrate_thresholds} function
@@ -32,9 +39,12 @@ optimize_design <- function(x,
 #' acceptable power. Specify NULL to return the full range of resulting power.
 #' Defaults to 0.8.
 #' @param ... ignored
+#' 
+#' @return A list of length two containing details of the optimal efficiency
+#' and optimal accuracy designs
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' 
 #' # One-sample case
 #' set.seed(123)

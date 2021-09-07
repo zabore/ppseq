@@ -20,17 +20,7 @@
 #'
 #' @return Returns a tibble with n0, n1, y0, y1 for the two-sample case and
 #' a tibble with n1 and y1 for the one-sample case
-#'
-#' @examples
-#' \dontrun{
-#' set.seed(123)
-#'
-#' # One-sample case
-#' sim_dat1(p = 0.1, n = seq(5, 25, 5))
-#'
-#' # Two-sample case
-#' sim_dat1(p = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
-#' }
+#' 
 #' @importFrom stats rbinom
 #' @importFrom tibble tibble
 sim_dat1 <- function(p, n) {
@@ -107,18 +97,6 @@ sim_dat1 <- function(p, n) {
 #' predictive probability generated from calc_predictive(), and an indicator
 #' for whether the trial was positive or not at the end
 #'
-#' @examples
-#' \dontrun{
-#' set.seed(123)
-#'
-#' # One-sample case
-#' dat1 <- sim_dat1(p = 0.1, n = seq(5, 25, 5))
-#' eval_thresh(dat1, 0.95, 0.3, p0 = 0.1, delta = NULL, S = 500, N = 25)
-#'
-#' # Two-sample case
-#' dat2 <- sim_dat1(p = c(0.1, 0.3), n = cbind(seq(5, 25, 5), seq(5, 25, 5)))
-#' eval_thresh(dat2, 0.95, 0.3, S = 500, N = c(25, 25))
-#' }
 #' @importFrom tibble add_column
 #' @importFrom dplyr mutate case_when
 eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N, 
@@ -259,7 +237,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' @examples
 #'
 #' # One-sample case
-#' \dontrun{
+#' \donttest{
 #' set.seed(123)
 #'
 #' calibrate_thresholds(
@@ -273,7 +251,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' }
 #'
 #' # Two-sample case
-#' \dontrun{
+#' \donttest{
 #' set.seed(123)
 #'
 #' calibrate_thresholds(
