@@ -175,12 +175,11 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' probability threshold with interim futility monitoring
 #'
 #' @description This function is meant to be used in the context of a
-#' clinical trial with a binary endpoint. For a vector of possible posterior
-#' decision thresholds, the function simulates many trials and then calculates
-#' the average number of times the posterior probability exceeds a given
-#' threshold. In a null case, this will result in the type I error at a given
-#' threshold. In an alternative case, this will result in the power at a given
-#' threshold.
+#' clinical trial with a binary endpoint. For every combination of the provided
+#' posterior thresholds and predictive thresholds, the function simulates many 
+#' trials and then calculates the average number of times a trial was positive. 
+#' In the null case, this is the type I error for the given thresholds. 
+#' In the alternative case, this is the power for the given thresholds.
 #'
 #' @param p_null vector of length two containing the probability of event in
 #' the standard of care and experimental arm c(p0, p1) for the two-sample case
@@ -203,8 +202,8 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' for two-sample case; integer of total planned sample size at end of trial N
 #' for one-sample case
 #' @param pp_threshold the posterior probability threshold of interest
-#' @param ppp_threshold the posterior probability threshold of interest for
-#' futility monitoring
+#' @param ppp_threshold the posterior predictive probability threshold of 
+#' interest for futility monitoring
 #' @param direction "greater" (default) if interest is in p(p1 > p0) and "less"
 #' if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
@@ -295,10 +294,15 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
       function(x) 
         pmap_dfr(cross_threshold,
                  function(pp_threshold, ppp_threshold) 
-                   eval_thresh(x, pp_threshold, ppp_threshold,
-                 direction = direction, p0 = p0, 
-                 delta = delta, prior = prior, 
-                 S = S, N = N)), 
+                   eval_thresh(x, 
+                               pp_threshold, 
+                               ppp_threshold,
+                               direction = direction, 
+                               p0 = p0, 
+                               delta = delta, 
+                               prior = prior, 
+                               S = S, 
+                               N = N)), 
       .options = furrr_options(seed = TRUE)
     )
   
@@ -308,10 +312,15 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
       function(x) 
         pmap_dfr(cross_threshold,
                  function(pp_threshold, ppp_threshold) 
-                   eval_thresh(x, pp_threshold, ppp_threshold,
-                 direction = direction, p0 = p0, 
-                 delta = delta, prior = prior, 
-                 S = S, N = N)),
+                   eval_thresh(x, 
+                               pp_threshold, 
+                               ppp_threshold,
+                               direction = direction, 
+                               p0 = p0, 
+                               delta = delta, 
+                               prior = prior, 
+                               S = S, 
+                               N = N)),
       .options = furrr_options(seed = TRUE)
     )
 

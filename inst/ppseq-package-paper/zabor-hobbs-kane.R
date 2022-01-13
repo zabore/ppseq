@@ -33,7 +33,7 @@ library(ppseq)
 #>     prior = c(0.5, 0.5),
 #>     S = 5000,
 #>     nsim = 1000
-#>     )
+#>   )
 
 
 ## -----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ print(
   one_sample_cal_tbl,
   type1_range = c(0.05, 0.1),
   minimum_power = 0.7
-  )
+)
 
 
 ## -----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ optimize_design(
   one_sample_cal_tbl, 
   type1_range = c(0.05, 0.1), 
   minimum_power = 0.7
-  )
+)
 
 
 ## ----eval = FALSE-------------------------------------------------------------
@@ -58,7 +58,7 @@ optimize_design(
 #>   type1_range = c(0.05, 0.1),
 #>   minimum_power = 0.7,
 #>   plotly = TRUE
-#>   )
+#> )
 
 
 ## ----echo = FALSE, fig.width = 6, fig.height = 4, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with ggplot. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."----
@@ -96,7 +96,7 @@ p
 #>     delta = NULL,
 #>     prior = c(0.5, 0.5),
 #>     S = 5000
-#>     )
+#>   )
 
 
 ## -----------------------------------------------------------------------------

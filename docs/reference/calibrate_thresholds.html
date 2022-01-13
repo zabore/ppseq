@@ -43,12 +43,11 @@ probability threshold with interim futility monitoring — calibrate_thresholds 
 <meta property="og:title" content="Calibrate according to posterior probability threshold and predictive
 probability threshold with interim futility monitoring — calibrate_thresholds" />
 <meta property="og:description" content="This function is meant to be used in the context of a
-clinical trial with a binary endpoint. For a vector of possible posterior
-decision thresholds, the function simulates many trials and then calculates
-the average number of times the posterior probability exceeds a given
-threshold. In a null case, this will result in the type I error at a given
-threshold. In an alternative case, this will result in the power at a given
-threshold." />
+clinical trial with a binary endpoint. For every combination of the provided
+posterior thresholds and predictive thresholds, the function simulates many
+trials and then calculates the average number of times a trial was positive.
+In the null case, this is the type I error for the given thresholds.
+In the alternative case, this is the power for the given thresholds." />
 
 
 
@@ -140,12 +139,11 @@ probability threshold with interim futility monitoring</h1>
 
     <div class="ref-description">
     <p>This function is meant to be used in the context of a
-clinical trial with a binary endpoint. For a vector of possible posterior
-decision thresholds, the function simulates many trials and then calculates
-the average number of times the posterior probability exceeds a given
-threshold. In a null case, this will result in the type I error at a given
-threshold. In an alternative case, this will result in the power at a given
-threshold.</p>
+clinical trial with a binary endpoint. For every combination of the provided
+posterior thresholds and predictive thresholds, the function simulates many
+trials and then calculates the average number of times a trial was positive.
+In the null case, this is the type I error for the given thresholds.
+In the alternative case, this is the power for the given thresholds.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calibrate_thresholds</span><span class='op'>(</span>
@@ -203,8 +201,8 @@ for one-sample case</p></td>
     </tr>
     <tr>
       <th>ppp_threshold</th>
-      <td><p>the posterior probability threshold of interest for
-futility monitoring</p></td>
+      <td><p>the posterior predictive probability threshold of
+interest for futility monitoring</p></td>
     </tr>
     <tr>
       <th>direction</th>

@@ -46,8 +46,8 @@ for one-sample case}
 
 \item{pp_threshold}{the posterior probability threshold of interest}
 
-\item{ppp_threshold}{the posterior probability threshold of interest for
-futility monitoring}
+\item{ppp_threshold}{the posterior predictive probability threshold of
+interest for futility monitoring}
 
 \item{direction}{"greater" (default) if interest is in p(p1 > p0) and "less"
 if interest is in p(p1 < p0) for two-sample case. For one-sample case,
@@ -86,12 +86,11 @@ for a null setting, and a measure of the power in the alternative setting.
 }
 \description{
 This function is meant to be used in the context of a
-clinical trial with a binary endpoint. For a vector of possible posterior
-decision thresholds, the function simulates many trials and then calculates
-the average number of times the posterior probability exceeds a given
-threshold. In a null case, this will result in the type I error at a given
-threshold. In an alternative case, this will result in the power at a given
-threshold.
+clinical trial with a binary endpoint. For every combination of the provided
+posterior thresholds and predictive thresholds, the function simulates many
+trials and then calculates the average number of times a trial was positive.
+In the null case, this is the type I error for the given thresholds.
+In the alternative case, this is the power for the given thresholds.
 }
 \examples{
 

@@ -66,7 +66,7 @@ set.seed(123)
 # One-sample case 
 calc_predictive(y = 14, n = 50, p0 = 0.2, N = 100)
 
-# Two-sample case (not run)
+# Two-sample case 
 calc_predictive(
   y = c(7, 12), 
   n = c(50, 50), 
