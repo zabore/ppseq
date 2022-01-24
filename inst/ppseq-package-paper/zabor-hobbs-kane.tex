@@ -79,18 +79,18 @@ monitoring in clinical trials previously
 \citep{Dmitrienko2006, Lee2008, Saville2014, Hobbs2018}. However, in
 order to be useful to investigators designing such trials, software must
 be made available to select an optimal design. This paper introduces the
-\pkg{ppseq} package for the R software language \citep{RCT2020}, which
-provides functions to design one-sample and two-sample early phase
+\CRANpkg{ppseq} package for the R software language \citep{RCT2020},
+which provides functions to design one-sample and two-sample early phase
 clinical trials using sequential predictive probability monitoring for
 futility. Interactive plots produced using the \CRANpkg{ggplot2} package
 \citep{Wickham2016} and the \CRANpkg{plotly} package \citep{Sievert2020}
 compare designs based on different thresholds for decision making.
 Moreover, we demonstrate optimization criteria for selecting an ideal
-predictive probability monitoring design using the \pkg{ppseq} package.
-While the \pkg{ppseq} package was developed with early phase oncology
-clinical trials in mind, the methodology is general and can be applied
-to any application of sequential futility monitoring in clinical trial
-design.
+predictive probability monitoring design using the \CRANpkg{ppseq}
+package. While the \CRANpkg{ppseq} package was developed with early
+phase oncology clinical trials in mind, the methodology is general and
+can be applied to any application of sequential futility monitoring in
+clinical trial design.
 
 \hypertarget{predictive-probability-monitoring}{%
 \section{Predictive probability
@@ -149,7 +149,7 @@ size, based on the data observed in the trial to date.
 \hypertarget{package-overview}{%
 \section{Package overview}\label{package-overview}}
 
-The \pkg{ppseq} package facilitates the design of clinical trials
+The \CRANpkg{ppseq} package facilitates the design of clinical trials
 utilizing sequential predictive probability monitoring for futility. The
 goal is to establish a set of decision rules at the trial planning phase
 that would be used for interim monitoring during the course of the
@@ -187,7 +187,7 @@ error and minimum power, if desired.
 
 After obtaining results for all combinations of evaluated posterior and
 predictive thresholds, the next step is to select the ideal design from
-among the various options. The \pkg{ppseq} package introduces two
+among the various options. The \CRANpkg{ppseq} package introduces two
 optimization criteria to assist users in making a selection. The first,
 called the ``optimal accuracy'' design, identifies the design that
 minimizes the Euclidean distance to the top left point on a plot of the
@@ -268,39 +268,40 @@ decision for each combination and the hover box produced by
 \hypertarget{case-study}{%
 \section{Case study}\label{case-study}}
 
-To demonstrate the functionality of the \pkg{ppseq} package, we focus on
-a re-design of a dose-expansion cohort for the study of atezolizumab in
-metastatic urothelial carcinoma patients (mUC) using sequential
-predictive probability monitoring. Atezolizumab is an anti-PD-L1
-treatment that was originally tested in the phase 1 setting in a basket
-trial across a variety of cancer sites harboring PD-L1 mutations. The
-atezolizumab expansion study in mUC had the primary aim of further
-evaluating safety, pharmacodynamics and pharmacokinetics and therefore
-was not designed to meet any specific criteria for type I error or
-power. An expansion cohort in mUC was not part of the original protocol
-design, but was rather added later through a protocol amendment. The
-expansion cohort in mUC ultimately evaluated a total of 95 participants
-\citep{Powles2014}. Other expansion cohorts that were included in the
-original protocol, including in renal-cell carcinoma, non-small-cell
-lung cancer, and melanoma, were planned to have a sample size of 40.
-These pre-planned expansion cohorts were designed with a single interim
-analysis for futility that would stop the trial if 0 responses were seen
-in the first 14 patients enrolled. According to the trial protocol, this
-futility rule is associated with at most a 4.4\% chance of observing no
-responses in 14 patients if the true response rate is 20\% or higher.
-The protocol also states the widths of the 90\% confidence intervals for
-a sample size of 40 if the observed response rate is 30\%. There was no
-stated decision rule for efficacy since efficacy was not an explicit aim
-of the expansion cohorts. In the re-design we assume a null, or
-unacceptable, response rate of 0.1 and an alternative, or acceptable,
-response rate of 0.2. We plan a study with up to a total of 95
-participants. In our sequential predictive probability design we will
-check for futility after every 5 patients are enrolled. We consider
-posterior thresholds of 0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93,
-0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, and 1, and
-predictive thresholds of 0.05, 0.1, 0.15, and 0.2.
+To demonstrate the functionality of the \CRANpkg{ppseq} package, we
+focus on a re-design of a dose-expansion cohort for the study of
+atezolizumab in metastatic urothelial carcinoma patients (mUC) using
+sequential predictive probability monitoring. Atezolizumab is an
+anti-PD-L1 treatment that was originally tested in the phase 1 setting
+in a basket trial across a variety of cancer sites harboring PD-L1
+mutations. The atezolizumab expansion study in mUC had the primary aim
+of further evaluating safety, pharmacodynamics and pharmacokinetics and
+therefore was not designed to meet any specific criteria for type I
+error or power. An expansion cohort in mUC was not part of the original
+protocol design, but was rather added later through a protocol
+amendment. The expansion cohort in mUC ultimately evaluated a total of
+95 participants \citep{Powles2014}. Other expansion cohorts that were
+included in the original protocol, including in renal-cell carcinoma,
+non-small-cell lung cancer, and melanoma, were planned to have a sample
+size of 40. These pre-planned expansion cohorts were designed with a
+single interim analysis for futility that would stop the trial if 0
+responses were seen in the first 14 patients enrolled. According to the
+trial protocol, this futility rule is associated with at most a 4.4\%
+chance of observing no responses in 14 patients if the true response
+rate is 20\% or higher. The protocol also states the widths of the 90\%
+confidence intervals for a sample size of 40 if the observed response
+rate is 30\%. There was no stated decision rule for efficacy since
+efficacy was not an explicit aim of the expansion cohorts. In the
+re-design we assume a null, or unacceptable, response rate of 0.1 and an
+alternative, or acceptable, response rate of 0.2. We plan a study with
+up to a total of 95 participants. In our sequential predictive
+probability design we will check for futility after every 5 patients are
+enrolled. We consider posterior thresholds of 0, 0.7, 0.74, 0.78, 0.82,
+0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999,
+0.9999, 0.99999, and 1, and predictive thresholds of 0.05, 0.1, 0.15,
+and 0.2.
 
-First we install and load the \pkg{ppseq} package.
+First we install and load the \CRANpkg{ppseq} package.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -327,7 +328,7 @@ we wished to use 76 cores to accommodate the 76 distinct designs that
 result from the 19 posterior by 4 predictive threshold grid. Because the
 code takes some time to run, the results of the below example code are
 available as a dataset called \code{one\_sample\_cal\_tbl} included in
-the \pkg{ppseq} package.
+the \CRANpkg{ppseq} package.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -451,7 +452,8 @@ optimize_design(
 
 To compare these optimal designs with all other designs, we can use the
 \code{plot()} function with the \code{plotly = TRUE} option to obtain
-interactive visualizations.
+interactive visualizations, or the \code{plotly = FALSE} option to
+obtain static visualizations.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -466,7 +468,7 @@ plot(
 
 \begin{Schunk}
 \begin{figure}
-\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-7-1} \caption[Plot of design options made with ggplot]{Plot of design options made with ggplot. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:unnamed-chunk-7)
+\includegraphics[width=1.1\linewidth]{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-7-1} \caption[Plot of design options made with ggplot2]{Plot of design options made with ggplot2. The accuracy designs are in the plot on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:unnamed-chunk-7)
 \end{figure}
 \end{Schunk}
 
@@ -481,11 +483,11 @@ Finally, we generate the decision table associated with the selected
 design for use in making decision at each interim analysis during the
 conduct of the trial. Because of the computational time involved, the
 results of the below example code are available as a dataset called
-\code{one\_sample\_decision\_tbl} included in the \pkg{ppseq} package.
-In the results table, we see that at the first interim futility look
-after just 5 patients, we would not stop the trial. After the first 10
-patients we would stop the trial if there were 0 responses, and so on.
-At the end of the trial when all 95 patients have accrued, we would
+\code{one\_sample\_decision\_tbl} included in the \CRANpkg{ppseq}
+package. In the results table, we see that at the first interim futility
+look after just 5 patients, we would not stop the trial. After the first
+10 patients we would stop the trial if there were 0 responses, and so
+on. At the end of the trial when all 95 patients have accrued, we would
 declare the treatment promising of further study if there were greater
 than or equal to 14 responses.
 
@@ -543,7 +545,7 @@ one_sample_decision_tbl
 plot(one_sample_decision_tbl, plotly = FALSE)
 \end{Sinput}
 \begin{figure}
-\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-11-1} \caption[Plot of decision rules made with ggplot]{Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis.}(\#fig:unnamed-chunk-11)
+\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-12-1} \caption[Plot of decision rules made with ggplot]{Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis.}(\#fig:unnamed-chunk-12)
 \end{figure}
 \end{Schunk}
 
@@ -558,10 +560,10 @@ for the maximum tolerated dose \citep{Hobbs2019}. Bayesian sequential
 predictive probability monitoring provides a natural and flexible way to
 expand the number of patients studied in phase 1 or to design phase 2
 trials that allow for efficient early stopping for futility while
-maintaining control of type I error and power. The \pkg{ppseq} package
-implements functionality to evaluate a range of posterior and predictive
-thresholds for a given study design and identify the optimal design
-based on accuracy (i.e.~type I error and power) or efficiency
+maintaining control of type I error and power. The \CRANpkg{ppseq}
+package implements functionality to evaluate a range of posterior and
+predictive thresholds for a given study design and identify the optimal
+design based on accuracy (i.e.~type I error and power) or efficiency
 (i.e.~average sample sizes under the null and alternative). Interactive
 visualization options are provided to ease comparison of the resulting
 design options. Once an ideal design is selected, a table of decision
