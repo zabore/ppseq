@@ -39,3 +39,6 @@ vignettes/*.pdf
 .Renviron
 .Rproj.user
 inst/doc
+
+# R Journal paper zip files
+*.zip
