@@ -34,14 +34,15 @@ Suggests:
   vdiffr
 VignetteBuilder: knitr
 Imports: 
-  dplyr,
-  furrr,
-  future,
-  ggplot2,
-  plotly,
-  purrr,
-  tibble,
-  patchwork,
-  tidyr
+    dplyr,
+    furrr,
+    future,
+    ggplot2,
+    plotly,
+    purrr,
+    tibble,
+    patchwork,
+    tidyr,
+    HDInterval
 Config/testthat/edition: 3
 Language: en-US

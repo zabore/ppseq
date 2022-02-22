@@ -1,4 +1,4 @@
-#' Calculate a single posterior probability
+#' Calculate response probability for the next patient
 #'
 #' @description This function is meant to be used in the context of a
 #' clinical trial with a binary endpoint. For the two-sample case, the total
@@ -67,23 +67,29 @@ calc_next <- function(y, n, p0, direction = "greater", delta = NULL,
   if (length(y) == 2 & is.null(delta))
     stop("delta must be specified for the two-sample case")
   
+  if (interval <= 0 | interval >= 1)
+    stop("interval must be a value between 0 and 1")
+  
   if (length(y) == 2) {
     rb0 <- rbeta(S, prior[1] + y[1], prior[2] + n[1] - y[1])
     rb1 <- rbeta(S, prior[1] + y[2], prior[2] + n[2] - y[2])
     
-    hdi1 <- if(direction == "greater") hdi(rb1 - rb0) else hdi(rb0 - rb1)
+    hdi0 <- hdi(rb0, credMass = interval)
+    hdi1 <- hdi(rb1, credMass = interval)
     
     out <- tibble(
-      mean = ifelse(direction == "greater", mean(rb1 - rb0), mean(rb0 - rb1)),
-      lower = hdi1["lower"],
-      upper = hdi1["upper"]
+      arm = c(0, 1),
+      mean = c(mean(rb0), mean(rb1)),
+      lower = c(hdi0["lower"], hdi1["lower"]),
+      upper = c(hdi0["upper"], hdi1["upper"])
     )
   } else if (length(y) == 1) {
     rb1 <- rbeta(S, prior[1] + y, prior[2] + n - y)
     
-    hdi1 <- hdi(rb1)
+    hdi1 <- hdi(rb1, credMass = interval)
     
     out <- tibble(
+      arm = 1,
       mean = mean(rb1),
       lower = hdi1["lower"],
       upper = hdi1["upper"]

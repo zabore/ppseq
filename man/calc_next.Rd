@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_next.R
 \name{calc_next}
 \alias{calc_next}
-\title{Calculate a single posterior probability}
+\title{Calculate response probability for the next patient}
 \usage{
 calc_next(
   y,
@@ -39,10 +39,12 @@ distribution.}
 
 \item{S}{number of samples, default is 5000}
 
-\item{interval}{}
+\item{interval}{a value between 0 and 1 indicating the width of the desired
+interval, default is 0.95}
 }
 \value{
-Returns the numeric posterior probability
+Returns a tibble with the empiric mean and
+highest posterior density interval
 }
 \description{
 This function is meant to be used in the context of a
@@ -50,19 +52,20 @@ clinical trial with a binary endpoint. For the two-sample case, the total
 number of events in the standard-of-care arm is y0 and the total number of
 events in the experimental arm is y1. The function samples from the posterior
 beta distribution based on the data and the prior beta hyperparameters, and
-returns the posterior probability that p1 is greater than (or less than) p0
-given the data. The one-sample case is also available, in which a target p0
-must be specified and the function returns the posterior probability that
-p is greater than (or less than) p0 given the data.
+returns the empiric mean and highest posterior density interval for the next
+patient. The empiric mean represents the probability of the binary outcome
+occurring in the next patient.
+The one-sample case is also available, in which a target p0
+must be specified..
 }
 \examples{
 
 set.seed(123)
 
 # One-sample case
-calc_posterior(y = 27, n = 100, p0 = 0.2)
+calc_next(y = 27, n = 100, p0 = 0.2)
 
 # Two-sample case
-calc_posterior(y = c(14, 23), n = c(100, 100), p0 = NULL, delta = 0)
+calc_next(y = c(14, 23), n = c(100, 100), p0 = NULL, delta = 0)
 
 }

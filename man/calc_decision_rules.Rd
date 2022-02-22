@@ -63,7 +63,11 @@ In the two-sample case, returns a tibble with n0 and n1, the number
 enrolled subjects in the control and experimental arms at each look,
 respectively, r0 and r1, the number of possible responses in the control and
 experimental arms at each look, respectively, and ppp, the associated
-posterior predictive probability. Any NA value in either table represents an
+posterior predictive probability. For a given value of r0, stop the trial if
+the number of observed responses in the experimental arm is <=r1. At the end
+of the trial, the treatment is considered promising if the number of
+observed responses in the experimental arm is >=r1 for a given r0.
+Any NA value in either table represents an
 interim look where there is no number of responses that would lead to
 stopping the trial.
 }
@@ -76,16 +80,17 @@ optimal design using the functions \code{calibrate_thresholds} and
 \code{optimize_design}.
 }
 \examples{
-\donttest{
 set.seed(123)
 
+# Setting S = 100 for speed, in practice you would want a much larger sample
+
 # One-sample case
-calc_decision_rules(n = seq(5, 25, 5), N = 25, theta = 0.86, ppp = 0.2, p0 = 0.1)
+calc_decision_rules(n = seq(5, 25, 5), N = 25, theta = 0.86, ppp = 0.2, 
+p0 = 0.1, S = 100)
 
 # Two-sample case
 calc_decision_rules(n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25),
-theta = 0.86, ppp = 0.2, p0 = NULL, direction = "greater", delta = 0,
-prior = c(0.5, 0.5), S = 5000)
-}
+theta = 0.86, ppp = 0.2, p0 = NULL, direction = "greater", delta = 0, 
+S = 100)
 
 }

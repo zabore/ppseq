@@ -234,34 +234,34 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' for a null setting, and a measure of the power in the alternative setting.
 #'
 #' @examples
-#'
+#' \donttest{
+#' # Setting S = 100 and nsim = 100 for speed
+#' # In practice you would want a much larger sample and more simulations
+#' 
 #' # One-sample case
-#' \donttest{
 #' set.seed(123)
-#'
+#' 
 #' calibrate_thresholds(
-#'   p_null = 0.1, p_alt = 0.3,
-#'   n = seq(5, 25, 5), N = 25, 
-#'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#'   ppp_threshold = seq(0.05, 0.2, 0.05),
-#'   direction = "greater", delta = NULL,
-#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
+#'   p_null = 0.1, p_alt = 0.4,
+#'   n = seq(5, 15, 5), N = 15,
+#'   pp_threshold = c(0.85, 0.9),
+#'   ppp_threshold = c(0.1, 0.2),
+#'   S = 100, nsim = 100
 #' )
-#' }
-#'
+#' 
 #' # Two-sample case
-#' \donttest{
-#' set.seed(123)
-#'
+#' set.seed(456)
+#' 
 #' calibrate_thresholds(
-#'   p_null = c(0.1, 0.1), p_alt = c(0.1, 0.3),
-#'   n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25), 
-#'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#'   ppp_threshold = seq(0.05, 0.2, 0.05),
-#'   direction = "greater", delta = 0,
-#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
+#'   p_null = c(0.1, 0.1), p_alt = c(0.1, 0.5),
+#'   n = cbind(seq(5, 15, 5), seq(5, 15, 5)), N = c(15, 15),
+#'   pp_threshold = c(0.8, 0.85),
+#'   ppp_threshold = c(0.2, 0.3),
+#'   delta = 0,
+#'   S = 100, nsim = 100
 #' )
 #' }
+#' 
 #' @importFrom purrr pmap_dfr map cross_df
 #' @importFrom furrr future_map furrr_options
 #' @importFrom dplyr bind_rows full_join select rename ungroup summarize
