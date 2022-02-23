@@ -4,7 +4,7 @@
 
 # ppseq 0.1.2
 
-* Updating all examples to run without \donttest{} 
+* Updating all examples to run without `\donttest{}` 
 * Some minor documentation changes
 
 # ppseq 0.1.1
