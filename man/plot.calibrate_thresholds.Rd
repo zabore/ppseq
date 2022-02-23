@@ -37,19 +37,23 @@ based on various criteria, and to assist in selecting an optimal design.
 }
 \examples{
 
-\donttest{
+# Setting S = 50 and nsim = 50 for speed
+# In practice you would want a much larger sample and more simulations
+
 set.seed(123)
 
-cal_tbl <- calibrate_thresholds(
-  p_null = 0.1, p_alt = 0.3,
-  n = seq(5, 25, 5), N = 25, 
-  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-  ppp_threshold = seq(0.05, 0.2, 0.05),
-  direction = "greater", delta = NULL,
-  prior = c(0.5, 0.5), S = 5000, nsim = 1000
-)
+# One-sample case
+cal_tbl1 <- calibrate_thresholds(
+  p_null = 0.1,
+  p_alt = 0.4,
+  n = seq(5, 15, 5),
+  N = 15,
+  pp_threshold = c(0.85, 0.9),
+  ppp_threshold = c(0.1, 0.2),
+  S = 50,
+  nsim = 50
+  )
 
-plot(cal_tbl, type1_range = c(0.01, 0.2), minimum_power = 0.7)
-}
+plot(cal_tbl1, type1_range = c(0.01, 0.2), minimum_power = 0.7)
 
 }

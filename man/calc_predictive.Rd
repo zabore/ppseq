@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_predictive.R
 \name{calc_predictive}
 \alias{calc_predictive}
-\title{Calculate a single posterior predictive value}
+\title{Calculate a single posterior predictive probability}
 \usage{
 calc_predictive(
   y,
@@ -17,29 +17,30 @@ calc_predictive(
 )
 }
 \arguments{
-\item{y}{vector of length two containing number of events observed so far
-c(y0, y1) for two-sample case; integer of number of events y observed so far
-for one-sample case}
+\item{y}{number of events observed so far. Vector of length two c(y0, y1)
+for the two-sample case; integer y for the one-sample case.}
 
-\item{n}{vector of length two containing the sample size so far c(n0, n1)
-for two-sample case; integer of sample size so far for one-sample case}
+\item{n}{sample size observed so far. Vector of length two c(n0, n1)
+for the two-sample case; integer n for the one-sample case.}
 
-\item{p0}{The target value to compare to in the one-sample case. Set to NULL
+\item{p0}{the target value to compare to in the one-sample case. Set to NULL
 for the two-sample case.}
 
-\item{N}{the total planned sample size at the end of the trial, c(N0, N1)
-for two-sample case; integer of total planned sample size at end of trial N
-for one-sample case}
+\item{N}{the total planned sample size at the end of the trial. Vector of
+length two c(N0, N1) for the two-sample case; integer N for the one-sample
+case.}
 
-\item{direction}{"greater" (default) if interest is in P(p1 > p0) and "less"
-if interest is in P(p1 < p0) for two-sample case. For one-sample case,
-"greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).}
+\item{direction}{"greater" (default) if interest is in P(p1 > p0) in the
+two-sample case or P(p > p0) in the one-sample case; "less"
+if interest is in P(p1 < p0) for the two-sample case or P(p < p0) for the
+one-sample case.}
 
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 for the two-sample case. NULL for one-sample case (default).}
 
-\item{prior}{hyperparameters of prior beta distribution.
-Beta(0.5, 0.5) is default}
+\item{prior}{vector of length two containing hyperparameters of the prior
+beta distribution. c(0.5, 0.5) is default, for the Beta(0.5, 0.5)
+distribution.}
 
 \item{S}{number of samples, default is 5000}
 
@@ -48,23 +49,33 @@ P(p1 > p0) > theta for the two-sample case with greater direction.
 Default is 0.95.}
 }
 \value{
-Returns the posterior predictive probability of interest
+Returns the numeric posterior predictive probability
 }
 \description{
 This function is meant to be used in the context of a
 clinical trial with a binary endpoint. The goal is to calculate the posterior
 predictive probability of success at the end of a trial, given the data
-available at an interim analysis. For the two-arm case the number of events
+available at an interim analysis. For the two-sample case the number of events
 observed at interim analysis, the sample size at interim analysis,
 and the total planned sample size are denoted y0, n0, and N0 in
 the standard-of-care arm and y1, n1, and N1 in the experimental arm.
+For the one-sample case, the number of events observed at interim analysis,
+the sample size at interim analysis, and the total planned sample size are
+denoted y, n, and N.
 }
 \examples{
-\donttest{
 set.seed(123)
 
+# Setting S = 100 for speed, in practice you would want a much larger sample
+
 # One-sample case 
-calc_predictive(y = 14, n = 50, p0 = 0.2, N = 100)
+calc_predictive(
+  y = 14, 
+  n = 50, 
+  p0 = 0.2, 
+  N = 100, 
+  S = 100
+  )
 
 # Two-sample case 
 calc_predictive(
@@ -72,7 +83,8 @@ calc_predictive(
   n = c(50, 50), 
   p0 = NULL, 
   N = c(100, 100),
-  delta = 0)
-}
+  delta = 0,
+  S = 100
+  )
 
 }

@@ -24,20 +24,24 @@
 #' 
 #' @examples
 #'
-#' \donttest{
-#' set.seed(123)
-#'
-#' cal_tbl <- calibrate_thresholds(
-#'   p_null = 0.1, p_alt = 0.3,
-#'   n = seq(5, 25, 5), N = 25, 
-#'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#'   ppp_threshold = seq(0.05, 0.2, 0.05),
-#'   direction = "greater", delta = NULL,
-#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
-#' )
+#' # Setting S = 50 and nsim = 50 for speed
+#' # In practice you would want a much larger sample and more simulations
 #' 
-#' plot(cal_tbl, type1_range = c(0.01, 0.2), minimum_power = 0.7)
-#' }
+#' set.seed(123)
+#' 
+#' # One-sample case
+#' cal_tbl1 <- calibrate_thresholds(
+#'   p_null = 0.1,
+#'   p_alt = 0.4,
+#'   n = seq(5, 15, 5),
+#'   N = 15,
+#'   pp_threshold = c(0.85, 0.9),
+#'   ppp_threshold = c(0.1, 0.2),
+#'   S = 50,
+#'   nsim = 50
+#'   )
+#' 
+#' plot(cal_tbl1, type1_range = c(0.01, 0.2), minimum_power = 0.7)
 #'
 #' @importFrom dplyr rename mutate filter ungroup slice group_by arrange
 #'                   row_number
@@ -245,23 +249,24 @@ plot.calibrate_thresholds <- function(x,
 #' combinations where the trial would stop.
 #' 
 #' @examples
-#' \donttest{
+#' 
 #' set.seed(123)
+#' 
+#' # Setting S = 100 for speed, in practice you would want a much larger sample
 #' 
 #' # Two-sample case
 #' dec_tbl <- calc_decision_rules(
-#' n = cbind(seq(5, 25, 5), seq(5, 25, 5)), 
-#' N = c(25, 25),
-#' theta = 0.86, 
-#' ppp = 0.2, 
-#' p0 = NULL, 
-#' direction = "greater", 
-#' delta = 0,
-#' prior = c(0.5, 0.5), 
-#' S = 5000)
+#'   n = cbind(seq(5, 15, 5), seq(5, 15, 5)),
+#'   N = c(15, 15),
+#'   theta = 0.86,
+#'   ppp = 0.2,
+#'   p0 = NULL,
+#'   direction = "greater",
+#'   delta = 0,
+#'   S = 100
+#' )
 #' 
 #' plot(dec_tbl)
-#' }
 #' 
 #' @importFrom dplyr mutate filter select rename ungroup group_by 
 #' full_join case_when

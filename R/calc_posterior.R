@@ -10,32 +10,43 @@
 #' must be specified and the function returns the posterior probability that
 #' p is greater than (or less than) p0 given the data.
 #'
-#' @param y vector of length two containing total responses c(y0, y1) for
-#' two-sample case; integer of total responses y for one-sample case
-#' @param n vector of length two containing the sample size so far c(n0, n1)
-#' for two-sample case; integer of sample size so far n for one-sample case
-#' @param p0 The target value to compare to in the one-sample case. Set to NULL 
-#' in two-sample case.
-#' @param direction "greater" (default) if interest is in p(p1 > p0) and "less"
-#' if interest is in p(p1 < p0) for two-sample case. For one-sample case,
-#' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
+#' @param y number of events observed so far. Vector of length two c(y0, y1) 
+#' for the two-sample case; integer y for the one-sample case.
+#' @param n sample size observed so far. Vector of length two c(n0, n1)
+#' for the two-sample case; integer n for the one-sample case.
+#' @param p0 the target value to compare to in the one-sample case. Set to NULL
+#' for the two-sample case.
+#' @param direction "greater" (default) if interest is in P(p1 > p0) in the 
+#' two-sample case or P(p > p0) in the one-sample case; "less"
+#' if interest is in P(p1 < p0) for the two-sample case or P(p < p0) for the
+#' one-sample case.
 #' @param delta clinically meaningful difference between groups.
-#' Typically 0 for two-sample case. NULL for one-sample case (default).
-#' @param prior hyperparameters of prior beta distribution.
-#' Beta(0.5, 0.5) is default
+#' Typically 0 for the two-sample case. NULL for one-sample case (default).
+#' @param prior vector of length two containing hyperparameters of the prior 
+#' beta distribution. c(0.5, 0.5) is default, for the Beta(0.5, 0.5) 
+#' distribution.
 #' @param S number of samples, default is 5000
 #'
-#' @return Returns the posterior probability of interest
+#' @return Returns the numeric posterior probability 
 #'
 #' @examples
 #'
 #' set.seed(123)
+#' 
+#' # One-sample case
+#' calc_posterior(
+#'   y = 27, 
+#'   n = 100, 
+#'   p0 = 0.2
+#'   )
 #'
 #' # Two-sample case
-#' calc_posterior(y = c(14, 23), n = c(100, 100), p0 = NULL, delta = 0)
-#'
-#' # One-sample case
-#' calc_posterior(y = 27, n = 100, p0 = 0.2)
+#' calc_posterior(
+#'   y = c(14, 23), 
+#'   n = c(100, 100), 
+#'   p0 = NULL, 
+#'   delta = 0
+#'   )
 #' 
 #' @importFrom stats rbeta
 #' @export

@@ -70,18 +70,27 @@ given the data available at each interim analysis.
 }
 \examples{
 
-# One-sample case
 set.seed(123)
-sim_single_trial(
-  p = 0.3, n = c(5, 10), direction = "greater",
-  p0 = 0.1, delta = NULL, prior = c(0.5, 0.5), S = 50, N = 25, theta = 0.95
-)
 
-# # Two-sample case (not run)
-# set.seed(123)
-#  sim_single_trial(
-#    p = c(0.1, 0.3), n = cbind(c(5, 10), c(5, 10)),
-#    direction = "greater", p0 = NULL, delta = 0, prior = c(0.5, 0.5), 
-#    S = 5000, N = c(50, 50), theta = 0.95
-#  )
+# Setting S = 100 for speed, in practice you would want a much larger sample
+
+# One-sample case
+sim_single_trial(
+  p = 0.3, 
+  n = c(5, 10),  
+  p0 = 0.1, 
+  N = 25, 
+  S = 100
+  )
+
+# Two-sample case 
+sim_single_trial(
+  p = c(0.1, 0.3), 
+  n = cbind(c(5, 10), c(5, 10)), 
+  p0 = NULL, 
+  N = c(50, 50), 
+  delta = 0, 
+  S = 100
+  )
+  
 }

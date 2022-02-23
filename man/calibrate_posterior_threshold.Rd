@@ -56,29 +56,27 @@ threshold. In an alternative case, this will result in the power at a given
 threshold.
 }
 \examples{
-\donttest{
 set.seed(123)
+
+# Setting S = 100 for speed, in practice you would want a much larger sample
 
 # One-sample case
 calibrate_posterior_threshold(
-  p = 0.1, 
-  N = 50, 
-  direction = "greater",
-  p0 = 0.1, 
-  delta = NULL, 
-  prior = c(0.5, 0.5), 
-  S = 5000, 
-  theta = c(0.9, 0.95))
+  p = 0.1,
+  N = 50,
+  p0 = 0.1,
+  S = 100,
+  theta = c(0.9, 0.95)
+  )
 
 # Two-sample case
 calibrate_posterior_threshold(
-  p = c(0.1, 0.1), 
+  p = c(0.1, 0.1),
   N = c(50, 50),
-  direction = "greater", 
-  p0 = NULL, 
-  delta = 0, 
-  prior = c(0.5, 0.5),
-  S = 5000, 
-  theta = c(0.9, 0.95))
-}
+  p0 = NULL,
+  delta = 0,
+  S = 100,
+  theta = c(0.9, 0.95)
+  )
+  
 }
