@@ -42,7 +42,6 @@ Imports:
     purrr,
     tibble,
     patchwork,
-    tidyr,
-    HDInterval
+    tidyr
 Config/testthat/edition: 3
 Language: en-US
