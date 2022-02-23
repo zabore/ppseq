@@ -13,6 +13,7 @@ eval_thresh(
   N,
   direction = "greater",
   delta = NULL,
+  monitoring = "futility",
   prior = c(0.5, 0.5),
   S = 5000
 )
@@ -39,6 +40,9 @@ if interest is in P(p1 < p0) for two-sample case. For one-sample case,
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 for the two-sample case. NULL for the one-sample case (default).}
 
+\item{monitoring}{the type of interim monitoring to be perfomed. One of
+"futility" or "efficacy". Default is "futility".}
+
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}
 
@@ -52,7 +56,7 @@ predictive probability generated from calc_predictive(), and an indicator
 for whether the trial was positive or not at the end
 }
 \description{
-Helper function for calibrate_thresholds() function that evaluates
-a single combination of a pp_threshold and a ppp_threshold for a single
-dataset
+Helper function for calibrate_thresholds() function that
+evaluates a single combination of a pp_threshold and a ppp_threshold for a
+single dataset
 }
