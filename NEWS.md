@@ -1,3 +1,5 @@
+# ppseq (development version)
+
 # ppseq 0.1.2
 
 # ppseq 0.1.1
