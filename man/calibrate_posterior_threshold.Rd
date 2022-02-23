@@ -66,7 +66,8 @@ calibrate_posterior_threshold(
   N = 50,
   p0 = 0.1,
   S = 100,
-  theta = c(0.9, 0.95))
+  theta = c(0.9, 0.95)
+  )
 
 # Two-sample case
 calibrate_posterior_threshold(
@@ -75,6 +76,7 @@ calibrate_posterior_threshold(
   p0 = NULL,
   delta = 0,
   S = 100,
-  theta = c(0.9, 0.95))
+  theta = c(0.9, 0.95)
+  )
   
 }

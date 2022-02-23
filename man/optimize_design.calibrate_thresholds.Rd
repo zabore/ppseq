@@ -33,36 +33,42 @@ accuracy design is the one with the shortest Euclidean distance to the
 upper left point on a plot of the type I error by the power.
 }
 \examples{
-\donttest{
-# Setting S = 100 and nsim = 100 for speed, in practice you would want a much larger sample and more simulations
+
+# Setting S = 50 and nsim = 50 for speed
+# In practice you would want a much larger sample and more simulations
 
 # One-sample case
 set.seed(123)
 
-cal_tbl <- calibrate_thresholds(
-  p_null = 0.1, p_alt = 0.4,
-  n = seq(5, 15, 5), N = 15,
+cal_tbl1 <- calibrate_thresholds(
+  p_null = 0.1, 
+  p_alt = 0.4,
+  n = seq(5, 15, 5), 
+  N = 15,
   pp_threshold = c(0.85, 0.9),
   ppp_threshold = c(0.1, 0.2),
-  S = 100, nsim = 100
-)
+  S = 50, 
+  nsim = 50
+  )
 
-optimize_design(cal_tbl)
+optimize_design(cal_tbl1)
 
 
 # Two-sample case
 set.seed(456)
 
 cal_tbl2 <- calibrate_thresholds(
-  p_null = c(0.1, 0.1), p_alt = c(0.1, 0.5),
-  n = cbind(seq(5, 15, 5), seq(5, 15, 5)), N = c(15, 15),
+  p_null = c(0.1, 0.1), 
+  p_alt = c(0.1, 0.5),
+  n = cbind(seq(5, 15, 5), seq(5, 15, 5)), 
+  N = c(15, 15),
   pp_threshold = c(0.8, 0.85),
   ppp_threshold = c(0.2, 0.3),
   delta = 0,
-  S = 100, nsim = 100
-)
+  S = 50, 
+  nsim = 50
+  )
 
 optimize_design(cal_tbl2)
-}
 
 }

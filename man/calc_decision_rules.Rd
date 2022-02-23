@@ -85,12 +85,25 @@ set.seed(123)
 # Setting S = 100 for speed, in practice you would want a much larger sample
 
 # One-sample case
-calc_decision_rules(n = seq(5, 25, 5), N = 25, theta = 0.86, ppp = 0.2, 
-p0 = 0.1, S = 100)
+calc_decision_rules(
+  n = seq(5, 25, 5), 
+  N = 25, 
+  theta = 0.86, 
+  ppp = 0.2, 
+  p0 = 0.1, 
+  S = 100
+  )
 
 # Two-sample case
-calc_decision_rules(n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25),
-theta = 0.86, ppp = 0.2, p0 = NULL, direction = "greater", delta = 0, 
-S = 100)
+calc_decision_rules(
+  n = cbind(seq(5, 25, 5), seq(5, 25, 5)), 
+  N = c(25, 25),
+  theta = 0.86, 
+  ppp = 0.2, 
+  p0 = NULL, 
+  direction = "greater", 
+  delta = 0, 
+  S = 100
+  )
 
 }

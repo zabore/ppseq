@@ -57,9 +57,18 @@ p is greater than (or less than) p0 given the data.
 set.seed(123)
 
 # One-sample case
-calc_posterior(y = 27, n = 100, p0 = 0.2)
+calc_posterior(
+  y = 27, 
+  n = 100, 
+  p0 = 0.2
+  )
 
 # Two-sample case
-calc_posterior(y = c(14, 23), n = c(100, 100), p0 = NULL, delta = 0)
+calc_posterior(
+  y = c(14, 23), 
+  n = c(100, 100), 
+  p0 = NULL, 
+  delta = 0
+  )
 
 }

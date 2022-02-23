@@ -42,7 +42,13 @@
 #' # Setting S = 100 for speed, in practice you would want a much larger sample
 #'
 #' # One-sample case 
-#' calc_predictive(y = 14, n = 50, p0 = 0.2, N = 100, S = 100)
+#' calc_predictive(
+#'   y = 14, 
+#'   n = 50, 
+#'   p0 = 0.2, 
+#'   N = 100, 
+#'   S = 100
+#'   )
 #'
 #' # Two-sample case 
 #' calc_predictive(
@@ -51,7 +57,8 @@
 #'   p0 = NULL, 
 #'   N = c(100, 100),
 #'   delta = 0,
-#'   S = 100)
+#'   S = 100
+#'   )
 #'
 #' @importFrom stats rbeta rbinom
 #' @importFrom purrr map_dbl map2_dbl

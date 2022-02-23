@@ -63,9 +63,18 @@ must be specified..
 set.seed(123)
 
 # One-sample case
-calc_next(y = 27, n = 100, p0 = 0.2)
+calc_next(
+  y = 27, 
+  n = 100, 
+  p0 = 0.2
+  )
 
 # Two-sample case
-calc_next(y = c(14, 23), n = c(100, 100), p0 = NULL, delta = 0)
+calc_next(
+  y = c(14, 23), 
+  n = c(100, 100), 
+  p0 = NULL, 
+  delta = 0
+  )
 
 }
