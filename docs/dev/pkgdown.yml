@@ -1,0 +1,10 @@
+pandoc: 2.14.0.3
+pkgdown: 2.0.2
+pkgdown_sha: ~
+articles:
+  one_sample_expansion: one_sample_expansion.html
+last_built: 2022-04-14T17:54Z
+urls:
+  reference: http://www.emilyzabor.com/ppseq/reference
+  article: http://www.emilyzabor.com/ppseq/articles
+

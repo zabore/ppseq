@@ -40,7 +40,7 @@ if interest is in P(p1 < p0) for two-sample case. For one-sample case,
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 for the two-sample case. NULL for the one-sample case (default).}
 
-\item{monitoring}{the type of interim monitoring to be perfomed. One of
+\item{monitoring}{the type of interim monitoring to be performed. One of
 "futility" or "efficacy". Default is "futility".}
 
 \item{prior}{hyperparameters of prior beta distribution.
