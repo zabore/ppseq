@@ -34,10 +34,10 @@ optimize_design <- function(x,
 #' \code{calibrate_thresholds} function
 #' @param type1_range a vector specifying the minimum and maximum acceptable
 #' type I error. Specify NULL to return the full range of resulting type I
-#' error. Defaults to c(0.05, 0.1)
+#' error. Defaults to c(0, 1) to return all results.
 #' @param minimum_power a numeric between 0 and 1 specifying the minimum
 #' acceptable power. Specify NULL to return the full range of resulting power.
-#' Defaults to 0.8.
+#' Defaults to 0 to return all results.
 #' @param ... ignored
 #' 
 #' @return A list of length two containing details of the optimal efficiency
@@ -62,7 +62,7 @@ optimize_design <- function(x,
 #'   nsim = 50
 #'   )
 #' 
-#' optimize_design(cal_tbl1)
+#' optimize_design(cal_tbl1, type1_range = c(0.05, 0.1), minimum_power = 0.8)
 #' 
 #' 
 #' # Two-sample case
@@ -80,14 +80,14 @@ optimize_design <- function(x,
 #'   nsim = 50
 #'   )
 #' 
-#' optimize_design(cal_tbl2)
+#' optimize_design(cal_tbl2, type1_range = c(0.05, 0.1), minimum_power = 0.8)
 #'
 #' @importFrom dplyr rename mutate filter slice group_by arrange
 #' @export
 
 optimize_design.calibrate_thresholds <- function(x,
-                                                 type1_range = c(0.05, 0.1),
-                                                 minimum_power = 0.8, ...) {
+                                                 type1_range = c(0, 1),
+                                                 minimum_power = 0, ...) {
   if (any(class(x) == "calibrate_thresholds") == FALSE)
     stop("x must be class 'calibrate_thresholds', usually an object ",
          "returned from a call to the function ppseq::calibrate_thresholds()")
