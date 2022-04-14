@@ -68,9 +68,9 @@ sim_dat1 <- function(p, n) {
 #' Evaluate a single dataset for a single pp_threshold and ppp_threshold
 #' combination
 #'
-#' @description Helper function for calibrate_thresholds() function that evaluates
-#' a single combination of a pp_threshold and a ppp_threshold for a single
-#' dataset
+#' @description Helper function for calibrate_thresholds() function that 
+#' evaluates a single combination of a pp_threshold and a ppp_threshold for a 
+#' single dataset
 #'
 #' @param data the name of the dataset
 #' @param pp_threshold the posterior probability threshold of interest
@@ -86,10 +86,11 @@ sim_dat1 <- function(p, n) {
 #' "greater" if interest is in P(p > p0) and "less" if interest is in P(p < p0).
 #' @param delta clinically meaningful difference between groups.
 #' Typically 0 for the two-sample case. NULL for the one-sample case (default).
+#' @param monitoring the type of interim monitoring to be performed. One of 
+#' "futility" or "efficacy". Default is "futility".
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples, default is 5000
-
 #'
 #' @return Returns a tibble with the total sample size at the end of the
 #' trial, the number of responses observed at the end of the trial, the
@@ -101,7 +102,12 @@ sim_dat1 <- function(p, n) {
 #' @importFrom dplyr mutate case_when
 eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N, 
                         direction = "greater", delta = NULL,
+                        monitoring = "futility",
                         prior = c(0.5, 0.5), S = 5000) {
+  
+  if (!monitoring %in% c("futility", "efficacy"))
+    stop('monitoring must be either "futility" or "efficacy"')
+  
   decision <- NULL
   ppp <- NULL
   for (i in 1:nrow(data)) {
@@ -130,41 +136,26 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
         theta = pp_threshold
       )
     }
-    decision[i] <- ppp[i] < ppp_threshold
+    decision[i] <- ifelse(monitoring == "futility", 
+                          ppp[i] < ppp_threshold,
+                          ppp[i] > ppp_threshold)
     if (decision[i] == TRUE) break
   }
-  res0 <- add_column(
+  
+  res <- mutate(
     data[ifelse(any(decision == TRUE),
-      which(decision == TRUE),
-      length(decision)
+                which(decision == TRUE),
+                length(decision)
     ), ],
     pp_threshold = pp_threshold,
     ppp_threshold = ppp_threshold,
     ppp = ppp[ifelse(any(decision == TRUE),
-      which(decision == TRUE),
-      length(decision)
-    )]
+                     which(decision == TRUE),
+                     length(decision)
+    )],
+    positive = ppp > pp_threshold
   )
-
-  if (ncol(data) == 4) {
-    res <- mutate(
-      res0,
-      positive = case_when(
-        sum(n0, n1) == sum(N) & ppp > pp_threshold ~ TRUE,
-        sum(n0, n1) == sum(N) & ppp <= pp_threshold ~ FALSE,
-        sum(n0, n1) != sum(N) ~ FALSE
-      )
-    )
-  } else if (ncol(data) == 2) {
-    res <- mutate(
-      res0,
-      positive = case_when(
-        n1 == N & ppp > pp_threshold ~ TRUE,
-        n1 == N & ppp <= pp_threshold ~ FALSE,
-        n1 != N ~ FALSE
-      )
-    )
-  }
+  
   return(res)
 }
 
@@ -209,6 +200,8 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
 #' @param delta clinically meaningful difference between groups.
 #' Typically 0 for the two-sample case. NULL for the one-sample case (default).
+#' @param monitoring the type of interim monitoring to be perfomed. One of 
+#' "futility" or "efficacy". Default is "futility".
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default
 #' @param S number of samples drawn from the posterior. Default is 5000
@@ -275,20 +268,21 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 calibrate_thresholds <- function(p_null, p_alt, n, N,
                                  pp_threshold, ppp_threshold, 
                                  direction = "greater", delta = NULL, 
+                                 monitoring = "futility",
                                  prior = c(0.5, 0.5),
                                  S = 5000, nsim = 1000) {
   sim_dat_null <-
     map(seq_len(nsim), ~ sim_dat1(p = p_null, n = n))
-
+  
   sim_dat_alt <-
     map(seq_len(nsim), ~ sim_dat1(p = p_alt, n = n))
-
+  
   cross_threshold <-
     cross_df(list(
       pp_threshold = pp_threshold,
       ppp_threshold = ppp_threshold
     ))
-
+  
   p0 <- if(length(p_null) == 1) 
     p_null else if(length(p_null) == 2)
       NULL
@@ -307,7 +301,8 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
                                delta = delta, 
                                prior = prior, 
                                S = S, 
-                               N = N)), 
+                               N = N,
+                               monitoring = monitoring)), 
       .options = furrr_options(seed = TRUE)
     )
   
@@ -325,43 +320,44 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
                                delta = delta, 
                                prior = prior, 
                                S = S, 
-                               N = N)),
+                               N = N,
+                               monitoring = monitoring)),
       .options = furrr_options(seed = TRUE)
     )
-
+  
   res_df_null <-
     bind_rows(
       res_null,
       .id = "sim_num"
     )
-
+  
   res_df_alt <-
     bind_rows(
       res_alt,
       .id = "sim_num"
     )
-
+  
   if (length(p_null) == 2) {
     res_df <-
       full_join(
         select(
           rename(res_df_null,
-            n0_null = n0, 
-            n1_null = n1,
-            positive_null = positive
+                 n0_null = n0, 
+                 n1_null = n1,
+                 positive_null = positive
           ),
           -ppp, -y0, -y1
         ),
         select(
           rename(res_df_alt,
-            n0_alt = n0, 
-            n1_alt = n1,
-            positive_alt = positive
+                 n0_alt = n0, 
+                 n1_alt = n1,
+                 positive_alt = positive
           ),
           -ppp, -y0, -y1
         )
       )
-
+    
     res_summary <-
       ungroup(
         summarize(
@@ -388,7 +384,7 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
           -ppp, -y1
         )
       )
-
+    
     res_summary <-
       ungroup(
         summarize(
@@ -402,13 +398,13 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
         )
       )
   }
-
+  
   # create empty list to return everything
   x <- list()
-
+  
   # add the main results in
   x$res_summary <- res_summary
-
+  
   # will return call, and all object passed to in table1 call
   # the object func_inputs is a list of every object passed to the function
   calibrate_thresholds_inputs <- list(
@@ -422,9 +418,10 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
     N = N,
     nsim = nsim,
     pp_threshold = pp_threshold,
-    ppp_threshold = ppp_threshold
+    ppp_threshold = ppp_threshold,
+    monitoring = monitoring
   )
-
+  
   # create other objects to return
   x$call_list <- list(calibrate_thresholds = match.call())
   x$inputs <- calibrate_thresholds_inputs
@@ -435,4 +432,3 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
   x
   
 }
-
