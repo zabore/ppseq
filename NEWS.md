@@ -1,6 +1,7 @@
 # ppseq (development version)
 
-* Added the option for efficacy monitoring in `calibrate_thresholds()`, default is still futility monitoring
+* fixed a bug in the default arguments to `optimize_design()` (Closed Issue #12)
+* added efficacy monitoring option, default is still futility monitoring (Closed Issue #3)
 
 # ppseq 0.1.2
 
