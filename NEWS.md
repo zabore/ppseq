@@ -1,12 +1,12 @@
-# ppseq 0.1.3
+# ppseq (development version)
 
-* fixed a bug in the default arguments to `optimize_design()`
-* Closed Issue #12
+* fixed a bug in the default arguments to `optimize_design()` (Closed Issue #12)
+* added efficacy monitoring (Closed Issue #3)
 
 # ppseq 0.1.2
 
-* added efficacy monitoring
-* Close Issue #3
+* Updating all examples to run without `\donttest{}` 
+* Some minor documentation changes
 
 # ppseq 0.1.1
 
