@@ -62,7 +62,7 @@ optimize_design <- function(x,
 #'   nsim = 50
 #'   )
 #' 
-#' optimize_design(cal_tbl1, type1_range = c(0.05, 0.1), minimum_power = 0.8)
+#' optimize_design(cal_tbl1)
 #' 
 #' 
 #' # Two-sample case
@@ -80,7 +80,7 @@ optimize_design <- function(x,
 #'   nsim = 50
 #'   )
 #' 
-#' optimize_design(cal_tbl2, type1_range = c(0.05, 0.1), minimum_power = 0.8)
+#' optimize_design(cal_tbl2)
 #'
 #' @importFrom dplyr rename mutate filter slice group_by arrange
 #' @export

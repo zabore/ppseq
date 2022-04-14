@@ -1,7 +1,7 @@
 # ppseq (development version)
 
 * fixed a bug in the default arguments to `optimize_design()` (Closed Issue #12)
-* added efficacy monitoring (Closed Issue #3)
+* added efficacy monitoring option, default is still futility monitoring (Closed Issue #3)
 
 # ppseq 0.1.2
 
