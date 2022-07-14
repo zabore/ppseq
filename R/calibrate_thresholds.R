@@ -200,7 +200,7 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #' "greater" if interest is in p(p > p0) and "less" if interest is in p(p < p0).
 #' @param delta clinically meaningful difference between groups.
 #' Typically 0 for the two-sample case. NULL for the one-sample case (default).
-#' @param monitoring the type of interim monitoring to be perfomed. One of 
+#' @param monitoring the type of interim monitoring to be performed. One of 
 #' "futility" or "efficacy". Default is "futility".
 #' @param prior hyperparameters of prior beta distribution.
 #' Beta(0.5, 0.5) is default

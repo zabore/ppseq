@@ -107,35 +107,54 @@ If only a single look will be done
 at the end of the trial, this can be a vector specifying the total sample
 size c(N0, N1) for the two-sample case or an integer specifying the total
 sample size N for the one-sample case</p></dd>
+
+
 <dt>N</dt>
 <dd><p>the total planned sample size at the end of the trial, c(N0, N1)
 for two-sample case; integer of total planned sample size at end of trial N
 for one-sample case</p></dd>
+
+
 <dt>theta</dt>
 <dd><p>The target posterior probability. e.g. Efficacy decision if
 P(p1 &gt; p0) &gt; theta for the two-sample case with greater direction.</p></dd>
+
+
 <dt>ppp</dt>
 <dd><p>The target predictive probability. e.g. Stop the trial if the
 predictive probability falls below this target.</p></dd>
+
+
 <dt>p0</dt>
 <dd><p>The target value to compare to in the one-sample case. Set to NULL
 for the two-sample case.</p></dd>
+
+
 <dt>direction</dt>
 <dd><p>"greater" (default) if interest is in P(p1 &gt; p0) and "less"
 if interest is in P(p1 &lt; p0) for two-sample case. For one-sample case,
 "greater" if interest is in P(p &gt; p0) and "less" if interest is in P(p &lt; p0).</p></dd>
+
+
 <dt>delta</dt>
 <dd><p>clinically meaningful difference between groups.
 Typically 0 for two-sample case. NULL for one-sample case (default).</p></dd>
+
+
 <dt>prior</dt>
 <dd><p>hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default</p></dd>
+
+
 <dt>S</dt>
 <dd><p>number of samples, default is 5000</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>In the one-sample case, returns a tibble with n at each look, r at
+    
+
+<p>In the one-sample case, returns a tibble with n at each look, r at
 each look, and ppp, the associated posterior predictive probability.
 Stop the trial at that look if the number of observed responses is &lt;=r.
 At the end of the trial, the treatment is considered promising if the number
@@ -168,7 +187,7 @@ stopping the trial.</p>
 <span class="r-in">  p0 <span class="op">=</span> <span class="fl">0.1</span>, </span>
 <span class="r-in">  S <span class="op">=</span> <span class="fl">100</span></span>
 <span class="r-in">  <span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 x 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       n     r   ppp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     5     0  0.13</span>
@@ -188,7 +207,7 @@ stopping the trial.</p>
 <span class="r-in">  delta <span class="op">=</span> <span class="fl">0</span>, </span>
 <span class="r-in">  S <span class="op">=</span> <span class="fl">100</span></span>
 <span class="r-in">  <span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 80 x 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 80 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       n0    n1    r0    r1   ppp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     5     5     0    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span>
@@ -201,7 +220,7 @@ stopping the trial.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>    10    10     1    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>    10    10     2    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10    10     3    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ... with 70 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 70 more rows</span></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>
@@ -217,7 +236,7 @@ stopping the trial.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

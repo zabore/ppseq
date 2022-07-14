@@ -101,30 +101,45 @@ p is greater than (or less than) p0 given the data.</p>
     <dl><dt>y</dt>
 <dd><p>number of events observed so far. Vector of length two c(y0, y1)
 for the two-sample case; integer y for the one-sample case.</p></dd>
+
+
 <dt>n</dt>
 <dd><p>sample size observed so far. Vector of length two c(n0, n1)
 for the two-sample case; integer n for the one-sample case.</p></dd>
+
+
 <dt>p0</dt>
 <dd><p>the target value to compare to in the one-sample case. Set to NULL
 for the two-sample case.</p></dd>
+
+
 <dt>direction</dt>
 <dd><p>"greater" (default) if interest is in P(p1 &gt; p0) in the
 two-sample case or P(p &gt; p0) in the one-sample case; "less"
 if interest is in P(p1 &lt; p0) for the two-sample case or P(p &lt; p0) for the
 one-sample case.</p></dd>
+
+
 <dt>delta</dt>
 <dd><p>clinically meaningful difference between groups.
 Typically 0 for the two-sample case. NULL for one-sample case (default).</p></dd>
+
+
 <dt>prior</dt>
 <dd><p>vector of length two containing hyperparameters of the prior
 beta distribution. c(0.5, 0.5) is default, for the Beta(0.5, 0.5)
 distribution.</p></dd>
+
+
 <dt>S</dt>
 <dd><p>number of samples, default is 5000</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns the numeric posterior probability</p>
+    
+
+<p>Returns the numeric posterior probability</p>
     </div>
 
     <div id="ref-examples">
@@ -163,7 +178,7 @@ distribution.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>
