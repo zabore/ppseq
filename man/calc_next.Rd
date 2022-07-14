@@ -4,16 +4,7 @@
 \alias{calc_next}
 \title{Calculate response probability for the next patient}
 \usage{
-calc_next(
-  y,
-  n,
-  p0,
-  direction = "greater",
-  delta = NULL,
-  prior = c(0.5, 0.5),
-  S = 5000,
-  interval = 0.95
-)
+calc_next(y, n, prior = c(0.5, 0.5), S = 5000, interval = 0.95)
 }
 \arguments{
 \item{y}{number of events observed so far. Vector of length two c(y0, y1)
@@ -21,17 +12,6 @@ for the two-sample case; integer y for the one-sample case.}
 
 \item{n}{sample size observed so far. Vector of length two c(n0, n1)
 for the two-sample case; integer n for the one-sample case.}
-
-\item{p0}{the target value to compare to in the one-sample case. Set to NULL
-for the two-sample case.}
-
-\item{direction}{"greater" (default) if interest is in P(p1 > p0) in the
-two-sample case or P(p > p0) in the one-sample case; "less"
-if interest is in P(p1 < p0) for the two-sample case or P(p < p0) for the
-one-sample case.}
-
-\item{delta}{clinically meaningful difference between groups.
-Typically 0 for the two-sample case. NULL for one-sample case (default).}
 
 \item{prior}{vector of length two containing hyperparameters of the prior
 beta distribution. c(0.5, 0.5) is default, for the Beta(0.5, 0.5)
@@ -43,8 +23,9 @@ distribution.}
 interval, default is 0.95}
 }
 \value{
-Returns a tibble with the empiric mean and
-highest posterior density interval
+Returns a tibble with the group indicator (for the two-sample case
+only), the empiric mean, the bootstrap confidence interval, and the
+specified width of the confidence interval.
 }
 \description{
 This function is meant to be used in the context of a
@@ -52,11 +33,10 @@ clinical trial with a binary endpoint. For the two-sample case, the total
 number of events in the standard-of-care arm is y0 and the total number of
 events in the experimental arm is y1. The function samples from the posterior
 beta distribution based on the data and the prior beta hyperparameters, and
-returns the empiric mean and highest posterior density interval for the next
+returns the empiric mean and bootstrap confidence interval for the next
 patient. The empiric mean represents the probability of the binary outcome
 occurring in the next patient.
-The one-sample case is also available, in which a target p0
-must be specified..
+The one-sample case is also available.
 }
 \examples{
 
@@ -65,16 +45,13 @@ set.seed(123)
 # One-sample case
 calc_next(
   y = 27, 
-  n = 100, 
-  p0 = 0.2
+  n = 100
   )
 
 # Two-sample case
 calc_next(
   y = c(14, 23), 
-  n = c(100, 100), 
-  p0 = NULL, 
-  delta = 0
+  n = c(100, 100)
   )
 
 }
