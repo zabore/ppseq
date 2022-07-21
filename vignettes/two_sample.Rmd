@@ -1,0 +1,31 @@
+---
+title: "Two-sample randomized trial"
+author: "Emily C. Zabor"
+date: "Last updated: `r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Two-sample randomized trial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Setup
+
+To execute the code in this vignette, you first need to install and load the {ppseq} package.
+
+```{r setup, warning = FALSE, message = FALSE, error = FALSE}
+# remotes::install_github("zabore/ppseq")
+library(ppseq)
+```
+
+# Introduction
+
