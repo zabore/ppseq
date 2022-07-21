@@ -1,0 +1,59 @@
+% Encoding: UTF-8
+
+@Article{Zabor2022,
+  author   = {Zabor, Emily C and Kaizer, Alexander M and Garrett-Mayer, Elizabeth and Hobbs, Brian P},
+  journal  = {JCO Precision Oncology},
+  title    = {Optimal sequential predictive probability designs for early-phase oncology expansion cohorts},
+  year     = {2022},
+  month    = mar,
+  number   = {6},
+  pages    = {e2100390},
+  volume   = {6},
+  abstract = {PURPOSE: The customary approach to early-phase clinical trial
+               design, where the focus is on identification of the maximum
+               tolerated dose, is not always suitable for noncytotoxic or other
+               targeted therapies. Many trials have continued to follow the 3 +
+               3 dose-escalation design, but with the addition of phase I
+               dose-expansion cohorts to further characterize safety and assess
+               efficacy. Dose-expansion cohorts are not always planned in
+               advance nor rigorously designed. We introduce an approach to the
+               design of phase I expansion cohorts on the basis of sequential
+               predictive probability monitoring. METHODS: Two optimization
+               criteria are proposed that allow investigators to stop for
+               futility to preserve limited resources while maintaining
+               traditional control of type I and type II errors. We demonstrate
+               the use of these designs through simulation, and we elucidate
+               their implementation with a redesign of the phase I expansion
+               cohort for atezolizumab in metastatic urothelial carcinoma.
+               RESULTS: A sequential predictive probability design outperforms
+               Simon's two-stage designs and posterior probability monitoring
+               with respect to both proposed optimization criteria. The
+               Bayesian sequential predictive probability design yields
+               increased power while significantly reducing the average sample
+               size under the null hypothesis in the context of the case study,
+               whereas the original study design yields too low type I error
+               and power. The optimal efficiency design tended to have more
+               desirable properties, subject to constraints on type I error and
+               power, compared with the optimal accuracy design. CONCLUSION:
+               The optimal efficiency design allows investigators to preserve
+               limited financial resources and to maintain ethical standards by
+               halting potentially large dose-expansion cohorts early in the
+               absence of promising efficacy results, while maintaining
+               traditional control of type I and II error rates.},
+  language = {en},
+}
+
+@Article{Powles2014,
+  author  = {Powles, T. and Eder, J. P. and Fine, G. D. and Braiteh, F. S. and Loriot, Y. and Cruz, C. and Bellmunt, J. and Burris, H. A. and Petrylak, D. P. and Teng, S. L. and Shen, X. and Boyd, Z. and Hegde, P. S. and Chen, D. S. and Vogelzang, N. J.},
+  journal = {Nature},
+  title   = {MPDL3280A (anti-PD-L1) treatment leads to clinical activity in metastatic bladder cancer},
+  year    = {2014},
+  issn    = {0028-0836},
+  number  = {7528},
+  pages   = {558-62},
+  volume  = {515},
+  doi     = {10.1038/nature13904},
+  type    = {Journal Article},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

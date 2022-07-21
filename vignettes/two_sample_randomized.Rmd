@@ -1,0 +1,89 @@
+---
+title: "Two-sample randomized trial"
+author: "Emily C. Zabor"
+date: "Last updated: `r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Two-sample randomized trial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Setup
+
+To execute the code in this vignette, you first need to install and load the {ppseq} package. You will also need the {future} package to parallelize your code to improve speed.
+
+```{r setup, warning = FALSE, message = FALSE, error = FALSE}
+#install.packages("ppseq")
+library(ppseq)
+#install.packages("future")
+library(future)
+```
+
+# Introduction
+
+Efforts to develop biomarker-targeted anti-cancer therapies have progressed rapidly in recent years. Witht he aim of expediting regulatory reviews of promising therapies, an increasing number of targeted cancer therapies are being granted accelerated approval on the basis of evidence acquired in single-arm phase II clinical trials. The historical control rates used to design and evaluate emerging targeted therapies in single-arm trials often arise as population averages, lacking specificity to the biomarker-targeted subpopulation of interest. Thus, historical trial results are inherently limited for inferring the potential “comparative efficacy” of novel targeted therapies. Randomization may be the best option in this setting, and is not out of the question given the increasingly large sample sizes being used in phase II trials. We propose a design for two-arm randomized phase II trials based on sequential predictive probability monitoring that allows an investigator to identify an optimal clinical trial design within contraints of traditional type I error and power, and with futility stopping rules that preserve valuable human and financial resources (cite two-sample paper once it's available).
+
+
+# Case study background
+
+Atezolizumab is a programmed death-ligand 1 (PD-L1) blocking monoclonal antibody that was given accelerated approval by the U.S. Food and Drug Administration in May 2016 for the treatment of patients with locally advanced or metastatic urothelial carcinoma who had disease progression following platinum-containing chemotherapy. The approval was based on the results of a single-arm phase II study in 310 patients [@Rosenberg2016]. The phase II study used a hierarchical fixed-sequence testing procedure to test increasingly broad subgroups of patients based on PD-L1 status, and found overall response rates of 26% (95% CI: 18-36), 18% (95% CI: 13-24), and 15% (95% CI 11-19) in patients with ≥5% PD-L1-positive immune cells (IC2/3 subgroup), in patients with ≥1% PD-L1-positive immune cells (IC1/2/3 subgroup), and in all patients, respectively [@Rosenberg2016]. All three rates exceeded the historical control rate of 10%. Then, in March 2021, the approval in this indication was voluntarily withdrawn by the sponsor following negative results from a randomized phase III study [@Powles2018]. In the phase III study, 931 patients were randomly assigned to receive atezolizumab or chemotherapy in a 1:1 ratio, and the same hierarchical fixed-sequence testing procedure as in the phase II study was used. The phase III study found that overall survival did not differ significantly between the atezolizumab and chemotherapy groups of the IC2/3 subgroup (median survival 11.1 months [95% CI: 8.6-15.5] versus 10.6 months [95% CI: 8.4-12.2]), so no further testing was conducted for the primary endpoint (3). Further analyses revealed that while the response rates to atezolizumab were comparable to those seen in the phase II study, the response rates to chemotherapy were much higher than the historical control rate of 10%. The overall response rates to chemotherapy were 21.6% (95% CI: 14.5-30.2), 14.7% (95% CI: 10.9-19.2), and 13.4% (95% CI: 10.5-16.9) for the IC2/3 subgroup, IC1/2/3 subgroup, and all patients, respectively. The overall response rates to atezolizumab were 23% (95% CI: 15.6-31.9), 14.1% (95% CI: 10.4-18.5), and 13.4% (95% CI: 10.5-16.9) for the IC2/3 subgroup, IC1/2/3 subgroup, and all patients, respectively. These results indicate that PD-L1 status is a predictive biomarker for both standard of care chemotherapies that comprised the control arm as well as atezolizumab in this patient population. 
+
+
+# Re-design of case study
+
+We will demonstrate the use of the functions in {ppseq} to re-design the phase II trial of atezolizumab using a two-arm randomized design with sequential predictive probability monitoring. We focus here on the main biomarker subgroup of interest, the IC2/3 subgroup. We design the study with a null response rate of 0.1 in both arms, and an alternative response rate of 0.25 in the atezolizumab arm. We plan the study with 100 participants, assuming that the total sample size available is similar to the 310 used in the actual single-arm phase II trial, and that a third of that patient population fall into our desired biomarker subgroup. We will check for futility after every 10 patients are enrolled on each arm. To design the study, we need to calibrate the design over a range of posterior probability thresholds and predictive probability thresholds.
+
+The posterior probability is calculated from the posterior distribution based on the specified priors and the data observed so far, and represents the probability of success based only on the data accrued so far. A posterior probability threshold would be set during the design stage and if, at the end of the trial, the posterior probability exceeded the pre-specified threshold, the trial would be declared a success. The posterior predictive probability is the probability that, at a given interim monitoring point, the treatment will be declared efficacious at the end of the trial when full enrollment is reached, conditional on the currently observed data and the specified priors. Predictive probability provides an intuitive monitoring framework that tells an investigator what the chances are of declaring the treatment efficacious at the end of the trial if we were to continue enrolling to the maximum planned sample size, given the data observed so far in the trial. If this probability drops below a certain threshold, which is pre-specified during the design stage, the trial would be stopped early. Predictive probability thresholds closer to 0 lead to less frequent stopping for futility, whereas thresholds near 1 lead to frequent stopping unless there is almost certain probability of success. 
+
+We consider a grid of thresholds so that we have a range of possible designs from which to select a design with optimal operating characteristics such as type I error, power, and sample size under the null and alternative. In this example we will consider posterior thresholds of 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, and 0.99, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2. 
+
+
+# Using `calibrate_thresholds()` to obtain design options
+
+To conduct the case study re-design, we use the `calibrate_thresholds()` function from the {ppseq} package. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment and their simulation setup prior to running the function. In this example, we used the following code on a Unix server with 192 cores, with the goal of utilizing 56 cores since our grid of thresholds to consider was 14 posterior thresholds by 4 predictive thresholds. 
+
+The `calibrate_thresholds()` function will simulate `nsim` datasets under the null hypothesis and `nsim` datasets under the alternative hypothesis. For each simulated dataset, every combination of posterior and predictive thresholds will be considered and the final sample size and whether or not the trial was positive will be saved. Then across all simulated datasets, `calibrate_thresholds()` will return the average sample size under the null, the average sample size under the alternative, the proportion of positive trials under the null (i.e. the type I error), and the proportion of positive trials under the alternative (i.e. the power).
+
+Because `calibrate_thresholds()` randomly generates simulated datasets, you will want to set a seed before running the function in order to ensure your results are reproducible.
+
+The inputs to `calibrate_thresholds()` for our case study re-design include `p_null = c(0.1, 0.1)` as the null response rate, `p_alt = c(0.1, 0.25)` as the alternative response rate, `n = cbind(seq(10, 50, 10), seq(10, 50, 10))` indicates interim looks after every 10 patients up to a total of 50 in each arm, `N = c(50, 50)` indicates the final total sample size of 50 in each arm, `direction = "greater"` specifies that interest is in whether the response rate in the experimental arm exceeds the response rate in the control arm, `delta = 0` is the default for the clinically meaningful difference in the two-sample case, `prior = c(0.5, 0.5)` specifies that both hyperparameters of the prior beta distribution be set to 0.5, `S = 5000` specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, and `nsim = 1000` specifies that we will generate 1000 simulated datasets under both the null and the alternative. `pp_threshold` is a vector of the posterior thresholds of interest and `ppp_threshold` is a vector of predictive thresholds of interest. Note that due to the computational time involved, the object produced from the below example code `two_sample_cal_tbl` is available as a dataset in the {ppseq} package.
+
+<!-- The below code was run on the server from H:\ppseq-papers\two_sample_cal_tbl-server.R -->
+
+```{r eval = FALSE}
+set.seed(123)
+
+future::plan(future::multicore(workers = 56))
+
+two_sample_cal_tbl <- 
+  calibrate_thresholds(p_null = c(0.1, 0.1), 
+                       p_alt = c(0.1, 0.25), 
+                       n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+                       N = c(50, 50), 
+                       pp_threshold = c(0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
+                                        0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
+                                        0.98, 0.99),
+                       ppp_threshold = seq(0.05, 0.2, 0.05),
+                       direction = "greater", 
+                       delta = 0, 
+                       prior = c(0.5, 0.5), 
+                       S = 5000, 
+                       nsim = 1000
+                       )
+```
+
+
+
+
+# References
+

@@ -1,0 +1,14 @@
+citHeader("To cite ppseq in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "Optimal Sequential Predictive Probability Designs for Early-Phase Oncology Expansion Cohorts",
+  author   = c(person("Emily C.", "Zabor"),
+  person("Alexander M.", "Kaizer"), person("Elizabeth", "Garrett-Mayer"), person("Brian P.", "Hobbs")),
+  journal  = "JCO Precision Oncology",
+  year     = "2022",
+  volume   = "6",
+  pages    = "e2100390",
+  url      = "https://doi.org/10.1200/PO.21.00390",
+  textVersion = "Zabor, E. C., Kaizer, A. M., Garrett-Mayer, E., & Hobbs, B. P. (2022). Optimal Sequential Predictive Probability Designs for Early-Phase Oncology Expansion Cohorts. JCO Precision Oncology, 6, e2100390. https://doi.org/10.1200/PO.21.00390"
+)
