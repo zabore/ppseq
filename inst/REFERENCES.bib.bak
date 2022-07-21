@@ -39,4 +39,17 @@
   type    = {Journal Article},
 }
 
+@Article{Powles2018,
+  author  = {Powles, T. and Durán, I. and van der Heijden, M. S. and Loriot, Y. and Vogelzang, N. J. and De Giorgi, U. and Oudard, S. and Retz, M. M. and Castellano, D. and Bamias, A. and Fléchon, A. and Gravis, G. and Hussain, S. and Takano, T. and Leng, N. and Kadel, E. E., 3rd and Banchereau, R. and Hegde, P. S. and Mariathasan, S. and Cui, N. and Shen, X. and Derleth, C. L. and Green, M. C. and Ravaud, A.},
+  journal = {Lancet},
+  title   = {Atezolizumab versus chemotherapy in patients with platinum-treated locally advanced or metastatic urothelial carcinoma (IMvigor211): a multicentre, open-label, phase 3 randomised controlled trial},
+  year    = {2018},
+  issn    = {0140-6736},
+  number  = {10122},
+  pages   = {748-757},
+  volume  = {391},
+  doi     = {10.1016/s0140-6736(17)33297-x},
+  type    = {Journal Article},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}

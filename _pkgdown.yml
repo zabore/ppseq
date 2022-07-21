@@ -20,5 +20,7 @@ navbar:
     menu:
     - text: "One-sample expansion cohort"
       href: articles/one_sample_expansion.html
+    - text: "Two-sample randomized trial"
+      href: articles/two_sample_randomized.html
   - text: News
     href: news/index.html

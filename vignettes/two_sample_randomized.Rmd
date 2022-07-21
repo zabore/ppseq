@@ -5,6 +5,7 @@ date: "Last updated: `r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
     toc_depth: 3
+bibliography: "`r system.file('REFERENCES.bib', package='ppseq')`"
 vignette: >
   %\VignetteIndexEntry{Two-sample randomized trial}
   %\VignetteEngine{knitr::rmarkdown}
@@ -83,6 +84,7 @@ two_sample_cal_tbl <-
 ```
 
 
+# Results
 
 
 # References
