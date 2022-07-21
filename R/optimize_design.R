@@ -9,11 +9,8 @@
 #' acceptable power. Specify NULL to return the full range of resulting power.
 #' Defaults to 0 to return all results.
 #' @param ... ignored
-#' 
-#' @return No return value, called for side effects 
-#'
+#' @keywords internal
 #' @export
-
 optimize_design <- function(x,
                             type1_range = c(0, 1),
                             minimum_power = 0, ...) {

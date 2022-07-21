@@ -1,26 +1,60 @@
-url: http://www.emilyzabor.com/ppseq/
+url: https://www.emilyzabor.com/ppseq/
 
 template:
-  params:
-    bootswatch: flatly
+  bootstrap: 5
+  bootswatch: flatly
+  bslib:
+    bg: "#ffffff"
+    fg: "#4b4b45"
+    primary: "#0078bf"
+    success: "#f08122"
+
 development:
   mode: auto
   version_label: default
-  
+
 navbar:
-  type: default
-  left:
-  - icon: fa-home
-    href: index.html
-  - icon: fab fa-github fa-lg
-    href: https://github.com/zabore/ppseq
-  - text: Reference
-    href: reference/index.html
-  - text: Articles
-    menu:
-    - text: "One-sample expansion cohort"
-      href: articles/one_sample_expansion.html
-    - text: "Two-sample randomized trial"
-      href: articles/two_sample_randomized.html
-  - text: News
-    href: news/index.html
+  type: light
+  structure:
+    left:  [home, reference, articles, news]
+    right: [search, github]
+  components:
+    home:
+      icon: fa-home
+      href: index.html
+    github:
+      icon: fa-github
+      href: http://github.com/zabore
+    news:
+      text: News
+      href: news/index.html
+
+reference:
+  - title: Calibrate thresholds
+  - contents: 
+      - calibrate_thresholds
+      - calibrate_posterior_threshold
+  - title: Identify the optimal design
+  - contents:
+      - optimize_design
+      - optimize_design.calibrate_thresholds
+  - title: Calculate decision rules
+  - contents:
+      - calc_decision_rules
+  - title: Plotting and printing
+  - contents:
+      - plot.calibrate_thresholds
+      - print.calibrate_thresholds
+      - plot.calc_decision_rules
+  - title: Data files
+  - contents:
+      - one_sample_cal_tbl
+      - one_sample_decision_tbl
+  - title: Support functions
+  - contents: 
+      - calc_posterior
+      - calc_predictive
+      - calc_next
+      - eval_thresh
+      - sim_dat1
+      - sim_single_trial
