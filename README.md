@@ -7,6 +7,8 @@
 coverage](https://codecov.io/gh/zabore/ppseq/branch/main/graph/badge.svg)](https://codecov.io/gh/zabore/ppseq?branch=main)
 <!-- badges: end -->
 
+<br> <br>
+
 The goal of ppseq is to provide functions to design clinical trials
 using sequential predictive probability monitoring for futility
 stopping.

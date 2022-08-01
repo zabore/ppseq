@@ -66,7 +66,7 @@ experimental arms at each look, respectively, and ppp, the associated
 posterior predictive probability. For a given value of r0, stop the trial if
 the number of observed responses in the experimental arm is <=r1. At the end
 of the trial, the treatment is considered promising if the number of
-observed responses in the experimental arm is >=r1 for a given r0.
+observed responses in the experimental arm is >r1 for a given r0.
 Any NA value in either table represents an
 interim look where there is no number of responses that would lead to
 stopping the trial.

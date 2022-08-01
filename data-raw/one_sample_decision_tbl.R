@@ -1,4 +1,6 @@
 ## code to prepare `one_sample_decision_tbl` dataset goes here
+# Note that this was actually run on the server using file H:/ppseq-papers/one_sample_decision_tbl-server.R
+library(ppseq)
 
 set.seed(123)
 

@@ -5,6 +5,7 @@ date: "Last updated: `r Sys.Date()`"
 output: 
   rmarkdown::html_vignette:
     toc_depth: 3
+bibliography: "`r system.file('REFERENCES.bib', package='ppseq')`"
 vignette: >
   %\VignetteIndexEntry{One-sample expansion cohort}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,30 +15,34 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE, 
+  message = FALSE, 
+  error = FALSE
 )
 ```
 
 
 # Setup
 
-To execute the code in this vignette, you first need to install and load the {ppseq} package.
+To execute the code in this vignette, you first need to install and load the {ppseq} package. You will also need the {future} package to parallelize your code to improve speed.
 
-```{r setup, warning = FALSE, message = FALSE, error = FALSE}
-# remotes::install_github("zabore/ppseq")
+```{r setup}
+#install.packages("ppseq")
 library(ppseq)
+#install.packages("future")
 library(future)
 ```
 
 
 # Introduction
 
-While traditional phase I clinical trials in oncology were focused on identification of the maximum tolerated dose, typically using the rule-based 3+3 design or at times an alternative model-based design, the focus is now shifting to interest in obtaining additional safety data across a range of doses or a variety of disease subtypes, and characterizing preliminary efficacy. As a result, one-sample expansion cohorts are becoming increasingly common in phase I clinical trials in oncology, particularly in the context of immunotherapies or other non-cytotoxic treatments, where the maximum tolerated dose may not exist. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D), or possibly several contending doses, that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. While expansion cohorts have been used extensively in phase I clinical trials in oncology, they have often not been planned in advance or with statistical properties in mind, allowing the sample size at times to expand to  very large numbers of treated patients. While having data on more patients can sometimes seem desirable, the goal in phase I trials should still be focused on identifying promising treatments for further study in phase 2 and beyond while limiting the number of patients treated with possibly inefficacious drugs. We propose a design for phase I expansion cohorts based on sequential predictive probability monitoring that allows an investigator to identify an optimal clinical trial design within constraints of traditional type I error control and power, and with futility stopping rules that preserve valuable human and financial resources (cite one-sample paper when it's available). The {ppseq} package provides functions to implement the proposed design. This vignette will demonstrate how to use functions from the {ppseq} package to design a phase I expansion cohort, in the context of a case study based on the study of atezolizumab in metastatic urothelial carcinoma.
+While traditional phase I clinical trials in oncology were focused on identification of the maximum tolerated dose, typically using the rule-based 3+3 design or at times an alternative model-based design, the focus is now shifting to interest in obtaining additional safety data across a range of doses or a variety of disease subtypes, and characterizing preliminary efficacy. As a result, one-sample expansion cohorts are becoming increasingly common in phase I clinical trials in oncology, particularly in the context of immunotherapies or other non-cytotoxic treatments, where the maximum tolerated dose may not exist. An expansion cohort is a group of additional patients being treated at the recommended phase 2 dose (RP2D), or possibly several contending doses, that was identified in the dose finding portion of the phase I study, and is typically used to further characterize the toxicity and/or efficacy of the RP2D. While expansion cohorts have been used extensively in phase I clinical trials in oncology, they have often not been planned in advance or with statistical properties in mind, allowing the sample size at times to expand to  very large numbers of treated patients. While having data on more patients can sometimes seem desirable, the goal in phase I trials should still be focused on identifying promising treatments for further study in phase 2 and beyond while limiting the number of patients treated with possibly inefficacious drugs. We propose a design for phase I expansion cohorts based on sequential predictive probability monitoring that allows an investigator to identify an optimal clinical trial design within constraints of traditional type I error control and power, and with futility stopping rules that preserve valuable human and financial resources [@Zabor2022]. The {ppseq} package provides functions to implement the proposed design. This vignette will demonstrate how to use functions from the {ppseq} package to design a phase I expansion cohort, in the context of a case study based on the study of atezolizumab in metastatic urothelial carcinoma.
 
 
 # Case study background
 
-Atezolizumab is an anti-PD-L1 treatment that was originally tested in the phase I setting in a basket trial across a variety of cancer sites harboring PD-L1 mutations. The atezolizumab expansion study in metastatic urothelial carcinoma had the primary aim of further evaluating safety, pharmacodynamics and pharmacokinetics and therefore was not designed to meet any specific criteria for type I error or power. An expansion cohort in metastatic urothelial carcinoma (mUC) was not part of the original protocol design, but was rather added later. The expansion cohort in mUC ultimately enrolled a total of 95 participants (Powles et al., 2014). Other expansion cohorts that were included in the original protocol, including in renal-cell carcinoma, non-small-cell lung cancer, and melanoma, were planned to have a sample size of 40. These pre-planned expansion cohorts were designed with a single interim analysis for futility that would stop the trial if 0 responses were seen in the first 14 patients enrolled. According to the trial protocol, this futility rule is associated with at most a 4.4% chance of observing no responses in 14 patients if the true response rate is 20% or higher. The protocol also states the widths of the 90% confidence intervals for a sample size of 40 if the observed response rate is 30%. There was no stated decision rule for efficacy since efficacy was not an explicit aim of the expansion cohorts. 
+Atezolizumab is an anti-PD-L1 treatment that was originally tested in the phase I setting in a basket trial across a variety of cancer sites harboring PD-L1 mutations. The atezolizumab expansion study in metastatic urothelial carcinoma had the primary aim of further evaluating safety, pharmacodynamics and pharmacokinetics and therefore was not designed to meet any specific criteria for type I error or power. An expansion cohort in metastatic urothelial carcinoma (mUC) was not part of the original protocol design, but was rather added later. The expansion cohort in mUC ultimately enrolled a total of 95 participants [@Petrylak2018]. Other expansion cohorts that were included in the original protocol, including in renal-cell carcinoma, non-small-cell lung cancer, and melanoma, were planned to have a sample size of 40. These pre-planned expansion cohorts were designed with a single interim analysis for futility that would stop the trial if 0 responses were seen in the first 14 patients enrolled. According to the trial protocol, this futility rule is associated with at most a 4.4% chance of observing no responses in 14 patients if the true response rate is 20% or higher. The protocol also states the widths of the 90% confidence intervals for a sample size of 40 if the observed response rate is 30%. There was no stated decision rule for efficacy since efficacy was not an explicit aim of the expansion cohorts. 
 
 
 # Re-design of case study 
@@ -46,12 +51,12 @@ We will demonstrate the use of the functions in {ppseq} to re-design the one-sam
 
 The posterior probability is calculated from the posterior distribution based on the specified priors and the data observed so far, and represents the probability of success based only on the data accrued so far. A posterior probability threshold would be set during the design stage and if, at the end of the trial, the posterior probability exceeded the pre-specified threshold, the trial would be declared a success. The posterior predictive probability is the probability that, at a given interim monitoring point, the treatment will be declared efficacious at the end of the trial when full enrollment is reached, conditional on the currently observed data and the specified priors. Predictive probability provides an intuitive monitoring framework that tells an investigator what the chances are of declaring the treatment efficacious at the end of the trial if we were to continue enrolling to the maximum planned sample size, given the data observed so far in the trial. If this probability drops below a certain threshold, which is pre-specified during the design stage, the trial would be stopped early. Predictive probability thresholds closer to 0 lead to less frequent stopping for futility, whereas thresholds near 1 lead to frequent stopping unless there is almost certain probability of success. 
 
-We consider a grid of thresholds so that we have a range of possible designs from which to select a design with optimal operating characteristics such as type I error, power, and sample size under the null and alternative. In this example we will consider posterior thresholds of 0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, and 1, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2. 
+We consider a grid of thresholds so that we have a range of possible designs from which to select a design with optimal operating characteristics such as type I error, power, and sample size under the null and alternative. In this example we will consider posterior thresholds of 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, and 0.99, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2. 
 
 
 # Using `calibrate_thresholds()` to obtain design options
 
-To conduct the case study re-design, we use the `calibrate_thresholds()` function from the {ppseq} package. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment and their simulation setup prior to running the function. In this example, we used the following code on a Unix server with 192 cores, with the goal of utilizing 76 cores since our grid of thresholds to consider was 19 posterior thresholds by 4 predictive thresholds. 
+To conduct the case study re-design, we use the `calibrate_thresholds()` function from the {ppseq} package. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment and their simulation setup prior to running the function. In this example, we used the following code on a Unix server with 192 cores, with the goal of utilizing 56 cores since our grid of thresholds to consider was 14 posterior thresholds by 4 predictive thresholds. 
 
 The `calibrate_thresholds()` function will simulate `nsim` datasets under the null hypothesis and `nsim` datasets under the alternative hypothesis. For each simulated dataset, every combination of posterior and predictive thresholds will be considered and the final sample size and whether or not the trial was positive will be saved. Then across all simulated datasets, `calibrate_thresholds()` will return the average sample size under the null, the average sample size under the alternative, the proportion of positive trials under the null (i.e. the type I error), and the proportion of positive trials under the alternative (i.e. the power).
 
@@ -59,19 +64,21 @@ Because `calibrate_thresholds()` randomly generates simulated datasets, you will
 
 The inputs to `calibrate_thresholds()` for our case study re-design include `p_null = 0.1` as the null response rate, `p_alt = 0.2` as the alternative response rate, `n = seq(5, 95, 5)` indicates interim looks after every 5 patients up to a total of 95, `direction = "greater"` specifies that interest is in whether the alternative response rate exceeds the null response rate, `delta = NULL` because this argument specifies the clinically meaningful difference between groups, which is not relevant in the one-sample case, `prior = c(0.5, 0.5)` specifies that both hyperparameters of the prior beta distribution be set to 0.5, `S = 5000` specifies that 5000 posterior samples will be drawn to calculate the posterior and predictive probabilities, `N = 95` indicates the final total sample size of 95, `nsim = 1000` specifies that we will generate 1000 simulated datasets under both the null and the alternative, `pp_threshold` is a vector of the posterior thresholds of interest, and `ppp_threshold` is a vector of predictive thresholds of interest. Note that due to the computational time involved, the object produced from the below example code `one_sample_cal_tbl` is available as a dataset in the {ppseq} package.
 
+<!-- The below code was run on the server from H:\ppseq-papers\one_sample_cal_tbl-server.R -->
+
 ```{r eval = FALSE}
 set.seed(123)
 
-future::plan(future::multicore(workers = 76))
+future::plan(future::multicore(workers = 56))
 
 one_sample_cal_tbl <- 
   calibrate_thresholds(p_null = 0.1, 
                        p_alt = 0.2, 
                        n = seq(5, 95, 5),
                        N = 95, 
-                       pp_threshold = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
+                       pp_threshold = c(0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
                                         0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
-                                        0.98, 0.99, 0.999, 0.9999, 0.99999, 1),
+                                        0.98, 0.99),
                        ppp_threshold = seq(0.05, 0.2, 0.05),
                        direction = "greater", 
                        delta = NULL, 
@@ -103,7 +110,7 @@ gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.05,
                  prop_pos_null <= 0.1, prop_pos_alt >= 0.7))
 ```
 
-We find that 14 of the 76 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
+We find that 8 of the 56 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
 
 ## `optimize_design()` 
 
@@ -115,18 +122,20 @@ optimize_design(one_sample_cal_tbl,
                 minimum_power = 0.7)
 ```
 
-The optimal accuracy design is the one with posterior threshold 0.9 and predictive threshold 0.05. It has a type I error of 0.072, power of 0.882, average sample size under the null of 51, and average sample size under the alternative of 91. 
+The optimal accuracy design is the one with posterior threshold 0.92 and predictive threshold 0.05. It has a type I error of 0.081, power of 0.874, average sample size under the null of 51, and average sample size under the alternative of 90. 
 
-The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.1. It has a type I error of 0.06, power of 0.796, average sample size under the null of 39, and average sample size under the alternative of 82.
+The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.1. It has a type I error of 0.073, power of 0.793, average sample size under the null of 39, and average sample size under the alternative of 82.
 
 For comparison, the original design of the atezolizumab expansion cohort in mUC, with a single look for futility after the first 14 patients, has a type I error of 0.005, power of 0.528, average sample size under the null of 76, and average sample size under the alternative of 92.
 
-In this case study, we find that either the optimal accuracy or the optimal efficiency sequential predictive probability design has superior performance to the original design of the atezolizumab expansion cohort in mUC with respect to both type I error and power, and average sample size under the null. In this case we may choose to use the optimal efficiency design, which has the desirable trait of a very small average sample size under the null of just 39 patients, while still maintaining reasonable type I error of 0.06 and power of 0.796. This design would allow us to stop early if the treatment were inefficacious, thus preserving valuable financial resources for use in studying more promising treatments and preventing our human subjects from continuing an ineffective treatment.
+In this case study, we find that either the optimal accuracy or the optimal efficiency sequential predictive probability design has superior performance to the original design of the atezolizumab expansion cohort in mUC with respect to both type I error and power, and average sample size under the null. In this case we may choose to use the optimal efficiency design, which has the desirable trait of a very small average sample size under the null of just 39 patients, while still maintaining reasonable type I error of 0.073 and power of 0.793. This design would allow us to stop early if the treatment were inefficacious, thus preserving valuable financial resources for use in studying more promising treatments and preventing our human subjects from continuing an ineffective treatment.
 
 
 ## `calc_decision_rules()`
 
 Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.1` specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above. Note that due to the computational time involved, the object produced from the below example code `one_sample_decision_tbl` is available as a dataset in the {ppseq} package.
+
+<!-- The below code was run on the server from H:\ppseq-papers\one_sample_decision_tbl-server.R -->
 
 ```{r eval = FALSE}
 set.seed(123)
@@ -143,6 +152,10 @@ one_sample_decision_tbl <-
     prior = c(0.5, 0.5), 
     S = 5000
     )
+```
+
+```{r eval = FALSE}
+one_sample_decision_tbl
 ```
 
 ```{r echo = FALSE}
@@ -186,4 +199,5 @@ plot(one_sample_decision_tbl)
 ```
 
 
+# References
 
