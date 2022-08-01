@@ -24,7 +24,7 @@ navbar:
       href: index.html
     github:
       icon: fa-github
-      href: http://github.com/zabore
+      href: http://github.com/zabore/ppseq
     news:
       text: News
       href: news/index.html
