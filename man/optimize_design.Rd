@@ -20,9 +20,7 @@ Defaults to 0 to return all results.}
 
 \item{...}{ignored}
 }
-\value{
-No return value, called for side effects
-}
 \description{
 Function to setup usage of \code{optimize_design.calibrate_thresholds}
 }
+\keyword{internal}

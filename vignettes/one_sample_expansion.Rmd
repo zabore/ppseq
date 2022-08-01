@@ -15,7 +15,10 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE, 
+  message = FALSE, 
+  error = FALSE
 )
 ```
 
@@ -24,7 +27,7 @@ knitr::opts_chunk$set(
 
 To execute the code in this vignette, you first need to install and load the {ppseq} package. You will also need the {future} package to parallelize your code to improve speed.
 
-```{r setup, warning = FALSE, message = FALSE, error = FALSE}
+```{r setup}
 #install.packages("ppseq")
 library(ppseq)
 #install.packages("future")
@@ -107,7 +110,7 @@ gt(dplyr::filter(one_sample_cal_tbl$res_summary, prop_pos_null >= 0.05,
                  prop_pos_null <= 0.1, prop_pos_alt >= 0.7))
 ```
 
-We find that 14 of the 76 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
+We find that 8 of the 56 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
 
 ## `optimize_design()` 
 
@@ -119,18 +122,20 @@ optimize_design(one_sample_cal_tbl,
                 minimum_power = 0.7)
 ```
 
-The optimal accuracy design is the one with posterior threshold 0.9 and predictive threshold 0.05. It has a type I error of 0.072, power of 0.882, average sample size under the null of 51, and average sample size under the alternative of 91. 
+The optimal accuracy design is the one with posterior threshold 0.92 and predictive threshold 0.05. It has a type I error of 0.081, power of 0.874, average sample size under the null of 51, and average sample size under the alternative of 90. 
 
-The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.1. It has a type I error of 0.06, power of 0.796, average sample size under the null of 39, and average sample size under the alternative of 82.
+The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.1. It has a type I error of 0.073, power of 0.793, average sample size under the null of 39, and average sample size under the alternative of 82.
 
 For comparison, the original design of the atezolizumab expansion cohort in mUC, with a single look for futility after the first 14 patients, has a type I error of 0.005, power of 0.528, average sample size under the null of 76, and average sample size under the alternative of 92.
 
-In this case study, we find that either the optimal accuracy or the optimal efficiency sequential predictive probability design has superior performance to the original design of the atezolizumab expansion cohort in mUC with respect to both type I error and power, and average sample size under the null. In this case we may choose to use the optimal efficiency design, which has the desirable trait of a very small average sample size under the null of just 39 patients, while still maintaining reasonable type I error of 0.06 and power of 0.796. This design would allow us to stop early if the treatment were inefficacious, thus preserving valuable financial resources for use in studying more promising treatments and preventing our human subjects from continuing an ineffective treatment.
+In this case study, we find that either the optimal accuracy or the optimal efficiency sequential predictive probability design has superior performance to the original design of the atezolizumab expansion cohort in mUC with respect to both type I error and power, and average sample size under the null. In this case we may choose to use the optimal efficiency design, which has the desirable trait of a very small average sample size under the null of just 39 patients, while still maintaining reasonable type I error of 0.073 and power of 0.793. This design would allow us to stop early if the treatment were inefficacious, thus preserving valuable financial resources for use in studying more promising treatments and preventing our human subjects from continuing an ineffective treatment.
 
 
 ## `calc_decision_rules()`
 
 Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.1` specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above. Note that due to the computational time involved, the object produced from the below example code `one_sample_decision_tbl` is available as a dataset in the {ppseq} package.
+
+<!-- The below code was run on the server from H:\ppseq-papers\one_sample_decision_tbl-server.R -->
 
 ```{r eval = FALSE}
 set.seed(123)
@@ -147,6 +152,10 @@ one_sample_decision_tbl <-
     prior = c(0.5, 0.5), 
     S = 5000
     )
+```
+
+```{r eval = FALSE}
+one_sample_decision_tbl
 ```
 
 ```{r echo = FALSE}

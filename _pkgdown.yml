@@ -10,7 +10,7 @@ template:
     success: "#f08122"
 
 development:
-  mode: auto
+  mode: release
   version_label: default
 
 navbar:
@@ -50,6 +50,8 @@ reference:
   - contents:
       - one_sample_cal_tbl
       - one_sample_decision_tbl
+      - two_sample_cal_tbl
+      - two_sample_decision_tbl
   - title: Support functions
   - contents: 
       - calc_posterior

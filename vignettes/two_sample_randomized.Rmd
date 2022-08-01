@@ -15,7 +15,10 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE, 
+  message = FALSE, 
+  error = FALSE
 )
 ```
 
@@ -32,7 +35,7 @@ library(future)
 
 # Introduction
 
-Efforts to develop biomarker-targeted anti-cancer therapies have progressed rapidly in recent years. Witht he aim of expediting regulatory reviews of promising therapies, an increasing number of targeted cancer therapies are being granted accelerated approval on the basis of evidence acquired in single-arm phase II clinical trials. The historical control rates used to design and evaluate emerging targeted therapies in single-arm trials often arise as population averages, lacking specificity to the biomarker-targeted subpopulation of interest. Thus, historical trial results are inherently limited for inferring the potential “comparative efficacy” of novel targeted therapies. Randomization may be the best option in this setting, and is not out of the question given the increasingly large sample sizes being used in phase II trials. We propose a design for two-arm randomized phase II trials based on sequential predictive probability monitoring that allows an investigator to identify an optimal clinical trial design within contraints of traditional type I error and power, and with futility stopping rules that preserve valuable human and financial resources (cite two-sample paper once it's available).
+Efforts to develop biomarker-targeted anti-cancer therapies have progressed rapidly in recent years. With the aim of expediting regulatory reviews of promising therapies, an increasing number of targeted cancer therapies are being granted accelerated approval on the basis of evidence acquired in single-arm phase II clinical trials. The historical control rates used to design and evaluate emerging targeted therapies in single-arm trials often arise as population averages, lacking specificity to the biomarker-targeted subpopulation of interest. Thus, historical trial results are inherently limited for inferring the potential “comparative efficacy” of novel targeted therapies. Randomization may be the best option in this setting, and is not out of the question given the increasingly large sample sizes being used in phase II trials. We propose a design for two-arm randomized phase II trials based on sequential predictive probability monitoring that allows an investigator to identify an optimal clinical trial design within constraints of traditional type I error and power, and with futility stopping rules that preserve valuable human and financial resources (cite two-sample paper once it's available).
 
 
 # Case study background
@@ -85,6 +88,111 @@ two_sample_cal_tbl <-
 
 
 # Results
+
+We will limit our consideration to designs with type I error between 0.05 and 0.1, and a minimum power of 0.7.
+
+## `print()` 
+
+When you pass the results of `calibrate_thresholds()` to `print()` you will get back a table of the resulting design options that satisfy the desired range of type I error, specified as a vector of minimum and maximum passed to the `type1_range` argument, and minimal power, specified as a numeric value between 0 and 1 passed to the argument `minimum_power`.
+
+```{r eval = FALSE}
+print(two_sample_cal_tbl, 
+      type1_range = c(0.05, 0.1), 
+      minimum_power = 0.7)
+```
+
+```{r echo = FALSE}
+library(gt)
+
+gt(dplyr::filter(two_sample_cal_tbl$res_summary, prop_pos_null >= 0.05, 
+                 prop_pos_null <= 0.1, prop_pos_alt >= 0.7))
+```
+
+We find that 5 of the 56 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
+
+## `optimize_design()` 
+
+Finally, we can pass the results from a call to `calibrate_thresholds()` to the `optimize_design()` function to list the optimal design with respect to type I error and power, termed the "optimal accuracy" design, and the optimal design with respect to the average sample sizes under the null and alternative, termed the "optimal efficiency" design, within the specified range of acceptable type I error and minimum power. 
+
+```{r}
+optimize_design(two_sample_cal_tbl, 
+                type1_range = c(0.05, 0.1), 
+                minimum_power = 0.7)
+```
+
+The optimal accuracy design is the one with posterior threshold 0.86 and predictive threshold 0.1. It has a type I error of 0.1, power of 0.751, average sample size under the null of 29 per arm, and average sample size under the alternative of 45 per arm. 
+
+The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.05. It has a type I error of 0.07, power of 0.701, average sample size under the null of 29 per arm, and average sample size under the alternative of 46 per arm.
+
+We find that either the optimal accuracy or the optimal efficiency sequential predictive probability design reasonable type I error and power to detect the effect of interest, and results in a much lower average total sample size under both the null and alternative than the 310 actually used in the phase II study of atezolizumab. Additionally, this randomized design would allow direct estimation of the response rate to both the experimental treatment and to the standard of care treatment in the biomarker subgroup of interest, thus avoiding the issues with historical control rates that arose in the original atezolizumab study. While this design would not prevent the problem of the targeted biomarker being prognostic rather than predictive, it uses fewer patients and avoids continuation to phase III when it is unwarranted.
+
+## `calc_decision_rules()`
+
+Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.1` specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above. Note that due to the computational time involved, the object produced from the below example code `one_sample_decision_tbl` is available as a dataset in the {ppseq} package.
+
+<!-- The below code was run on the server from H:\ppseq-papers\two_sample_decision_tbl-server.R -->
+
+```{r eval = FALSE}
+set.seed(123)
+
+two_sample_decision_tbl <- 
+  calc_decision_rules(
+    n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+    N = c(50, 50),
+    theta = 0.92, 
+    ppp = 0.05, 
+    p0 = NULL, 
+    direction = "greater", 
+    delta = 0, 
+    prior = c(0.5, 0.5), 
+    S = 5000
+    )
+```
+
+```{r eval = FALSE}
+two_sample_decision_tbl
+```
+
+```{r echo = FALSE}
+gt::gt(two_sample_decision_tbl[1:11, ])
+```
+
+Above are the first 11 rows of the resulting table, which contains all possible combinations of number of responses in the control and experimental arms that would stop the trial at each interim look. In the results table, `n0` indicates the number of enrolled patients in the control arm and `n1` indicates the number of enrolled patients in the treatment arm at each look for futility; `r0` indicates the number of responses in the control arm and `r1` indicates the number of responses in the treatment arm for which we would stop the trial at a given interim look if the number of observed responses is <=r1 for a given fixed value of r0. At the end of the trial the treatment would be considered promising if the number of observed responses is >r1 for a given r0. For example, in this case we see that if we had 4 responses in the control arm out of the first 10 control arm patients, we would stop the trial if we had 2 or fewer responses in the experimental arm out of the first 10 experimental arm patients.
+
+
+## `plot()` 
+
+Passing the results of `calibrate_thresholds()` to `plot()` returns two plots, one of type I error by power, and one of average sample size under the null by average sample size under the alternative. The arguments `type1_range` and `power` are used in the same way as for the `print()` function. The argument `plotly` defaults to FALSE, which results in a pair of side-by-side ggplots being returned. If set to TRUE, two individual interactive plotly plots will be returned, as demonstrated below.
+
+```{r eval = FALSE}
+plot(two_sample_cal_tbl, 
+     type1_range = c(0.05, 0.1), 
+     minimum_power = 0.7,
+     plotly = TRUE)
+```
+
+```{r echo = FALSE}
+ptest <- 
+  plot(two_sample_cal_tbl, 
+     type1_range = c(0.05, 0.1), 
+     minimum_power = 0.7,
+     plotly = TRUE)
+```
+
+```{r echo = FALSE, fig.width = 8, fig.height = 6}
+ptest[[1]]
+ptest[[2]]
+```
+
+Note that when points were tied based on optimization criteria, the point with the highest posterior and predictive threshold is selected for plotting.
+
+The diamond-shaped point represents the optimal design based on each criteria, which is discussed in more detail below. Using the `plotly = TRUE` option to `plot()` we can hover over each point to see the x-axis and y-axis values, along with the distance to the top left corner on each plot, the posterior and predictive thresholds associated with each point, and the average sample sizes under the null and alternative for each arm.
+
+Passing the results of `calc_decision_rules()` to `plot()` returns a faceted plot according to the interim look. One each plot, the x-axis indicates the number of responses in the control arm and the y-axis indicates the number of responses in the experimental arm. The color denotes whether the trial should proceed (green) or stop (red). Hovering over each box will indicate the combination of sample size and responses and the decision at that time. 
+
+```{r message = FALSE, fig.width = 8, fig.height = 6}
+plot(two_sample_decision_tbl)
+```
 
 
 # References
