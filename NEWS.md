@@ -1,5 +1,7 @@
 # ppseq (development version)
 
+* upgraded package website to bootstrap 5 and changed some styling
+* added two-sample randomized trial vignette
 * added `calc_next()` function to calculate probability of response in next patient (Closed Issue #2)
 * fixed a bug in the default arguments to `optimize_design()` (Closed Issue #12)
 * added efficacy monitoring option, default is still futility monitoring (Closed Issue #3)
