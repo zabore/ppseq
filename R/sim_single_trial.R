@@ -44,8 +44,6 @@
 #' @importFrom stats rbinom
 #' @importFrom purrr pmap_dbl map2_dbl
 #' @importFrom tibble tibble add_column
-#' @importFrom furrr future_pmap_dbl furrr_options
-#' @importFrom future nbrOfWorkers
 #' @importFrom dplyr arrange select everything
 #' 
 #' @examples

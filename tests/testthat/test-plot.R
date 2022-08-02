@@ -34,10 +34,14 @@ test_that(
     expect_error(plot(one_sample_cal_tbl, minimum_power = "a"))
 
     expect_doppelganger('plot_one_sample_cal_tbl', plot(one_sample_cal_tbl))
+    
+    expect_doppelganger(
+      'plot_one_sample_cal_tbl_plotly',
+      plot(one_sample_cal_tbl, plotly = TRUE)
+      )
   }
 )
 
-# Emily, can you provide an example where this works and plots?
 test_that(
  "two-sample calibrate threshold plotting",
  {
@@ -85,6 +89,11 @@ test_that(
       'plot_one_sample_decision_rules',
       plot(cd1, plotly = FALSE)
     )
+    
+    expect_doppelganger(
+      'plot_one_sample_decision_rules_plotly',
+      plot(cd1, plotly = TRUE)
+    )
   }
 )
 
@@ -110,3 +119,4 @@ test_that(
     )
   }
 )
+
