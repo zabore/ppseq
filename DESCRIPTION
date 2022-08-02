@@ -36,7 +36,6 @@ VignetteBuilder: knitr
 Imports: 
     dplyr,
     furrr,
-    future,
     ggplot2,
     plotly,
     purrr,
