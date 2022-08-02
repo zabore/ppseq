@@ -106,17 +106,23 @@ optimize_design.calibrate_thresholds <- function(x,
     stop("type1_range must be a numeric vector of length 2 or NULL")
 
   options(tibble.width = Inf)
+  
+  filter_x <- 
+    filter(
+      x$res_summary,
+      prop_pos_null >= type1_range[1] &
+        prop_pos_null <= type1_range[2] &
+        prop_pos_alt >= minimum_power
+    )
+  
+  if (nrow(filter_x) == 0 )
+    stop("No results returned for the given combination of type I error and power. Please try a larger upper bound for type I error and/or a lower minimum power.")
 
   if (length(x$inputs$p_null) == 2) {
     opt_x <-
       rename(
         mutate(
-          filter(
-            x$res_summary,
-            prop_pos_null >= type1_range[1] &
-              prop_pos_null <= type1_range[2] &
-              prop_pos_alt >= minimum_power
-          ),
+          filter_x,
           mean_n_null = (mean_n0_null + mean_n1_null) / 2,
           mean_n_alt = (mean_n0_alt + mean_n1_alt) / 2,
           ab_dist_metric = ((prop_pos_null - 0)^2 +
@@ -135,12 +141,7 @@ optimize_design.calibrate_thresholds <- function(x,
     opt_x <-
       rename(
         mutate(
-          filter(
-            x$res_summary,
-            prop_pos_null >= type1_range[1] &
-              prop_pos_null <= type1_range[2] &
-              prop_pos_alt >= minimum_power
-          ),
+          filter_x,
           ab_dist_metric = ((prop_pos_null - 0)^2 +
             (prop_pos_alt - 1)^2)^(1 / 2),
           n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 +
@@ -179,7 +180,6 @@ optimize_design.calibrate_thresholds <- function(x,
       ),
       1
     )
-
 
   list(
     "Optimal accuracy design:" =
