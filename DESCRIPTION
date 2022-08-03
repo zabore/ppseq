@@ -1,6 +1,6 @@
 Package: ppseq
 Title: Design Clinical Trials using Sequential Predictive Probability Monitoring
-Version: 0.1.2.9002
+Version: 0.1.2.9003
 Authors@R: 
   c(person(given = "Emily C.",
           family = "Zabor",
@@ -21,7 +21,6 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
 Depends:
     R (>= 3.5.0)
 Suggests: 
@@ -44,3 +43,4 @@ Imports:
     tidyr
 Config/testthat/edition: 3
 Language: en-US
+RoxygenNote: 7.2.1

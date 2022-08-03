@@ -26,10 +26,16 @@ knitr::opts_chunk$set(
 
 To execute the code in this vignette, you first need to install and load the {ppseq} package. You will also need the {future} package to parallelize your code to improve speed.
 
-```{r setup, warning = FALSE, message = FALSE, error = FALSE}
-#install.packages("ppseq")
+```{r eval = FALSE}
+install.packages("ppseq")
+install.packages("future")
+```
+
+```{r}
 library(ppseq)
-#install.packages("future")
+```
+
+```{r eval = FALSE}
 library(future)
 ```
 

@@ -35,6 +35,14 @@ optimize_design <- function(x,
 #' @param minimum_power a numeric between 0 and 1 specifying the minimum
 #' acceptable power. Specify NULL to return the full range of resulting power.
 #' Defaults to 0 to return all results.
+#' @param w_type1 a user-specified weight on the type 1 error.
+#' Defaults to 1 for no weighting.
+#' @param w_power a user-specified weight on the power. 
+#' Defaults to 1 for no weighting.
+#' @param w_Nnull a user-specified weight on the average sample size under the 
+#' null. Defaults to 1 for no weighting.
+#' @param w_Nalt a user-specified weight on the average sample size under the
+#' alternative. Defaults to 1 for no weighting.
 #' @param ... ignored
 #' 
 #' @return A list of length two containing details of the optimal efficiency
@@ -84,7 +92,12 @@ optimize_design <- function(x,
 
 optimize_design.calibrate_thresholds <- function(x,
                                                  type1_range = c(0, 1),
-                                                 minimum_power = 0, ...) {
+                                                 minimum_power = 0, 
+                                                 w_type1 = 1, 
+                                                 w_power = 1,
+                                                 w_Nnull = 1,
+                                                 w_Nalt = 1,
+                                                 ...) {
   if (any(class(x) == "calibrate_thresholds") == FALSE)
     stop("x must be class 'calibrate_thresholds', usually an object ",
          "returned from a call to the function ppseq::calibrate_thresholds()")
@@ -106,23 +119,31 @@ optimize_design.calibrate_thresholds <- function(x,
     stop("type1_range must be a numeric vector of length 2 or NULL")
 
   options(tibble.width = Inf)
+  
+  filter_x <- 
+    filter(
+      x$res_summary,
+      prop_pos_null >= type1_range[1] &
+        prop_pos_null <= type1_range[2] &
+        prop_pos_alt >= minimum_power
+    )
+  
+  if (nrow(filter_x) == 0 )
+    stop("No results returned for the given combination of type I error and power. Please try a larger upper bound for type I error and/or a lower minimum power.")
 
   if (length(x$inputs$p_null) == 2) {
     opt_x <-
       rename(
         mutate(
-          filter(
-            x$res_summary,
-            prop_pos_null >= type1_range[1] &
-              prop_pos_null <= type1_range[2] &
-              prop_pos_alt >= minimum_power
-          ),
+          filter_x,
           mean_n_null = (mean_n0_null + mean_n1_null) / 2,
           mean_n_alt = (mean_n0_alt + mean_n1_alt) / 2,
-          ab_dist_metric = ((prop_pos_null - 0)^2 +
-            (prop_pos_alt - 1)^2)^(1 / 2),
-          n_dist_metric = ((mean_n_null - min(mean_n_null))^2 +
-            (mean_n_alt - max(mean_n_alt))^2)^(1 / 2)
+          ab_dist_metric = 
+            (w_type1 * (prop_pos_null - 0)^2 +
+               w_power * (prop_pos_alt - 1)^2)^(1 / 2),
+          n_dist_metric = 
+            (w_Nnull * (mean_n_null - min(mean_n_null))^2 +
+               w_Nalt * (mean_n_alt - max(mean_n_alt))^2)^(1 / 2)
         ),
         `Type I error` = prop_pos_null,
         Power = prop_pos_alt,
@@ -135,16 +156,13 @@ optimize_design.calibrate_thresholds <- function(x,
     opt_x <-
       rename(
         mutate(
-          filter(
-            x$res_summary,
-            prop_pos_null >= type1_range[1] &
-              prop_pos_null <= type1_range[2] &
-              prop_pos_alt >= minimum_power
-          ),
-          ab_dist_metric = ((prop_pos_null - 0)^2 +
-            (prop_pos_alt - 1)^2)^(1 / 2),
-          n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 +
-            (mean_n1_alt - max(mean_n1_alt))^2)^(1 / 2)
+          filter_x,
+          ab_dist_metric = 
+            (w_type1 * (prop_pos_null - 0)^2 +
+               w_power * (prop_pos_alt - 1)^2)^(1 / 2),
+          n_dist_metric = 
+            (w_Nnull * (mean_n1_null - min(mean_n1_null))^2 +
+               w_Nalt * (mean_n1_alt - max(mean_n1_alt))^2)^(1 / 2)
         ),
         `Type I error` = prop_pos_null,
         Power = prop_pos_alt,
@@ -179,7 +197,6 @@ optimize_design.calibrate_thresholds <- function(x,
       ),
       1
     )
-
 
   list(
     "Optimal accuracy design:" =

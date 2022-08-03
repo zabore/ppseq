@@ -4,7 +4,16 @@
 \alias{optimize_design.calibrate_thresholds}
 \title{Custom optimization method for \code{calibrate_thresholds} objects}
 \usage{
-\method{optimize_design}{calibrate_thresholds}(x, type1_range = c(0, 1), minimum_power = 0, ...)
+\method{optimize_design}{calibrate_thresholds}(
+  x,
+  type1_range = c(0, 1),
+  minimum_power = 0,
+  w_type1 = 1,
+  w_power = 1,
+  w_Nnull = 1,
+  w_Nalt = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class 'calibrate_thresholds', usually returned by the
@@ -17,6 +26,18 @@ error. Defaults to c(0, 1) to return all results.}
 \item{minimum_power}{a numeric between 0 and 1 specifying the minimum
 acceptable power. Specify NULL to return the full range of resulting power.
 Defaults to 0 to return all results.}
+
+\item{w_type1}{a user-specified weight on the type 1 error.
+Defaults to 1 for no weighting.}
+
+\item{w_power}{a user-specified weight on the power.
+Defaults to 1 for no weighting.}
+
+\item{w_Nnull}{a user-specified weight on the average sample size under the
+null. Defaults to 1 for no weighting.}
+
+\item{w_Nalt}{a user-specified weight on the average sample size under the
+alternative. Defaults to 1 for no weighting.}
 
 \item{...}{ignored}
 }

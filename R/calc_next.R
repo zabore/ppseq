@@ -32,13 +32,15 @@
 #' # One-sample case
 #' calc_next(
 #'   y = 27, 
-#'   n = 100
+#'   n = 100,
+#'   S = 100
 #'   )
 #'
 #' # Two-sample case
 #' calc_next(
 #'   y = c(14, 23), 
-#'   n = c(100, 100)
+#'   n = c(100, 100),
+#'   S = 100
 #'   )
 #' 
 #' @importFrom stats rbeta quantile
