@@ -1,6 +1,7 @@
 # ppseq (development version)
 
-* adds informative messaging when no results returned from `optimize_design()` (Closed Issue #14)
+* added weighting options to `optimize_design()` (Closed Issue #7)
+* added informative messaging when no results returned from `optimize_design()` (Closed Issue #14)
 * upgraded package website to bootstrap 5 and changed some styling
 * added two-sample randomized trial vignette
 * added `calc_next()` function to calculate probability of response in next patient (Closed Issue #2)
