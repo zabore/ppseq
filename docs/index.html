@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">ppseq</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.2.9002</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.2.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,8 +74,12 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9">
-<p><br><br></p>
-<p>The goal of ppseq is to provide functions to design clinical trials using sequential predictive probability monitoring for futility stopping.</p>
+<p><br></p>
+<div class="section level2">
+<h2 id="ppseq">ppseq<a class="anchor" aria-label="anchor" href="#ppseq"></a>
+</h2>
+<p>The {ppseq} package provides functions to design clinical trials using Bayesian sequential predictive probability monitoring. Functionality is available to design <a href="https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html">one-arm</a> or <a href="https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html">two-arm</a> trials by searching over a grid of combinations of posterior and predictive thresholds and identifying the optimal design according to two criteria: accuracy and efficiency. Interactive plotting allows easy comparison of the various design options and easy trial implementation through decision rule plots.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -86,8 +90,20 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"zabore/ppseq"</span><span class="op">)</span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
+</h2>
+</div>
 
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/zabore/ppseq/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/zabore/ppseq/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
