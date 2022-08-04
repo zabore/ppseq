@@ -16,7 +16,7 @@ the input parameters used.'><meta name="robots" content="noindex"><!-- mathjax -
     
     <a class="navbar-brand me-2" href="../index.html">ppseq</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.2.9001</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.2.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,7 +47,7 @@ the input parameters used.'><meta name="robots" content="noindex"><!-- mathjax -
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="http://github.com/zabore">
+  <a class="external-link nav-link" href="http://github.com/zabore/ppseq">
     <span class="fa fa-github"></span>
      
   </a>
@@ -60,7 +60,7 @@ the input parameters used.'><meta name="robots" content="noindex"><!-- mathjax -
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Output from a one-sample call to <code>calc_decision_rules</code></h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/zabore/ppseq/blob/HEAD/R/one_sample_decision_tbl-data.R" class="external-link"><code>R/one_sample_decision_tbl-data.R</code></a></small>
       <div class="d-none name"><code>one_sample_decision_tbl.Rd</code></div>
     </div>
 
@@ -79,10 +79,11 @@ the input parameters used.</p>
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>A tibble containing n, the number of patients enrolled at each
-futility monitoring point, and r, the number of responses at which we would
+futility monitoring point; r, the number of responses at which we would
 stop the trial at a given look if the number of observed responses is &lt;=r,
 or at the end of the trial the treatment is considered promising if the
-number of observed responses is &gt;r.</p>
+number of observed responses is &gt;r; and ppp, the predictive probability at
+each given look</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -94,7 +95,7 @@ number of observed responses is &gt;r.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer></div>

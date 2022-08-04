@@ -74,7 +74,7 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9">
-<p><br></p>
+<p><br><br></p>
 <div class="section level2">
 <h2 id="ppseq">ppseq<a class="anchor" aria-label="anchor" href="#ppseq"></a>
 </h2>
@@ -93,6 +93,22 @@
 <div class="section level2">
 <h2 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h2>
+<p>The primary function to search over a grid of combinations of posterior and predictive thresholds for a certain trial design is <code><a href="reference/calibrate_thresholds.html">calibrate_thresholds()</a></code>. This function is computationally intensive to varying degrees depending on the number of looks and the number of threshold combinations, and is best run on a server and/or with parallelization.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span>
+<span class="va">calthresh</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="reference/calibrate_thresholds.html">calibrate_thresholds</a></span><span class="op">(</span>
+    p_null <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.2</span><span class="op">)</span>,
+    p_alt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.5</span><span class="op">)</span>,
+    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>,
+    N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span>,
+    pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.01</span><span class="op">)</span>,
+    ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span>,
+    delta <span class="op">=</span> <span class="fl">0</span>
+    <span class="op">)</span></code></pre></div>
+<p>The resulting design options can be interactively compared by passing the results to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with the option <code>plotly = TRUE</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">calthresh</span>, plotly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 
   </main><aside class="col-md-3"><div class="links">

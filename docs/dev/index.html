@@ -27,7 +27,7 @@
     
     <a class="navbar-brand me-2" href="index.html">ppseq</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.2.9001</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.2.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,7 @@
 
       <ul class="navbar-nav">
 <li class="nav-item">
-  <a class="external-link nav-link" href="http://github.com/zabore">
+  <a class="external-link nav-link" href="http://github.com/zabore/ppseq">
     <span class="fa fa-github"></span>
      
   </a>
@@ -75,7 +75,12 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9">
-<p>The goal of ppseq is to provide functions to design clinical trials using sequential predictive probability monitoring for futility stopping.</p>
+<p><br><br></p>
+<div class="section level2">
+<h2 id="ppseq">ppseq<a class="anchor" aria-label="anchor" href="#ppseq"></a>
+</h2>
+<p>The {ppseq} package provides functions to design clinical trials using Bayesian sequential predictive probability monitoring. Functionality is available to design <a href="https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html">one-arm</a> or <a href="https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html">two-arm</a> trials by searching over a grid of combinations of posterior and predictive thresholds and identifying the optimal design according to two criteria: accuracy and efficiency. Interactive plotting allows easy comparison of the various design options and easy trial implementation through decision rule plots.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -86,8 +91,36 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"zabore/ppseq"</span><span class="op">)</span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
+</h2>
+<p>The primary function to search over a grid of combinations of posterior and predictive thresholds for a certain trial design is <code><a href="reference/calibrate_thresholds.html">calibrate_thresholds()</a></code>. This function is computationally intensive to varying degrees depending on the number of looks and the number of threshold combinations, and is best run on a server and/or with parallelization.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span>
+<span class="va">calthresh</span> <span class="op">&lt;-</span>
+  <span class="fu"><a href="reference/calibrate_thresholds.html">calibrate_thresholds</a></span><span class="op">(</span>
+    p_null <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.2</span><span class="op">)</span>,
+    p_alt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.5</span><span class="op">)</span>,
+    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>,
+    N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span>,
+    pp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">0.95</span>, <span class="fl">0.01</span><span class="op">)</span>,
+    ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span>,
+    delta <span class="op">=</span> <span class="fl">0</span>
+    <span class="op">)</span></code></pre></div>
+<p>The resulting design options can be interactively compared by passing the results to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with the option <code>plotly = TRUE</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">calthresh</span>, plotly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+</div>
 
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/zabore/ppseq/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/zabore/ppseq/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
@@ -118,6 +151,8 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/zabore/ppseq/actions" class="external-link"><img src="https://github.com/zabore/ppseq/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://codecov.io/gh/zabore/ppseq?branch=main" class="external-link"><img src="https://codecov.io/gh/zabore/ppseq/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://CRAN.R-project.org/package=ppseq" class="external-link"><img src="https://www.r-pkg.org/badges/version/ppseq" alt="CRAN status"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
 </ul>
 </div>
 
@@ -132,7 +167,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer>

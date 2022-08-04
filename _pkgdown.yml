@@ -10,7 +10,7 @@ template:
     success: "#f08122"
 
 development:
-  mode: release
+  mode: auto
   version_label: default
 
 navbar:

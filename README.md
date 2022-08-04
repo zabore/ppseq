@@ -5,9 +5,13 @@
 [![R-CMD-check](https://github.com/zabore/ppseq/workflows/R-CMD-check/badge.svg)](https://github.com/zabore/ppseq/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/zabore/ppseq/branch/main/graph/badge.svg)](https://codecov.io/gh/zabore/ppseq?branch=main)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/ppseq)](https://CRAN.R-project.org/package=ppseq)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
-<br>
+<br> <br>
 
 ## ppseq
 
@@ -38,3 +42,31 @@ remotes::install_github("zabore/ppseq")
 ```
 
 ## Basic usage
+
+The primary function to search over a grid of combinations of posterior
+and predictive thresholds for a certain trial design is
+`calibrate_thresholds()`. This function is computationally intensive to
+varying degrees depending on the number of looks and the number of
+threshold combinations, and is best run on a server and/or with
+parallelization.
+
+``` r
+set.seed(12345)
+calthresh <-
+  calibrate_thresholds(
+    p_null = c(0.2, 0.2),
+    p_alt = c(0.2, 0.5),
+    n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+    N = c(50, 50),
+    pp_threshold = seq(0.9, 0.95, 0.01),
+    ppp_threshold = seq(0.05, 0.2, 0.05),
+    delta = 0
+    )
+```
+
+The resulting design options can be interactively compared by passing
+the results to `plot()` with the option `plotly = TRUE`:
+
+``` r
+plot(calthresh, plotly = TRUE)
+```

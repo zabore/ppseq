@@ -8,6 +8,15 @@
 \description{
 Functions are available to calibrate designs over a range of posterior and predictive thresholds, to plot the various design options, and to obtain the operating characteristics of optimal accuracy and optimal efficiency designs.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/zabore/ppseq}
+  \item \url{https://www.emilyzabor.com/ppseq/}
+  \item Report bugs at \url{https://github.com/zabore/ppseq/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Emily C. Zabor \email{zabore2@ccf.org} (\href{https://orcid.org/0000-0002-1402-4498}{ORCID})
 

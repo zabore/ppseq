@@ -20,7 +20,7 @@ upper left point on a plot of the type I error by the power."><meta name="robots
     
     <a class="navbar-brand me-2" href="../index.html">ppseq</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.2.9001</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.1.2.9003</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@ upper left point on a plot of the type I error by the power."><meta name="robots
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="http://github.com/zabore">
+  <a class="external-link nav-link" href="http://github.com/zabore/ppseq">
     <span class="fa fa-github"></span>
      
   </a>
@@ -64,7 +64,7 @@ upper left point on a plot of the type I error by the power."><meta name="robots
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Custom optimization method for <code>calibrate_thresholds</code> objects</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/zabore/ppseq/blob/HEAD/R/optimize_design.R" class="external-link"><code>R/optimize_design.R</code></a></small>
       <div class="d-none name"><code>optimize_design.calibrate_thresholds.Rd</code></div>
     </div>
 
@@ -80,7 +80,16 @@ upper left point on a plot of the type I error by the power.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for calibrate_thresholds</span>
-<span class="fu"><a href="optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">x</span>, type1_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, minimum_power <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="optimize_design.html">optimize_design</a></span><span class="op">(</span>
+  <span class="va">x</span>,
+  type1_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,
+  minimum_power <span class="op">=</span> <span class="fl">0</span>,
+  w_type1 <span class="op">=</span> <span class="fl">1</span>,
+  w_power <span class="op">=</span> <span class="fl">1</span>,
+  w_Nnull <span class="op">=</span> <span class="fl">1</span>,
+  w_Nalt <span class="op">=</span> <span class="fl">1</span>,
+  <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -100,6 +109,26 @@ error. Defaults to c(0, 1) to return all results.</p></dd>
 <dd><p>a numeric between 0 and 1 specifying the minimum
 acceptable power. Specify NULL to return the full range of resulting power.
 Defaults to 0 to return all results.</p></dd>
+
+
+<dt>w_type1</dt>
+<dd><p>a user-specified weight on the type 1 error.
+Defaults to 1 for no weighting.</p></dd>
+
+
+<dt>w_power</dt>
+<dd><p>a user-specified weight on the power.
+Defaults to 1 for no weighting.</p></dd>
+
+
+<dt>w_Nnull</dt>
+<dd><p>a user-specified weight on the average sample size under the
+null. Defaults to 1 for no weighting.</p></dd>
+
+
+<dt>w_Nalt</dt>
+<dd><p>a user-specified weight on the average sample size under the
+alternative. Defaults to 1 for no weighting.</p></dd>
 
 
 <dt>...</dt>
@@ -203,7 +232,7 @@ and optimal accuracy designs</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer></div>
