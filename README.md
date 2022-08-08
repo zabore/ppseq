@@ -43,6 +43,10 @@ remotes::install_github("zabore/ppseq")
 
 ## Basic usage
 
+``` r
+library(ppseq)
+```
+
 The primary function to search over a grid of combinations of posterior
 and predictive thresholds for a certain trial design is
 `calibrate_thresholds()`. This function is computationally intensive to
@@ -52,6 +56,7 @@ parallelization.
 
 ``` r
 set.seed(12345)
+
 calthresh <-
   calibrate_thresholds(
     p_null = c(0.2, 0.2),
@@ -64,9 +69,66 @@ calthresh <-
     )
 ```
 
-The resulting design options can be interactively compared by passing
-the results to `plot()` with the option `plotly = TRUE`:
+The resulting design options can be compared interactively compared by
+passing the results to `plot()` with the option `plotly = TRUE`. Static
+versions of the plots are also available using the default option
+`plotly = FALSE`, which produces `ggplot` results. Plot output can
+optionally be filtered by desired range of type 1 error and minimum
+power. The default plots all design options. The results can also be
+viewed in tabular form by passing the results to `print()` with
+filtering options for the desired range of type 1 error and minimum
+power.
 
 ``` r
-plot(calthresh, plotly = TRUE)
+plot(calthresh)
 ```
+
+<img src="man/figures/README-calthresh-plot.png" width="100%" />
+
+The optimal accuracy and optimal efficiency designs can be obtained by
+passing the results to the `optimize_design()` function, with filtering
+applied for the desired range of type 1 error and minimum power.
+
+``` r
+optimize_design(calthresh, type1_range = c(0.025, 0.05), minimum_power = 0.8)
+```
+
+<img src="man/figures/README-opt-acc-table.png" width="100%" /><img src="man/figures/README-opt-eff-table.png" width="100%" />
+
+After selecting a design, we can obtain a set of decision rules to
+implement the trial, so that no calculations will be needed during the
+course of the trial. The `calc_decision_rules()` function will generate
+the decision rules to stop or continue at each interim look of the
+trial.
+
+``` r
+set.seed(123456)
+
+opteffrules <- 
+  calc_decision_rules(
+    n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+    N = c(50, 50),
+    theta = 0.94,
+    ppp = 0.2,
+    p0 = NULL, 
+    delta = 0
+  )
+```
+
+The results can be displayed with interactive graphics by passing the
+results to `plot()` with the default option `plotly = TRUE`. Below are
+the static `ggplot` versions created with the option `plotly = FALSE`
+for demonstration purposes. Tabular results can be obtained by passing
+the results to `print()`.
+
+``` r
+plot(opteffrules, plotly = FALSE)
+```
+
+<img src="man/figures/README-opteffrules-plot.png" width="100%" />
+
+See the vignettes for the
+[one-sample](https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html)
+and
+[two-sample](https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html)
+cases for additional details about available features and options.

@@ -94,9 +94,12 @@
 <div class="section level2">
 <h2 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h2>
-<p>The primary function to search over a grid of combinations of posterior and predictive thresholds for a certain trial design is <code><a href="reference/calibrate_thresholds.html">calibrate_thresholds()</a></code>. This function is computationally intensive to varying degrees depending on the number of looks and the number of threshold combinations, and is best run on a server and/or with parallelization.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/zabore/ppseq" class="external-link">ppseq</a></span><span class="op">)</span></code></pre></div>
+<p>The primary function to search over a grid of combinations of posterior and predictive thresholds for a certain trial design is <code><a href="reference/calibrate_thresholds.html">calibrate_thresholds()</a></code>. This function is computationally intensive to varying degrees depending on the number of looks and the number of threshold combinations, and is best run on a server and/or with parallelization.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12345</span><span class="op">)</span>
+
 <span class="va">calthresh</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="reference/calibrate_thresholds.html">calibrate_thresholds</a></span><span class="op">(</span>
     p_null <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.2</span><span class="op">)</span>,
@@ -107,9 +110,32 @@
     ppp_threshold <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span><span class="op">)</span>,
     delta <span class="op">=</span> <span class="fl">0</span>
     <span class="op">)</span></code></pre></div>
-<p>The resulting design options can be interactively compared by passing the results to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with the option <code>plotly = TRUE</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">calthresh</span>, plotly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>The resulting design options can be compared interactively compared by passing the results to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with the option <code>plotly = TRUE</code>. Static versions of the plots are also available using the default option <code>plotly = FALSE</code>, which produces <code>ggplot</code> results. Plot output can optionally be filtered by desired range of type 1 error and minimum power. The default plots all design options. The results can also be viewed in tabular form by passing the results to <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> with filtering options for the desired range of type 1 error and minimum power.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">calthresh</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-calthresh-plot.png" width="100%"></p>
+<p>The optimal accuracy and optimal efficiency designs can be obtained by passing the results to the <code><a href="reference/optimize_design.html">optimize_design()</a></code> function, with filtering applied for the desired range of type 1 error and minimum power.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">calthresh</span>, type1_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.05</span><span class="op">)</span>, minimum_power <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-opt-acc-table.png" width="100%"><img src="reference/figures/README-opt-eff-table.png" width="100%"></p>
+<p>After selecting a design, we can obtain a set of decision rules to implement the trial, so that no calculations will be needed during the course of the trial. The <code><a href="reference/calc_decision_rules.html">calc_decision_rules()</a></code> function will generate the decision rules to stop or continue at each interim look of the trial.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123456</span><span class="op">)</span>
+
+<span class="va">opteffrules</span> <span class="op">&lt;-</span> 
+  <span class="fu"><a href="reference/calc_decision_rules.html">calc_decision_rules</a></span><span class="op">(</span>
+    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>,
+    N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span>,
+    theta <span class="op">=</span> <span class="fl">0.94</span>,
+    ppp <span class="op">=</span> <span class="fl">0.2</span>,
+    p0 <span class="op">=</span> <span class="cn">NULL</span>, 
+    delta <span class="op">=</span> <span class="fl">0</span>
+  <span class="op">)</span></code></pre></div>
+<p>The results can be displayed with interactive graphics by passing the results to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with the default option <code>plotly = TRUE</code>. Below are the static <code>ggplot</code> versions created with the option <code>plotly = FALSE</code> for demonstration purposes. Tabular results can be obtained by passing the results to <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">opteffrules</span>, plotly <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-opteffrules-plot.png" width="100%"></p>
+<p>See the vignettes for the <a href="https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html">one-sample</a> and <a href="https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html">two-sample</a> cases for additional details about available features and options.</p>
 </div>
 
   </main><aside class="col-md-3"><div class="links">
