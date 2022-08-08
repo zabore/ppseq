@@ -50,8 +50,8 @@ cal_tbl1 <- calibrate_thresholds(
   N = 15,
   pp_threshold = c(0.85, 0.9),
   ppp_threshold = c(0.1, 0.2),
-  S = 50,
-  nsim = 50
+  S = 10,
+  nsim = 10
   )
 
 plot(cal_tbl1, type1_range = c(0.01, 0.2), minimum_power = 0.7)

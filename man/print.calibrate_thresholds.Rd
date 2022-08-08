@@ -31,9 +31,6 @@ error and a minimum value of power using the arguments 'type1_range' and
 }
 \examples{
 
-# Setting S = 50 and nsim = 50 for speed
-# In practice you would want a much larger sample and more simulations
-
 set.seed(123)
 
 cal_tbl1 <- calibrate_thresholds(
@@ -43,8 +40,8 @@ cal_tbl1 <- calibrate_thresholds(
   N = 15,
   pp_threshold = c(0.85, 0.9),
   ppp_threshold = c(0.1, 0.2),
-  S = 50,
-  nsim = 50
+  S = 10,
+  nsim = 10
   )
 
 print(cal_tbl1)

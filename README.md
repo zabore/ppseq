@@ -4,7 +4,7 @@
 
 [![R-CMD-check](https://github.com/zabore/ppseq/workflows/R-CMD-check/badge.svg)](https://github.com/zabore/ppseq/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/zabore/ppseq/branch/main/graph/badge.svg)](https://codecov.io/gh/zabore/ppseq?branch=main)
+coverage](https://codecov.io/gh/zabore/ppseq/branch/main/graph/badge.svg)](https://app.codecov.io/gh/zabore/ppseq?branch=main)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/ppseq)](https://CRAN.R-project.org/package=ppseq)
 [![Lifecycle:

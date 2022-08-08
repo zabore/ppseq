@@ -33,8 +33,6 @@ when to proceed at the various interim analyses
 
 set.seed(123)
 
-# Setting S = 100 for speed, in practice you would want a much larger sample
-
 # Two-sample case
 dec_tbl <- calc_decision_rules(
   n = cbind(seq(5, 15, 5), seq(5, 15, 5)),
@@ -44,9 +42,9 @@ dec_tbl <- calc_decision_rules(
   p0 = NULL,
   direction = "greater",
   delta = 0,
-  S = 100
+  S = 50
 )
 
-plot(dec_tbl)
+plot(dec_tbl, plotly = FALSE)
 
 }

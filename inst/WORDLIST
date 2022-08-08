@@ -2,6 +2,7 @@ Atezolizumab
 CMD
 Codecov
 IC
+Lifecycle
 ORCID
 atezolizumab
 biomarker
@@ -14,6 +15,7 @@ immunotherapies
 inefficacious
 ligand
 mUC
+parallelization
 parallelize
 pharmacodynamics
 pharmacokinetics

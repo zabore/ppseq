@@ -98,9 +98,6 @@ In the alternative case, this is the power for the given thresholds.
 }
 \examples{
 
-# Setting S = 50 and nsim = 50 for speed
-# In practice you would want a much larger sample and more simulations
-
 # One-sample case
 set.seed(123)
 
@@ -111,8 +108,8 @@ calibrate_thresholds(
   N = 15,
   pp_threshold = c(0.85, 0.9),
   ppp_threshold = c(0.1, 0.2),
-  S = 50, 
-  nsim = 50
+  S = 10, 
+  nsim = 10
   )
 
 # Two-sample case
@@ -126,8 +123,8 @@ calibrate_thresholds(
   pp_threshold = c(0.8, 0.85),
   ppp_threshold = c(0.2, 0.3),
   delta = 0,
-  S = 50, 
-  nsim = 50
+  S = 10, 
+  nsim = 10
   )
 
 }

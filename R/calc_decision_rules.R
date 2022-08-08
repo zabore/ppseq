@@ -55,8 +55,6 @@
 #' @examples
 #' set.seed(123)
 #' 
-#' # Setting S = 100 for speed, in practice you would want a much larger sample
-#'
 #' # One-sample case
 #' calc_decision_rules(
 #'   n = seq(5, 25, 5), 
@@ -64,7 +62,7 @@
 #'   theta = 0.86, 
 #'   ppp = 0.2, 
 #'   p0 = 0.1, 
-#'   S = 100
+#'   S = 50
 #'   )
 #' 
 #' # Two-sample case
@@ -76,7 +74,7 @@
 #'   p0 = NULL, 
 #'   direction = "greater", 
 #'   delta = 0, 
-#'   S = 100
+#'   S = 50
 #'   )
 #'
 #' @importFrom tibble tibble add_row

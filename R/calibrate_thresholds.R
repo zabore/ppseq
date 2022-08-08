@@ -228,9 +228,6 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #'
 #' @examples
 #' 
-#' # Setting S = 50 and nsim = 50 for speed
-#' # In practice you would want a much larger sample and more simulations
-#' 
 #' # One-sample case
 #' set.seed(123)
 #' 
@@ -241,8 +238,8 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #'   N = 15,
 #'   pp_threshold = c(0.85, 0.9),
 #'   ppp_threshold = c(0.1, 0.2),
-#'   S = 50, 
-#'   nsim = 50
+#'   S = 10, 
+#'   nsim = 10
 #'   )
 #' 
 #' # Two-sample case
@@ -256,8 +253,8 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #'   pp_threshold = c(0.8, 0.85),
 #'   ppp_threshold = c(0.2, 0.3),
 #'   delta = 0,
-#'   S = 50, 
-#'   nsim = 50
+#'   S = 10, 
+#'   nsim = 10
 #'   )
 #' 
 #' @importFrom purrr pmap_dfr map cross_df
