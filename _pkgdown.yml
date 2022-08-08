@@ -10,9 +10,13 @@ template:
     success: "#f08122"
 
 development:
-  mode: auto
+  mode: release
   version_label: default
-
+  
+home:
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
+    
 navbar:
   type: light
   structure:
