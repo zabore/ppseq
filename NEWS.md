@@ -1,4 +1,4 @@
-# ppseq (development version)
+# ppseq 0.2.0
 
 * added weighting options to `optimize_design()` (Closed Issue #7)
 * added informative messaging when no results returned from `optimize_design()` (Closed Issue #14)
