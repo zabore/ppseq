@@ -8,56 +8,59 @@ Monitoring}
 \abstract{%
 Advances in drug discovery have produced numerous biomarker-guided
 therapeutic strategies for treating cancer. Yet the promise of precision
-medicine comes with the cost of increased complexity. Recent successes
-for non-cytotoxic treatments have relied on expansive early phase
-clinical trials that far exceeded the size of trials typically
-implemented for chemotherapies, with the addition of baskets for
-different disease sub-types or multiple dosing groups, expansion cohorts
-to further study safety and obtain preliminary efficacy information, or
-randomization to further define efficacy or compare across doses, among
-other design elements. With the enlarged sample sizes come increasing
-ethical concerns regarding patients who enroll in clinical trials, and
-the need for rigorous statistical designs to ensure that trials can stop
+medicine comes with the cost of increased complexity. Recent trials of
+targeted treatments have included expansion cohorts with sample sizes
+far exceeding those in traditional early phase trials of
+chemotherapeutic agents. The enlarged sample sizes raise ethical
+concerns for patients who enroll in clinical trials, and emphasize the
+need for rigorous statistical designs to ensure that trials can stop
 early for futility while maintaining traditional control of type I error
 and power. The R package \pkg{ppseq} provides a framework for designing
-early phase clinical trials using sequential futility monitoring based
-on the Bayesian predictive probability. Trial designs can be compared
-using interactive plots and optimized based on efficiency or accuracy.
+early phase clinical trials of binary endpoints using sequential
+futility monitoring based on Bayesian predictive probability. Trial
+designs can be compared using interactive plots and selected based on
+measures of efficiency or accuracy.
 }
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-In the context of cytotoxic treatments, phase 1 trials in oncology
-traditionally have the primary aim of identifying the maximum tolerated
-dose (MTD), defined as the highest dose that still maintains a certain
-pre-specified rate of toxicity, most commonly 30\%, in a dose-escalation
-phase. Designs for dose-escalation trials include the rule-based 3+3
-design and the model-based continual reassessment method, among others.
-But with increasing study focused on non-cytotoxic treatments, such as
-immunotherapies, the MTD either may not exist or may not be relevant,
-and toxicities may either develop much later or even be chronic, making
-these treatments difficult to study with traditional dose-escalation
-designs \citep{Pestana2020}. As a result, it is becoming increasingly
-common to include dose-expansion cohorts, in which additional patients
-are enrolled in phase 1 after the dose-escalation phase is complete. In
-this setup, the dose-escalation phase is considered phase 1a and used to
-assess the initial safety of multiple doses, then the dose-expansion
-phase is considered phase 1b and can have a variety of aims including to
-further refine the safety of one or more doses, to assess preliminary
-efficacy, to explore the treatment in various disease-specific subtypes
-that all share a common biomarker that the treatment is targeting, or to
+Statistical methods for early phase oncology trials were developed in
+the context of cytotoxic treatments. Most cytotoxic treatments exhibit
+increases in both efficacy and toxicity with increasing dose. As a
+result, phase I trials were centered on identifying the maximum
+tolerated dose (MTD), defined as the highest dose that did not exceed a
+pre-specified toxicity threshold. Phase I dose-escalation trials were
+designed using the rule-based 3+3 method or the model-based continual
+reassessment method, among others. But advances in drug discovery have
+produced numerous biomarker-guided non-cytotoxic therapies such as small
+molecule inhibitors, antibody drug conjugates, immune checkpoint
+inhibitors, and monoclonal antibodies. These therapies typically do not
+exhibit the same pattern of increases in both efficacy and toxicity with
+increasing dose, so the MTD as traditionally defined may not exist.
+Instead, lower doses may have equivalent efficacy but lower toxicity as
+compared to higher doses. As a result, these therapies can be difficult
+to study with traditional dose-escalation designs \citep{Pestana2020}.
+To address this issue, recent phase I trials have included large
+dose-expansion cohorts, in which additional patients are enrolled in
+phase 1 after the dose-escalation phase is complete. In this setup, the
+dose-escalation phase is considered phase 1a and used to assess the
+initial safety of multiple doses, then the dose-expansion phase is
+considered phase 1b and can have a variety of aims including to further
+refine the safety of one or more doses, to assess preliminary efficacy,
+to explore the treatment in various disease-specific subtypes, or to
 further characterize the pharmacokinetics and/or pharmacodynamics. The
 use of dose-expansion cohorts increased from 12\% in 2006 to 38\% in
 2011 \citep{Manji2013} and trials with dose-expansion cohorts led to
 higher response rates and more frequent success in phase 2 trials
 \citep{Bugano2017}.
 
-But dose-expansion cohorts are not always planned in advance, and
-therefore may be subject to on-the-fly decision making that can lead to
-large sample sizes and poor statistical properties. For example, the
-KEYNOTE-001 trial of pembrolizumab, initially designed as a 3+3
-dose-escalation trial, included multiple protocol amendments and
+But despite these successes, recent dose-expansion cohorts have not
+always been planned in advance, leading to uncertain statistical
+properties, and have at times included samples sizes that far exceed
+those typically seen in early phase trials of cytotoxic treatments. For
+example, the KEYNOTE-001 trial of pembrolizumab, initially designed as a
+3+3 dose-escalation trial, included multiple protocol amendments and
 ultimately enrolled a total of 655 patients across five melanoma
 expansion cohorts and 550 patients across four non-small-cell lung
 cancer expansion cohorts \citep{Khoja2015}. In a basket trial of
@@ -68,68 +71,75 @@ and evaluated 95, despite the fact that no expansion cohort in this
 disease subtype was originally planned in the trial protocol. The
 expansion cohort in metastatic urothelial carcinoma was rather added
 later in a protocol amendment in which the sample size was increased
-from what was initially planned \citep{Petrylak2018, Powles2014}.
+from what was initially planned \citep{Petrylak2018, Powles2014}. These
+enlarged sample sizes raise ethical concerns for patients who enroll in
+clinical trials, and emphasize the need for rigorous statistical designs
+to ensure that trials can stop early for futility while maintaining
+traditional control of type I error and power.
 
-Bayesian sequential predictive probability monitoring provides a natural
-framework for early phase oncology trial design, allowing flexibility to
-stop early for futility or safety concerns while also maintaining
-traditional levels of power and control of type I error. As a result,
-predictive probability has been proposed as an approach to interim
-monitoring in clinical trials previously
-\citep{Dmitrienko2006, Lee2008, Saville2014, Hobbs2018}. However, in
+Bayesian predictive probability has been proposed as an approach for
+sequential monitoring in early phase oncology trials
+\citep{Dmitrienko2006, Lee2008, Hobbs2018, Saville2014}. However, in
 order to be useful to investigators designing such trials, software must
-be made available to select an optimal design. This paper introduces the
-\CRANpkg{ppseq} package for the R software language \citep{RCT2020},
-which provides functions to design one-sample and two-sample early phase
-clinical trials using sequential predictive probability monitoring for
-futility. Interactive plots produced using the \CRANpkg{ggplot2} package
-\citep{Wickham2016} and the \CRANpkg{plotly} package \citep{Sievert2020}
-compare designs based on different thresholds for decision making.
-Moreover, we demonstrate optimization criteria for selecting an ideal
-predictive probability monitoring design using the \CRANpkg{ppseq}
-package. While the \CRANpkg{ppseq} package was developed with early
-phase oncology clinical trials in mind, the methodology is general and
-can be applied to any application of sequential futility monitoring in
-clinical trial design.
+be made available to calibrate the design for the desired statistical
+properties. To our knowledge no such software currently exists in the R
+programming language. This paper introduces the \CRANpkg{ppseq} package
+for the R software language \citep{RCT2020}, which provides functions to
+design early phase clinical trials of binary endpoints using sequential
+predictive probability monitoring for futility. Interactive plots
+produced using the \CRANpkg{ggplot2} package \citep{Wickham2016} and the
+\CRANpkg{plotly} package \citep{Sievert2020} compare designs based on
+different thresholds for decision making. Moreover, we demonstrate
+criteria for selecting an ideal predictive probability monitoring design
+using the \CRANpkg{ppseq} package. While the \CRANpkg{ppseq} package was
+developed with early phase oncology clinical trials in mind, the
+methodology is general and can be applied to any application of
+sequential futility monitoring in clinical trial design.
 
 \hypertarget{predictive-probability-monitoring}{%
 \section{Predictive probability
 monitoring}\label{predictive-probability-monitoring}}
 
-Consider the setting of a binary outcome, such as tumor response as
-measured by the RECIST criteria in the setting of a study in patients
-with solid tumors, where each patient, denoted by \(i\), enrolled in the
-trial either has a response such that \(x_i = 1\) or does not have a
-response such that \(x_i = 0\). Then \(X = \sum_{i=1}^n x_i\) represents
-the number of responses out of \(n\) currently observed patients up to a
-maximum of \(N\) total patients. Let \(p\) represent the probability of
-response, where \(p_0\) represents the null response rate under no
-treatment or the standard of care treatment and \(p_1\) represents the
-alternative response rate under the experimental treatment. Most
-dose-expansion studies with an efficacy aim will wish to test the null
-hypothesis \(H_0: p \leq p_0\) versus the alternative hypothesis
-\(H_1: p \geq p_1\).
+Consider the setting of an expansion cohort with a binary outcome, such
+as tumor response as measured by the RECIST (Response Evaluation
+Criteria in Solid Tumors) criteria. Here we will focus on the one-sample
+setting, in which all patients in the trial are enrolled onto a single
+arm and given the experimental treatment of interest. Functionality is
+also available for the two-sample setting, in which patients are
+enrolled onto two different treatment arms, or a treatment and a control
+arm, for comparative purposes. Each patient, denoted by \(i\), enrolled
+in the trial either has a response such that \(x_i = 1\) or does not
+have a response such that \(x_i = 0\). Then \(X = \sum_{i=1}^n x_i\)
+represents the number of responses out of \(n\) currently observed
+patients up to a maximum of \(N\) total patients. Let \(p\) represent
+the true probability of response. Fix \(p_0\) as the threshold for
+unacceptable response rate and \(p_1\) as the threshold for acceptable
+response rate. Most dose-expansion studies with an efficacy aim will
+wish to test the null hypothesis \(H_0: p \leq p_0\) versus the
+alternative hypothesis \(H_1: p \geq p_1\).
 
-The Bayesian paradigm of statistics is founded on Bayes rule, which is a
-mathematical theory that specifies how to combine the prior
+The Bayesian paradigm of statistics is founded on Bayes' theorem, which
+is a mathematical theory that specifies how to combine the prior
 distributions that define prior beliefs about parameters, such as the
-response rate \(p\), with the observed data, such as the total number of
-responses \(X\), yielding a posterior distribution. Here the prior
-distribution of the response rate \(\pi(p)\) has a beta distribution
-\(Beta(a_0, b_0)\) and our data \(X\) have a binomial distribution
-\(bin(n, p)\). Combining the likelihood function for the observed data
-\(L_x(p) \propto p^x (1-p)^{n-x}\) with the prior, we obtain the
-posterior distribution of the response rate, which follows the beta
-distribution \(p|x \sim Beta(a_0 + x, b_0 + n - x)\). A posterior
-probability threshold \(\theta\) would be pre-specified during the trial
-design stage. At the end of the trial if the posterior probability
-exceeded the pre-specified threshold, i.e.~if
-\(\Pr(p>p_0 | X) > \theta\), the trial would be declared a success.
+true response rate \(p\), with the observed data, such as the total
+number of responses \(X\), yielding a posterior distribution. Here the
+prior distribution of the response rate \(\pi(p)\) has a beta
+distribution \(\mbox{Beta}(a_0, b_0)\) and our data \(X\) have a
+binomial distribution \(\mbox{Bin}(n, p)\). Combining the likelihood
+function for the observed data \(L_x(p) \propto p^x (1-p)^{n-x}\) with
+the prior, we obtain the posterior distribution of the response rate,
+which follows the beta distribution
+\(p|x \sim \mbox{Beta}(a_0 + x, b_0 + n - x)\). A posterior probability
+threshold \(\theta\) would be pre-specified during the trial design
+stage. At the end of the trial if the posterior probability exceeded the
+pre-specified threshold, i.e.~if \(\Pr(p>p_0 | X) > \theta\), the trial
+would be declared a success.
 
 The posterior predictive distribution of the number of future responses
 \(X^*\) in the remaining \(n^*=N-n\) future patients follows a
-beta-binomial distribution \(Beta-binomial(n^*, a_0 + x, b_0 + n - x)\).
-Then the posterior predictive probability (PPP), is calculated as
+beta-binomial distribution
+\(\mbox{Beta-binomial}(n^*, a_0 + x, b_0 + n - x)\). Then the posterior
+predictive probability (PPP), is calculated as
 \(PPP = \sum_{{x^*}=0}^{n^*} \Pr(X^*=x^*|x) \times I(\Pr(p>p_0 | X, X^*=x^*) > \theta)\).
 The posterior predictive probability represents the probability that, at
 any given interim monitoring point, the treatment will be declared
@@ -153,51 +163,133 @@ The \CRANpkg{ppseq} package facilitates the design of clinical trials
 utilizing sequential predictive probability monitoring for futility. The
 goal is to establish a set of decision rules at the trial planning phase
 that would be used for interim monitoring during the course of the
-trial. The main challenge in designing such a trial is joint calibration
-of the posterior probability and posterior predictive probability
-thresholds to be used in the trial in order to maintain the desired
-level of power and type I error. The \texttt{calibrate\_thresholds()}
-function will evaluate a grid of posterior and predictive thresholds
-provided by the user as vector inputs through the argument
-\texttt{pp\_threshold} for posterior thresholds and the argument
-\texttt{ppp\_threshold} for predictive thresholds. Other required
-arguments include the null response rate \texttt{p\_null}, the
-alternative response rate \texttt{p\_alt}, a vector of sample sizes at
-which interim analyses are to be performed \texttt{n} as well as the
-maximum total sample size \texttt{N}. Default arguments are available
-for the direction of the alternative hypothesis \texttt{direction}, a
-vector of the two hyperparameters of the prior beta distribution
-\texttt{prior}, and the number of posterior samples \texttt{S} and the
-number of simulated trial datasets \texttt{nsim}, but customization is
-also possible. The additional argument \texttt{delta} can specify the
-clinically meaningful difference between groups in the case of a
-two-sample trial design. The function returns a list, the first element
-of which is a \texttt{tibble} containing the posterior threshold,
-predictive threshold, the mean sample size under the null and the
-alternative, the proportion of positive trials under the null and
-alternative, and the proportion of trials stopped early under the null
-and alternative. The proportion of positive trials under the null
-represents the type I error and the proportion of positive trials under
-the alternative represents the power. The \texttt{print()} option will
-print the results summary for each combination of thresholds, filtered
-by an acceptable range of type I error and minimum power, if desired.
+trial. The main computational challenge in designing such a trial is
+joint calibration of the posterior probability and posterior predictive
+probability thresholds to be used in the trial in order to achieve the
+desired levels of frequentist type I error and power. The main function
+for achieving this aim is the \texttt{calibrate\_thresholds()} function,
+which will evaluate a grid of posterior thresholds \(\theta\) and
+predictive thresholds \(\theta^*\) provided by the user as vector inputs
+specified with the arguments \texttt{pp\_threshold} and
+\texttt{ppp\_threshold}, respectively. Other required arguments include
+the unacceptable response rate \(p_0\) specified by \texttt{p\_null},
+the acceptable response rate \(p_1\) specified by \texttt{p\_alt}, a
+vector of sample sizes at which interim analyses are to be performed
+\texttt{n}, and the maximum total sample size \texttt{N}. The direction
+of the alternative hypothesis is specified with the argument
+\texttt{direction} and defaults to \texttt{"greater"}, which corresponds
+to the alternative hypothesis \(H_1: p \geq p_1\). The hyperparameters
+of the prior beta distribution are specified with the argument
+\texttt{prior} and default to \texttt{c(0.5,\ 0.5)}, which denotes a
+\(\mbox{Beta}(0.5, 0.5)\) distribution. The number of posterior samples
+are specified with the argument \texttt{S}, which defaults to
+\texttt{5000} samples, and the number of simulated trial datasets is
+specified with the argument \texttt{nsim}, which defaults to
+\texttt{1000}. The additional argument \texttt{delta}, which defaults to
+\texttt{NULL} for the one-sample setting, can specify a clinically
+meaningful difference between groups \(\delta = p_1 - p_0\) in the case
+of a two-sample trial design.
 
-\hypertarget{optimization}{%
-\subsection{Optimization}\label{optimization}}
+The \texttt{calibrate\_thresholds()} function conducts the following
+algorithm, given the default arguments:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Generate \texttt{nsim} datasets, denoted by \(j\), containing the
+  cumulative number of responses \(x\) at each interim sample size \(n\)
+  from a binomial distribution under the unacceptable (i.e.~null)
+  response rate \(p_0\), specified by \texttt{p\_null}, and under the
+  acceptable (i.e.~alternative) response rate \(p_1\), specified by
+  \texttt{p\_alt}, for each interim look, denoted by \(l\).
+\item
+  For dataset \(j\) and posterior threshold \(\theta_k\), draw
+  \texttt{S} samples, denoted by \(s\), from the posterior distribution
+  \(p|x_{ls} \sim \mbox{Beta}(a_0 + x_l, b_0 + n_l - x_l)\) where
+  \(x_l\) is the number of responses at interim look \(l\) and \(n_l\)
+  is the number of enrolled patients at interim look \(l\). Use each
+  \(p|x_{ls}\) as the response probability in a binomial distribution to
+  generate the number of future responses \(X^*_{ls}\) in the remaining
+  \(n^*_l=N-n_l\) future patients at interim look \(l\).
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \tightlist
+  \item
+    Then for each \(X^*_{ls}\), generate \texttt{S} posterior
+    probabilities, denoted by \(s'\), at the end of the trial:
+    \(PP^*_{lss'} \sim \mbox{Beta}(a_0 + X^*_{ls} + x_l, b_0 + n^*_l - (X^*_{ls} + x_l))\)
+    and calculate
+    \(PP^*_{ls} = \Pr(p>p_0 | X^*_{ls}) = \frac{\sum_1^{S'} PP^*_{lss'} > p_0}{S'}\).
+  \item
+    Estimate the predictive probability at posterior threshold \(k\) as
+    \(PPP_{lk} = \frac{\sum_1^S PP^*_{ls}>\theta_k}{S}\).
+  \item
+    Stop the trial for dataset \(j\) at interim look \(l\) and
+    predictive threshold \(m\) if \(PPP_{lk} < \theta^*_m\). Otherwise
+    continue enrolling.
+  \end{enumerate}
+\item
+  Repeat (2) over all combinations of datasets \(j\), posterior
+  thresholds \(k\), and predictive thresholds \(m\).
+\item
+  If dataset \(j\) was stopped early for futility then we do not reject
+  the null hypothesis. If dataset \(j\) reached full enrollment, we
+  reject the null hypothesis \(H_0: p \leq p_0\) at posterior threshold
+  \(k\) if \(PPP_{lk} > \theta_k\).
+\end{enumerate}
+
+The function returns a list, the first element of which is a
+\texttt{tibble} containing the posterior threshold \(\theta\), the
+predictive threshold \(\theta^*\), the mean sample size under the null
+and the alternative, the proportion of positive trials under the null
+and alternative, and the proportion of trials stopped early under the
+null and alternative. The proportion of trials simulated under the null
+hypothesis for which the null hypothesis was rejected is an estimate of
+the type I error, and the proportion of trials simulated under the
+alternative hypothesis for which the null hypothesis was rejected is an
+estimate of the power. The \texttt{print()} option will print the
+results summary for each combination of thresholds, filtered by an
+acceptable range of type I error and minimum power, if desired. Note
+that the results will be sensitive to the choice of \texttt{nsim} and
+\texttt{S}. We have set what we believe are reasonable defaults and
+would caution users against reducing these values without careful
+consideration.
+
+\hypertarget{design-selection}{%
+\subsection{Design selection}\label{design-selection}}
 
 After obtaining results for all combinations of evaluated posterior and
 predictive thresholds, the next step is to select the ideal design from
 among the various options. The \CRANpkg{ppseq} package introduces two
-optimization criteria to assist users in making a selection. The first,
-called the ``optimal accuracy'' design, identifies the design that
-minimizes the Euclidean distance to the top left point on a plot of the
-type I error by the power. The second, called the ``optimal efficiency''
-design, identifies the design that minimizes the Euclidean distance to
-the top left point on a plot of the average sample size under the null
-by the average sample size under the alternative, subject to constraints
-on the type I error and power. The \texttt{optimize\_design()} function
-will return a list that contains the details of each of the two optimal
-designs.
+criteria to assist users in making a selection. The first, called the
+``optimal accuracy'' design, identifies the design that minimizes the
+Euclidean distance to 0 type I error probability and a power of 1. To
+accomplish this, the accuracy Euclidean distance (AED) for the design
+with posterior threshold \(k\) and predictive threshold \(m\) is
+calculated as
+\(AED_{km} = w_\alpha * (\alpha_{km} - 0)^2 + w_(1-\beta) * ((1-\beta)_{km}-1)^2\),
+where \(w_\alpha\) and \(w_{(1-\beta)}\) are optional weights on the
+type I error and power, respectively, and \(\alpha_{km}\) denotes the
+estimated type I error and \((1-\beta)_{km}\) denotes the estimated
+power. The design with the smallest value of \(AED_{km}\) is selected as
+optimal. The second criteria, called the ``optimal efficiency'' design,
+identifies the design that minimizes the Euclidean distance to minimal
+average sample size under the null and maximal average sample size under
+the alternative. To accomplish this, the efficiency Euclidean distant
+(EED) for the design with posterior threshold \(k\) and predictive
+threshold \(m\) is calculated as
+\(EED_{km} = w_{\bar{N}_{H_0}} * (\bar{N}_{H_0km} - min(\bar{N}_{H_0}))^2 + w_{\bar{N}_{H_1}} * (\bar{N}_{H_1km}-max(\bar{N}_{H_1}))^2\),
+where \(w_{\bar{N}_{H_0}}\) and \(w_{\bar{N}_{H_1}}\) are optional
+weights on the average sample size under the null and alternative,
+respectively, \(\bar{N}_{H_0km}\) and \(\bar{N}_{H_1km}\) denote the
+average sample sizes under the null and alternative, respectively, and
+\(min(\bar{N}_{H_0})\) and \(max(\bar{N}_{H_1})\) denote the minimum
+average sample size under the null and the maximum average sample size
+under the alternative alternative, respectively, across all combinations
+of \(k\) and \(m\). The design with the smallest value of \(EED_{km}\)
+is selected as optimal. The \texttt{optimize\_design()} function returns
+a list that contains the details of each of the two optimal designs.
 
 \hypertarget{decision-rules}{%
 \subsection{Decision rules}\label{decision-rules}}
@@ -211,30 +303,25 @@ as the maximum total sample size \texttt{N}, the null value to compare
 to in the one-sample case \texttt{p0} (set to \texttt{NULL} in the
 two-sample case), the posterior threshold of the selected design
 \texttt{theta}, and the predictive threshold of the selected design
-\texttt{ppp}. Default arguments are provided for the direction of the
-alternative hypothesis \texttt{direction}, a vector of the two
-hyperparameters of the prior beta distribution \texttt{prior}, and the
-number of posterior samples \texttt{S}, though customization is also
-possible. The additional argument \texttt{delta} can specify the
-clinically meaningful difference between groups in the case of a
-two-sample trial design (set to \texttt{NULL} in the one-sample case).
-The function results in a \texttt{tibble}. In the one-sample case, the
+\texttt{ppp}. Arguments \texttt{direction}, \texttt{prior}, \texttt{S},
+\texttt{delta} are as described in the Package Overview section, with
+the same defaults. The function results in a \texttt{tibble}. The trial
+would stop at a given look if the number of observed responses is less
+than or equal to \(r\), otherwise the trial would continue enrolling if
+the number of observed responses is greater than \(r\). At the end of
+the trial when the maximum planned sample size is reached, the treatment
+would be considered promising if the number of observed responses is
+greater than \(r\). In the one-sample case, the resulting
 \texttt{tibble} includes a column for the sample size \texttt{n} at each
-interim analysis, a column for the decision point \(r\), and a column
-for the posterior predictive probability associated with that decision
-\texttt{ppp}. The trial would stop at a given look if the number of
-observed responses is less than or equal to \(r\) otherwise the trial
-would continue enrolling if the number of observed responses is greater
-than \(r\). At the end of the trial when the maximum planned sample size
-is reached, the treatment would be considered promising if the number of
-observed responses is greater than \(r\). In the two-sample case, the
-\texttt{tibble} includes columns for \texttt{n0} and \texttt{n1}, the
-sample size at each interim analysis in the control and experimental
+interim look, \(r\) at each look, and a column for the associated
+posterior predictive probability \texttt{ppp}. In the two-sample case,
+the \texttt{tibble} includes columns for \texttt{n0} and \texttt{n1},
+the sample size at each interim analysis in the control and experimental
 arms, respectively. There are also columns for \texttt{r0} and
 \texttt{r1}, the number of responses in the control arm and experimental
-arm leading to the decision, respectively. Finally, there is a column
-for the posterior predictive probability associated with that decision
-\texttt{ppp}.
+arm, respectively, leading to the decision to stop or continue. Finally,
+there is a column for the posterior predictive probability associated
+with that decision \texttt{ppp}.
 
 \hypertarget{visualizations}{%
 \subsection{Visualizations}\label{visualizations}}
@@ -265,6 +352,135 @@ the number of possible responses in the experimental group. In both
 cases, the boxes are colored green for a ``proceed'' decision and red
 for a ``stop'' decision for each combination and the hover box produced
 by \CRANpkg{plotly} provides the details.
+
+\hypertarget{toy-example}{%
+\section{Toy example}\label{toy-example}}
+
+In this section I will present a toy example to demonstrate the
+functionality, and the following section will present a more in-depth
+case study that is more computationally intensive.
+
+First we install and load the \CRANpkg{ppseq} package.
+
+\begin{Schunk}
+\begin{Sinput}
+install.packages("ppseq")
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+library(ppseq)
+\end{Sinput}
+\end{Schunk}
+
+Consider the case where we are interested in designing a trial to
+investigate how a new treatment impacts tumor response measured as a
+binary outcome of response versus no response. We know the current
+standard of care treatment results in a tumor response rate of 10\%, and
+we wish to improve this by 30\%. So we wish to test \(H_0: p \leq 0.1\)
+versus \(H_1: p \geq 0.4\), so we set \texttt{p\_null\ =\ 0.1} and
+\texttt{p\_alt\ =\ 0.4}. This is a rare disease so our maximum sample
+size is 15, so we set \texttt{N\ =\ 15}, and we will do interim analyses
+after every 5 patients, so we set \texttt{n\ =\ seq(5,\ 15,\ 5)}. We
+wish to examine designs based on combinations of posterior thresholds
+\(\theta = {0.85, 0.90}\) and predictive thresholds
+\(\theta^*={0.1, 0.2}\), so we set
+\texttt{pp\_threshold\ =\ c(0.85,\ 0.9)} and
+\texttt{ppp\_threshold\ =\ c(0.1,\ 0.2)}. Finally, for computational
+speed in this toy example, we set \texttt{S=50} and \texttt{nsim=50},
+but in practice we would want to use much larger values, in the
+thousands.
+
+\begin{Schunk}
+\begin{Sinput}
+set.seed(123)
+
+cal_thresh <-
+  calibrate_thresholds(
+    p_null = 0.1, 
+    p_alt = 0.4,
+    n = seq(5, 15, 5), 
+    N = 15,
+    pp_threshold = c(0.85, 0.9),
+    ppp_threshold = c(0.1, 0.2),
+    S = 50, 
+    nsim = 50
+    )
+\end{Sinput}
+\end{Schunk}
+
+Since there are only four design options in this toy example, we print
+the entire results table using a call to \texttt{print()}:
+
+\begin{Schunk}
+\begin{Sinput}
+print(cal_thresh)
+\end{Sinput}
+\begin{Soutput}
+#> # A tibble: 4 x 8
+#>   pp_threshold ppp_threshold mean_n1_null prop_pos_null
+#>          <dbl>         <dbl>        <dbl>         <dbl>
+#> 1         0.85           0.1         12.1          0.1 
+#> 2         0.85           0.2          9.5          0.06
+#> 3         0.9            0.1         10.8          0.04
+#> 4         0.9            0.2          8.9          0.04
+#>   prop_stopped_null mean_n1_alt prop_pos_alt prop_stopped_alt
+#>               <dbl>       <dbl>        <dbl>            <dbl>
+#> 1              0.42        14.8         0.92             0.02
+#> 2              0.64        14.8         0.92             0.02
+#> 3              0.5         14.8         0.9              0.02
+#> 4              0.74        14.7         0.88             0.04
+\end{Soutput}
+\end{Schunk}
+
+We use \texttt{optimize\_design()} to identify the optimal accuracy and
+optimal efficiency designs, subject to type I error between 0.025 and
+0.1, specified by \texttt{type1\_range\ =\ c(0.025,\ 0.1)}, and power of
+at least 0.75, specified by \texttt{minimum\_power\ =\ 0.75}:
+
+\begin{Schunk}
+\begin{Sinput}
+optimize_design(cal_thresh, type1_range = c(0.025, 0.1), minimum_power = 0.75)
+\end{Sinput}
+\begin{Soutput}
+#> $`Optimal accuracy design:`
+#> # A tibble: 1 x 6
+#>   pp_threshold ppp_threshold `Type I error` Power
+#>          <dbl>         <dbl>          <dbl> <dbl>
+#> 1         0.85           0.2           0.06  0.92
+#>   `Average N under the null` `Average N under the alternative`
+#>                        <dbl>                             <dbl>
+#> 1                        9.5                              14.8
+#> 
+#> $`Optimal efficiency design:`
+#> # A tibble: 1 x 6
+#>   pp_threshold ppp_threshold `Type I error` Power
+#>          <dbl>         <dbl>          <dbl> <dbl>
+#> 1          0.9           0.2           0.04  0.88
+#>   `Average N under the null` `Average N under the alternative`
+#>                        <dbl>                             <dbl>
+#> 1                        8.9                              14.7
+\end{Soutput}
+\end{Schunk}
+
+We can compare all of the design options graphically with a call to
+\texttt{plot()} and with \texttt{plotly\ =\ TRUE} to obtain interactive
+plots or \texttt{plotly\ =\ FALSE} to obtain static plots.
+
+\begin{Schunk}
+\begin{Sinput}
+plot(
+  cal_thresh, 
+  type1_range = c(0.025, 0.1), 
+  minimum_power = 0.75,
+  plotly = FALSE
+)
+\end{Sinput}
+\begin{figure}
+\includegraphics[width=1.1\linewidth]{zabor-hobbs-kane_files/figure-latex/figstatic-1} \caption[Plot of design options made with ggplot2]{Plot of design options made with ggplot2. The accuracy designs are in the plot on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:figstatic)
+\end{figure}
+\end{Schunk}
 
 \hypertarget{case-study}{%
 \section{Case study}\label{case-study}}
@@ -301,20 +517,6 @@ enrolled. We consider posterior thresholds of 0, 0.7, 0.74, 0.78, 0.82,
 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999,
 0.9999, 0.99999, and 1, and predictive thresholds of 0.05, 0.1, 0.15,
 and 0.2.
-
-First we install and load the \CRANpkg{ppseq} package.
-
-\begin{Schunk}
-\begin{Sinput}
-install.packages("ppseq")
-\end{Sinput}
-\end{Schunk}
-
-\begin{Schunk}
-\begin{Sinput}
-library(ppseq)
-\end{Sinput}
-\end{Schunk}
 
 We use the \texttt{calibrate\_thresholds()} function to obtain the
 operating characteristics of designs based on on each combination of
@@ -371,39 +573,27 @@ print(
 )
 \end{Sinput}
 \begin{Soutput}
-#> # A tibble: 14 x 8
-#>    pp_threshold ppp_threshold mean_n1_null prop_pos_null
-#>           <dbl>         <dbl>        <dbl>         <dbl>
-#>  1         0.82          0.1          42.9         0.096
-#>  2         0.82          0.15         39.1         0.081
-#>  3         0.82          0.2          35.3         0.076
-#>  4         0.86          0.1          42.8         0.096
-#>  5         0.86          0.15         39.1         0.081
-#>  6         0.86          0.2          35.0         0.073
-#>  7         0.9           0.05         51.1         0.072
-#>  8         0.9           0.1          38.6         0.061
-#>  9         0.9           0.15         35.0         0.057
-#> 10         0.92          0.05         50.8         0.071
-#> 11         0.92          0.1          38.6         0.061
-#> 12         0.92          0.15         35.1         0.058
-#> 13         0.93          0.05         50.1         0.05 
-#> 14         0.95          0.05         46.2         0.05 
-#>    prop_stopped_null mean_n1_alt prop_pos_alt prop_stopped_alt
-#>                <dbl>       <dbl>        <dbl>            <dbl>
-#>  1             0.852        83.2        0.829            0.16 
-#>  2             0.904        81.6        0.806            0.189
-#>  3             0.912        79.4        0.782            0.214
-#>  4             0.853        83.1        0.828            0.161
-#>  5             0.904        81.5        0.804            0.191
-#>  6             0.915        79.5        0.782            0.214
-#>  7             0.879        90.2        0.882            0.097
-#>  8             0.906        81.5        0.795            0.191
-#>  9             0.931        79.7        0.769            0.224
-#> 10             0.88         90.1        0.881            0.098
-#> 11             0.906        81.6        0.796            0.19 
-#> 12             0.93         79.8        0.771            0.225
-#> 13             0.881        89.9        0.839            0.099
-#> 14             0.92         88.8        0.828            0.131
+#> # A tibble: 8 x 8
+#>   pp_threshold ppp_threshold mean_n1_null prop_pos_null
+#>          <dbl>         <dbl>        <dbl>         <dbl>
+#> 1         0.82          0.2          35.9         0.096
+#> 2         0.86          0.2          36.0         0.097
+#> 3         0.9           0.05         50.7         0.082
+#> 4         0.9           0.1          38.8         0.073
+#> 5         0.9           0.15         35.5         0.065
+#> 6         0.92          0.05         50.7         0.081
+#> 7         0.92          0.1          38.8         0.073
+#> 8         0.92          0.15         35.6         0.066
+#>   prop_stopped_null mean_n1_alt prop_pos_alt prop_stopped_alt
+#>               <dbl>       <dbl>        <dbl>            <dbl>
+#> 1             0.891        79.4        0.781            0.214
+#> 2             0.89         79.4        0.782            0.213
+#> 3             0.865        89.8        0.872            0.097
+#> 4             0.884        81.7        0.791            0.185
+#> 5             0.919        79.4        0.76             0.232
+#> 6             0.866        89.9        0.874            0.095
+#> 7             0.884        81.8        0.793            0.183
+#> 8             0.917        79.7        0.765            0.227
 \end{Soutput}
 \end{Schunk}
 
@@ -435,19 +625,19 @@ optimize_design(
 #> # A tibble: 1 x 6
 #>   pp_threshold ppp_threshold `Type I error` Power
 #>          <dbl>         <dbl>          <dbl> <dbl>
-#> 1          0.9          0.05          0.072 0.882
+#> 1         0.92          0.05          0.081 0.874
 #>   `Average N under the null` `Average N under the alternative`
 #>                        <dbl>                             <dbl>
-#> 1                       51.1                              90.2
+#> 1                       50.7                              89.9
 #> 
 #> $`Optimal efficiency design:`
 #> # A tibble: 1 x 6
 #>   pp_threshold ppp_threshold `Type I error` Power
 #>          <dbl>         <dbl>          <dbl> <dbl>
-#> 1         0.92           0.1          0.061 0.796
+#> 1         0.92           0.1          0.073 0.793
 #>   `Average N under the null` `Average N under the alternative`
 #>                        <dbl>                             <dbl>
-#> 1                       38.6                              81.6
+#> 1                       38.8                              81.8
 \end{Soutput}
 \end{Schunk}
 
@@ -469,7 +659,7 @@ plot(
 
 \begin{Schunk}
 \begin{figure}
-\includegraphics[width=1.1\linewidth]{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-7-1} \caption[Plot of design options made with ggplot2]{Plot of design options made with ggplot2. The accuracy designs are in the plot on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:unnamed-chunk-7)
+\includegraphics[width=1.1\linewidth]{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-12-1} \caption[Plot of design options made with ggplot2]{Plot of design options made with ggplot2. The accuracy designs are in the plot on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:unnamed-chunk-12)
 \end{figure}
 \end{Schunk}
 
@@ -546,7 +736,7 @@ one_sample_decision_tbl
 plot(one_sample_decision_tbl, plotly = FALSE)
 \end{Sinput}
 \begin{figure}
-\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-12-1} \caption[Plot of decision rules made with ggplot]{Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis.}(\#fig:unnamed-chunk-12)
+\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-17-1} \caption[Plot of decision rules made with ggplot]{Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis.}(\#fig:unnamed-chunk-17)
 \end{figure}
 \end{Schunk}
 
