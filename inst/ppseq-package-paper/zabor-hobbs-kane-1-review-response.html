@@ -405,11 +405,11 @@ I don’t think that this is necessarily the case. I suggest improving the
 clarity of this paragraph.</li>
 </ul>
 </blockquote>
-<p>The goal of this paragraph was to introduce the often large sample
-sizes that have been used in recent expansion cohorts, which is part of
-the problem addressed by this package. We see how the wording did not
-emphasize this point properly, though, and have reworded in response to
-this comment. Thank you.</p>
+<p>The goal of this paragraph was to introduce readers to the often
+large sample sizes that have been used in recent expansion cohorts,
+which is part of the problem addressed by this package. We see how the
+wording did not emphasize this point properly, though, and have reworded
+in response to this comment. Thank you.</p>
 <blockquote>
 <ul>
 <li>In the third paragraph of the introduction the author claims that
@@ -453,6 +453,17 @@ alternative strategies. This aspect should also be discussed (see also
 following point).</li>
 </ul>
 </blockquote>
+<p>Thank you for pointing out the lack of specificity in our wording. We
+meant to convey that the proportion of trials simulated under the null
+hypothesis for which we reject the null hypothesis is an estimate of the
+type I error. And similarly the proportion of trials simulated under the
+alternative hypothesis for which we reject the null hypothesis is an
+estimate of the power. We have revised the sentence accordingly.</p>
+<p>And you are correct that the number of trial replications is an
+important aspect of this. Our default arguments are 1000 datasets with
+5000 posterior draws in each, which we believe are reasonable values. We
+have added a note of caution related to these values in the Package
+Overview section.</p>
 <blockquote>
 <ul>
 <li>I find the section “Optimization” that describe the function
@@ -465,17 +476,49 @@ of thresholds). Second, I think that with a minimal effort this function
 can be generalized to take as input any user specified utility that take
 as impute type-I error and power, and/or average sample sizes. I think
 this could be helpful for a broader use of the package.</li>
+</ul>
+</blockquote>
+<p>This is a very good point, and we apologize for the poor word choice
+here. We have renamed this section “Design selection” and have removed
+the word optimization to avoid any confusion. Since the paper was
+originally drafted, we have added the option of weighting the various
+criteria, to allow more user-specified flexibility in terms of the value
+of type I error versus power, and average sample size under the null
+versus average sample size under the alternative. We have added a
+description of this new functionality to the Design selection
+section.</p>
+<blockquote>
+<ul>
 <li>In the case study: what is the rational to select the considered
 posterior thresholds and not, say, an equi-spaced grid. I think this is
 an important point to discuss, and can have a large impact on the
 result.</li>
+</ul>
+</blockquote>
+<p>Thank you, we have written the case study a bit to be a two-sample
+example in order to differentiate from the added basic example, and have
+also added some information justifying the selected thresholds.</p>
+<blockquote>
+<ul>
 <li>In the code snipped at page 4 the parameters <code>S</code> and
 <code>nsim</code> of the <code>calibrate_thresholds()</code> function
 have not been discussed in the text. I think this are important
 parameters.</li>
+</ul>
+</blockquote>
+<p>We have added more discussion of the importance of selecting
+sufficiently large values of <code>S</code> and <code>nsim</code>
+throughout the paper, thank you.</p>
+<blockquote>
+<ul>
 <li>Figure 1: I think the x-axis should be rescaled in a (say 0-0.25 for
 the left panel and 35-55 for the right panel). The plot would be easier
 to read.</li>
+</ul>
+</blockquote>
+<p>Thank you for this suggestion, we have rescaled the axes.</p>
+<blockquote>
+<ul>
 <li>Page 7: In the first line of the tibble
 <code>one_sample_decision_tbl</code> there is NA,NA. If I am not
 mistaken this is interpreted as “never stop”. I will explicitly indicate
@@ -488,6 +531,8 @@ would allow to familiarize with the functions before running large scale
 simulations.</li>
 </ul>
 </blockquote>
+<p>We agree, and have added a toy example that can easily be run
+interactively prior to presenting the more realistic case study.</p>
 <blockquote>
 <p>Minor comments:</p>
 </blockquote>
@@ -524,10 +569,17 @@ to achieve the proper font/spacing.</p>
 <blockquote>
 <ul>
 <li>In the section decision rules, what is a decision point “r”? Please
-define this. -Figure 1: in the legend (#fig:unnamed-chunk-7). I suppose
-this is a compilation error.</li>
+define this.</li>
 </ul>
 </blockquote>
+<p>We have reworded this for clarity, thank you.</p>
+<blockquote>
+<p>-Figure 1: in the legend (#fig:unnamed-chunk-7). I suppose this is a
+compilation error.</p>
+</blockquote>
+<p>This is indeed a compilation error. I am not sure why this is being
+generated or how to suppress it, so hopefully it can be fixed when the
+article is finalized for publication,</p>
 <blockquote>
 <p><strong>Reviewer 5</strong></p>
 </blockquote>
@@ -549,6 +601,11 @@ or laptop computer (the example is reportedly run here on a 192 core
 computing cluster!). I have provided some queries, recommendations
 below.</p>
 </blockquote>
+<p>We are sorry that the article in it’s original form was difficult to
+follow. We hope the changes have made it more understandable, and that
+all of the needed detail is now included. Thank you for taking the time
+to conduct such a thorough review of our paper, we do believe that it
+has been improved as a result.</p>
 <blockquote>
 <ol style="list-style-type: decimal">
 <li>I found the Package Overview section difficult to follow, since it
@@ -565,6 +622,21 @@ time. Indeed, is the package useful if it requires such significant
 computational resources (see also point 3)?</li>
 </ol>
 </blockquote>
+<p>Thank you for this comment, we agree that much detail was overlooked
+in the Package Overview section, and we have expanded this section to
+include much more detail of the underlying algorithm, and to link the
+notation to the preceding section. We believe this is much easier to
+follow now. We have also added a section for a toy example that can
+easily be run interactively prior to presenting the more detailed case
+study.</p>
+<p>We do think this package is useful despite the potentially long
+computational time. This is meant to be used at the design stage of a
+clinical trial, when there is ample time to allow for computation. Once
+the design has been selected and decided, no additional computations are
+required throughout the conduct of the trial, as the decision table
+resulting from <code>calc_decision_rules()</code> is available for
+decisions at each interim look, making trial conduct fast at seamless at
+each interim analysis and at the end of the trial.</p>
 <blockquote>
 <ol start="2" style="list-style-type: decimal">
 <li>I was a little confused by the notation, some more detail would make
@@ -611,6 +683,10 @@ functions in this package. I may of course be completely wrong about
 what the function is doing, but it would help to have some clarification
 so we know the function is doing what the user expects.</p>
 </blockquote>
+<p>Thank you for drawing our attention to this oversight. We have added
+much more detail about the underlying computational algorithm for the
+<code>calibrate_thresholds()</code> function in the Package Overview
+section, and hope that this clarifies the functionality.</p>
 <blockquote>
 <ol start="4" style="list-style-type: decimal">
 <li>The section “Optimisation” mentions minimizing Euclidean distance on
@@ -618,6 +694,12 @@ different plots, however it isn’t clear what this means without notation
 or until the example is provided.</li>
 </ol>
 </blockquote>
+<p>Thank you for pointing out the lack of clarity in this section. We
+have added much more detail about the computations being done, with
+notation, to this section, and hope it is now more clear. Additionally,
+in response to another reviewer’s comment we have renamed this section
+“Design selection” and removed reference to optimization, since no true
+mathematical optimization was being conducted.</p>
 
 
 

@@ -353,12 +353,12 @@ cases, the boxes are colored green for a ``proceed'' decision and red
 for a ``stop'' decision for each combination and the hover box produced
 by \CRANpkg{plotly} provides the details.
 
-\hypertarget{toy-example}{%
-\section{Toy example}\label{toy-example}}
+\hypertarget{package-demonstration}{%
+\section{Package demonstration}\label{package-demonstration}}
 
-In this section I will present a toy example to demonstrate the
-functionality, and the following section will present a more in-depth
-case study that is more computationally intensive.
+In this section I will present a basic example to demonstrate the
+functionality included in the \CRANpkg{ppseq}. The following section
+will present a more realistic case study.
 
 First we install and load the \CRANpkg{ppseq} package.
 
@@ -388,7 +388,7 @@ wish to examine designs based on combinations of posterior thresholds
 \(\theta^*={0.1, 0.2}\), so we set
 \texttt{pp\_threshold\ =\ c(0.85,\ 0.9)} and
 \texttt{ppp\_threshold\ =\ c(0.1,\ 0.2)}. Finally, for computational
-speed in this toy example, we set \texttt{S=50} and \texttt{nsim=50},
+speed in this basic example, we set \texttt{S=50} and \texttt{nsim=50},
 but in practice we would want to use much larger values, in the
 thousands.
 
@@ -464,74 +464,132 @@ optimize_design(cal_thresh, type1_range = c(0.025, 0.1), minimum_power = 0.75)
 \end{Soutput}
 \end{Schunk}
 
-We can compare all of the design options graphically with a call to
-\texttt{plot()} and with \texttt{plotly\ =\ TRUE} to obtain interactive
-plots or \texttt{plotly\ =\ FALSE} to obtain static plots.
+And to ease interim analysis during the course of the trial, we obtain
+the decision table using the \texttt{calc\_decision\_rules} function,
+with the thresholds of our selected optimal efficiency design passed as
+\texttt{theta\ =\ 0.9} and \texttt{ppp\_threshold\ =\ 0.2}. For
+computational speed in this basic example, we set \texttt{S=50}, but in
+practice we would want to draw many more posterior samples, and values
+of 5000 or more should be considered. If any \texttt{NA} value was
+returned in this table, it would indicate that at that interim look you
+would never stop, regardless of the number of responses.
 
 \begin{Schunk}
 \begin{Sinput}
-plot(
-  cal_thresh, 
-  type1_range = c(0.025, 0.1), 
-  minimum_power = 0.75,
-  plotly = FALSE
+calc_decision_rules(
+  n = seq(5, 15, 5), 
+  N = 15,
+  theta = 0.9,
+  ppp = 0.2,
+  p0 = 0.1,
+  S = 50
 )
 \end{Sinput}
-\begin{figure}
-\includegraphics[width=1.1\linewidth]{zabor-hobbs-kane_files/figure-latex/figstatic-1} \caption[Plot of design options made with ggplot2]{Plot of design options made with ggplot2. The accuracy designs are in the plot on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:figstatic)
-\end{figure}
+\begin{Soutput}
+#> # A tibble: 3 x 3
+#>       n     r   ppp
+#>   <dbl> <int> <dbl>
+#> 1     5     0  0.06
+#> 2    10     1  0.1 
+#> 3    15     2  0
+\end{Soutput}
 \end{Schunk}
+
+This table tells us that at the first interim analysis after we have
+observed the first five patients for response, we would stop the trial
+if no responses had been observed, and would continue enrolling if at
+least one response had been observed. At the second interim analysis
+after we have observed the first ten patients for response, we would
+stop the trial if zero or one responses had been observed, and would
+continue enrolling if at least two responses had been observed. At the
+end of the trial after all 15 patients have been observed for response,
+we would declare the new treatment promising if at least three responses
+had been observed.
 
 \hypertarget{case-study}{%
 \section{Case study}\label{case-study}}
 
-To demonstrate the functionality of the \CRANpkg{ppseq} package, we
-focus on a re-design of a dose-expansion cohort for the study of
+The case study focuses on a re-design of a phase II study of
 atezolizumab in metastatic urothelial carcinoma patients (mUC) using
-sequential predictive probability monitoring. Atezolizumab is an
-anti-PD-L1 treatment that was originally tested in the phase 1 setting
-in a basket trial across a variety of cancer sites harboring PD-L1
-mutations. The atezolizumab expansion study in mUC had the primary aim
-of further evaluating safety, pharmacodynamics and pharmacokinetics and
-therefore was not designed to meet any specific criteria for type I
-error or power. An expansion cohort in mUC was not part of the original
-protocol design, but was rather added later through a protocol
-amendment. The expansion cohort in mUC ultimately evaluated a total of
-95 participants \citep{Powles2014}. Other expansion cohorts that were
-included in the original protocol, including in renal-cell carcinoma,
-non-small-cell lung cancer, and melanoma, were planned to have a sample
-size of 40. These pre-planned expansion cohorts were designed with a
-single interim analysis for futility that would stop the trial if 0
-responses were seen in the first 14 patients enrolled. According to the
-trial protocol, this futility rule is associated with at most a 4.4\%
-chance of observing no responses in 14 patients if the true response
-rate is 20\% or higher. The protocol also states the widths of the 90\%
-confidence intervals for a sample size of 40 if the observed response
-rate is 30\%. There was no stated decision rule for efficacy since
-efficacy was not an explicit aim of the expansion cohorts. In the
-re-design we assume a null, or unacceptable, response rate of 0.1 and an
-alternative, or acceptable, response rate of 0.2. We plan a study with
-up to a total of 95 participants. In our sequential predictive
-probability design we will check for futility after every 5 patients are
-enrolled. We consider posterior thresholds of 0, 0.7, 0.74, 0.78, 0.82,
-0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 0.999,
-0.9999, 0.99999, and 1, and predictive thresholds of 0.05, 0.1, 0.15,
-and 0.2.
+sequential predictive probability monitoring. Atezolizumab is a
+programmed death-ligand 1 (PD-L1) blocking monoclonal antibody that was
+given accelerated approval by the U.S. Food and Drug Administration in
+May 2016 for the treatment of patients with locally advanced or
+metastatic urothelial carcinoma who had disease progression following
+platinum-containing chemotherapy. The approval was based on the results
+of a single-arm phase II study in 310 patients \citep{Rosenberg2016}.
+The phase II study used a hierarchical fixed-sequence testing procedure
+to test increasingly broad subgroups of patients based on PD-L1 status,
+and found overall response rates of 26\% (95\% CI: 18-36), 18\% (95\%
+CI: 13-24), and 15\% (95\% CI 11-19) in patients with \(\geq5\%\)
+PD-L1-positive immune cells (IC2/3 subgroup), in patients with
+\(\geq1\%\) PD-L1-positive immune cells (IC1/2/3 subgroup), and in all
+patients, respectively \citep{Rosenberg2016}. All three rates exceeded
+the historical control rate of 10\%. Then, in March 2021, the approval
+in this indication was voluntarily withdrawn by the sponsor following
+negative results from a randomized phase III study \citep{Powles2018}.
+In the phase III study, 931 patients were randomly assigned to receive
+atezolizumab or chemotherapy in a 1:1 ratio, and the same hierarchical
+fixed-sequence testing procedure as in the phase II study was used. The
+phase III study found that overall survival did not differ significantly
+between the atezolizumab and chemotherapy groups of the IC2/3 subgroup
+(median survival 11.1 months {[}95\% CI: 8.6-15.5{]} versus 10.6 months
+{[}95\% CI: 8.4-12.2{]}), so no further testing was conducted for the
+primary endpoint \citep{Powles2018}. Further analyses revealed that
+while the response rates to atezolizumab were comparable to those seen
+in the phase II study, the response rates to chemotherapy were much
+higher than the historical control rate of 10\%. The overall response
+rates to chemotherapy were 21.6\% (95\% CI: 14.5-30.2), 14.7\% (95\% CI:
+10.9-19.2), and 13.4\% (95\% CI: 10.5-16.9) for the IC2/3 subgroup,
+IC1/2/3 subgroup, and all patients, respectively. The overall response
+rates to atezolizumab were 23\% (95\% CI: 15.6-31.9), 14.1\% (95\% CI:
+10.4-18.5), and 13.4\% (95\% CI: 10.5-16.9) for the IC2/3 subgroup,
+IC1/2/3 subgroup, and all patients, respectively. These results indicate
+that PD-L1 status is a prognostic biomarker for both standard of care
+chemotherapies that comprised the control arm as well as atezolizumab in
+this patient population.
 
-We use the \texttt{calibrate\_thresholds()} function to obtain the
+We wish to re-design the phase II trial of atezolizumab using a two-arm
+randomized design with sequential predictive probability monitoring. We
+willuse the \texttt{calibrate\_thresholds()} function to obtain the
 operating characteristics of designs based on on each combination of
-posterior and predictive thresholds. Because of the inherent computation
-intensity in these calculations, this function relies on the
-\CRANpkg{future} \citep{Bengtsson2020} and \CRANpkg{furrr}
-\citep{Vaughan2021} packages to parallelize computations. The user will
-be responsible for setting up a call to \texttt{future::plan()} that is
-appropriate to their operating environment and simulation setting. The
-example in this case study was run on a Unix server with 192 cores, and
-we wished to use 76 cores to accommodate the 76 distinct designs that
-result from the 19 posterior by 4 predictive threshold grid. Because the
-code takes some time to run, the results of the below example code are
-available as a dataset called \texttt{one\_sample\_cal\_tbl} included in
-the \CRANpkg{ppseq} package.
+posterior and predictive thresholds. We focus here on the main biomarker
+subgroup of interest, the IC2/3 subgroup. We design the study with a
+null response rate of 0.1 in both arms, and an alternative response rate
+of 0.25 in the atezolizumab arm. So we set
+\texttt{p\_null\ =\ c(0.1,\ 0.1)} and \texttt{p\_alt\ =\ c(0.1,\ 0.25)}.
+We plan the study with 100 participants, assuming that the total sample
+size available is similar to the 310 used in the actual single-arm phase
+II trial, and that a third of that patient population fall into our
+desired biomarker subgroup. So we set \texttt{N\ =\ c(50,\ 50)} to
+indicate equal allocation of the 100 patients to each of the two arms.
+We will check for futility after every 10 patients are enrolled on each
+arm, so we set
+\texttt{n\ =\ cbind(seq(10,\ 50,\ 10),\ seq(10,\ 50,\ 10))}, a matrix
+showing the interim analysis sample sizes in each of the two arms. To
+design the study, we need to calibrate the design over a range of
+posterior probability thresholds and predictive probability thresholds.
+In this example we will consider posterior thresholds of 0.9, 0.91,
+0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, and 0.99, and predictive
+thresholds of 0.05, 0.1, 0.15, and 0.2. So we set
+\texttt{pp\_threshold\ =\ seq(0.9,\ 0.99,\ 0.01)} and
+\texttt{ppp\_threshold\ =\ seq(0.05,\ 0.2,\ 0.05)}. We selected these
+posterior thresholds because we want to have a posterior probability of
+at least 0.9 that our response rate exceeds the null. And we selected
+these predictive thresholds because we would not want to stop the trial
+early for futility if there was more than a 20\% chance of success when
+full enrollment was reached. We use the defaults for all remaining
+arguments, including the defaults of \texttt{S=5000} and
+\texttt{nsim=1000}, which we believe are sufficient to obtain stable
+results. Because of the inherent computational intensity in these
+calculations, this function relies on the \CRANpkg{future}
+\citep{Bengtsson2020} and \CRANpkg{furrr} \citep{Vaughan2021} packages
+to parallelize computations. The user will be responsible for setting up
+a call to \texttt{future::plan()} that is appropriate to their operating
+environment and simulation setting. Because the code takes some time to
+run, the results of the below example code are available as a dataset
+called \texttt{two\_sample\_cal\_tbl} included in the \CRANpkg{ppseq}
+package.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -539,19 +597,18 @@ library(future)
 
 set.seed(123)
 
-plan(multicore(workers = 76))
+future::plan(future::multicore(workers = 40))
 
-one_sample_cal_tbl <- 
+two_sample_cal_tbl <- 
   calibrate_thresholds(
-    p_null = 0.1, 
-    p_alt = 0.2, 
-    n = seq(5, 95, 5),
-    N = 95, 
-    pp_threshold = c(0, 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 
-                     0.95, 0.96, 0.97, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1),
+    p_null = c(0.1, 0.1), 
+    p_alt = c(0.1, 0.25),
+    n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+    N = c(50, 50), 
+    pp_threshold = seq(0.9, 0.99, 0.01),
     ppp_threshold = seq(0.05, 0.2, 0.05),
     direction = "greater", 
-    delta = NULL, 
+    delta = 0, 
     prior = c(0.5, 0.5), 
     S = 5000, 
     nsim = 1000
@@ -559,97 +616,17 @@ one_sample_cal_tbl <-
 \end{Sinput}
 \end{Schunk}
 
-Next we print the results table using the \texttt{print()} option, and
-limited to designs with type I error between 0.05 and 0.1, and a minimum
-power of 0.7. We find that 35 of the 76 designs meet these criteria for
-type I error and power.
-
-\begin{Schunk}
-\begin{Sinput}
-print(
-  one_sample_cal_tbl,
-  type1_range = c(0.05, 0.1),
-  minimum_power = 0.7
-)
-\end{Sinput}
-\begin{Soutput}
-#> # A tibble: 8 x 8
-#>   pp_threshold ppp_threshold mean_n1_null prop_pos_null
-#>          <dbl>         <dbl>        <dbl>         <dbl>
-#> 1         0.82          0.2          35.9         0.096
-#> 2         0.86          0.2          36.0         0.097
-#> 3         0.9           0.05         50.7         0.082
-#> 4         0.9           0.1          38.8         0.073
-#> 5         0.9           0.15         35.5         0.065
-#> 6         0.92          0.05         50.7         0.081
-#> 7         0.92          0.1          38.8         0.073
-#> 8         0.92          0.15         35.6         0.066
-#>   prop_stopped_null mean_n1_alt prop_pos_alt prop_stopped_alt
-#>               <dbl>       <dbl>        <dbl>            <dbl>
-#> 1             0.891        79.4        0.781            0.214
-#> 2             0.89         79.4        0.782            0.213
-#> 3             0.865        89.8        0.872            0.097
-#> 4             0.884        81.7        0.791            0.185
-#> 5             0.919        79.4        0.76             0.232
-#> 6             0.866        89.9        0.874            0.095
-#> 7             0.884        81.8        0.793            0.183
-#> 8             0.917        79.7        0.765            0.227
-\end{Soutput}
-\end{Schunk}
-
-We use the \texttt{optimize\_design()} function to obtain the details of
-the optimal accuracy and optimal efficiency designs, limited to our
-desired range of type I error and minimum power. We find that the
-optimal accuracy design is the one with posterior threshold 0.9 and
-predictive threshold 0.05. It has a type I error of 0.072, power of
-0.883, average sample size under the null of 51, and average sample size
-under the alternative of 91. The optimal efficiency design is the one
-with posterior threshold of 0.92 and predictive threshold of 0.1. It has
-a type I error of 0.06, power of 0.796, average sample size under the
-null of 39, and average sample size under the alternative of 82. For
-comparison, the original design of the atezolizumab expansion cohort in
-mUC, with a single look for futility after the first 14 patients, has a
-type I error of 0.005, power of 0.528, average sample size under the
-null of 76, and average sample size under the alternative of 92.
-
-\begin{Schunk}
-\begin{Sinput}
-optimize_design(
-  one_sample_cal_tbl, 
-  type1_range = c(0.05, 0.1), 
-  minimum_power = 0.7
-)
-\end{Sinput}
-\begin{Soutput}
-#> $`Optimal accuracy design:`
-#> # A tibble: 1 x 6
-#>   pp_threshold ppp_threshold `Type I error` Power
-#>          <dbl>         <dbl>          <dbl> <dbl>
-#> 1         0.92          0.05          0.081 0.874
-#>   `Average N under the null` `Average N under the alternative`
-#>                        <dbl>                             <dbl>
-#> 1                       50.7                              89.9
-#> 
-#> $`Optimal efficiency design:`
-#> # A tibble: 1 x 6
-#>   pp_threshold ppp_threshold `Type I error` Power
-#>          <dbl>         <dbl>          <dbl> <dbl>
-#> 1         0.92           0.1          0.073 0.793
-#>   `Average N under the null` `Average N under the alternative`
-#>                        <dbl>                             <dbl>
-#> 1                       38.8                              81.8
-\end{Soutput}
-\end{Schunk}
-
-To compare these optimal designs with all other designs, we can use the
-\texttt{plot()} function with the \texttt{plotly\ =\ TRUE} option to
-obtain interactive visualizations, or the \texttt{plotly\ =\ FALSE}
-option to obtain static visualizations.
+We can compare the design options that meet our desired range of type I
+error and minimum power by passing the results of our call to the
+\texttt{calibrate\_thresholds()} function to the \texttt{plot()}
+function. The \texttt{plotly\ =\ TRUE} option produces interactive
+visualizations or the \texttt{plotly\ =\ FALSE} option produces static
+visualizations.
 
 \begin{Schunk}
 \begin{Sinput}
 plot(
-  one_sample_cal_tbl, 
+  two_sample_cal_tbl, 
   type1_range = c(0.05, 0.1), 
   minimum_power = 0.7,
   plotly = TRUE
@@ -659,22 +636,53 @@ plot(
 
 \begin{Schunk}
 \begin{figure}
-\includegraphics[width=1.1\linewidth]{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-12-1} \caption[Plot of design options made with ggplot2]{Plot of design options made with ggplot2. The accuracy designs are in the plot on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:unnamed-chunk-12)
+\includegraphics[width=1.1\linewidth]{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-9-1} \caption[Plot of design options made with the {ggplot2} package]{Plot of design options made with the {ggplot2} package. The accuracy designs are on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond.}(\#fig:unnamed-chunk-9)
 \end{figure}
 \end{Schunk}
 
-In this case we may choose to use the optimal efficiency design, which
-has the desirable trait of a very small average sample size under the
-null of just 39 patients, while still maintaining reasonable type I
-error of 0.06 and power of 0.796. This design would allow us to stop
-early if the treatment were inefficacious, thus preserving valuable
-financial resources for use in studying more promising treatments and
-preventing our human subjects from continuing an ineffective treatment.
+We see that the optimal efficiency design is the one with posterior
+threshold 0.92 and predictive threshold 0.05. It has a type I error of
+0.07, power of 0.7, average sample size under the null of 29 per arm,
+and average sample size under the alternative of 46 per arm. This design
+would allow us to stop early if the treatment were inefficacious, thus
+preserving valuable financial resources for use in studying more
+promising treatments and preventing our human subjects from continuing
+an ineffective treatment.
+
+\begin{Schunk}
+\begin{Sinput}
+optimize_design(
+  two_sample_cal_tbl, 
+  type1_range = c(0.05, 0.1), 
+  minimum_power = 0.7
+)
+\end{Sinput}
+\begin{Soutput}
+#> $`Optimal accuracy design:`
+#> # A tibble: 1 x 6
+#>   pp_threshold ppp_threshold `Type I error` Power
+#>          <dbl>         <dbl>          <dbl> <dbl>
+#> 1         0.86           0.1            0.1 0.751
+#>   `Average N under the null` `Average N under the alternative`
+#>                        <dbl>                             <dbl>
+#> 1                       28.6                              45.1
+#> 
+#> $`Optimal efficiency design:`
+#> # A tibble: 1 x 6
+#>   pp_threshold ppp_threshold `Type I error` Power
+#>          <dbl>         <dbl>          <dbl> <dbl>
+#> 1         0.92          0.05           0.07 0.701
+#>   `Average N under the null` `Average N under the alternative`
+#>                        <dbl>                             <dbl>
+#> 1                       28.6                              45.5
+\end{Soutput}
+\end{Schunk}
+
 Finally, we generate the decision table associated with the selected
-design for use in making decision at each interim analysis during the
+design for use in making decisions at each interim analysis during the
 conduct of the trial. Because of the computational time involved, the
 results of the below example code are available as a dataset called
-\texttt{one\_sample\_decision\_tbl} included in the \CRANpkg{ppseq}
+\texttt{two\_sample\_decision\_tbl} included in the \CRANpkg{ppseq}
 package. In the results table, we see that at the first interim futility
 look after just 5 patients, we would not stop the trial. After the first
 10 patients we would stop the trial if there were 0 responses, and so
@@ -686,57 +694,40 @@ than or equal to 14 responses.
 \begin{Sinput}
 set.seed(123)
 
-one_sample_decision_tbl <- 
+two_sample_decision_tbl <- 
   calc_decision_rules(
-    n = seq(5, 95, 5),
-    N = 95, 
+    n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+    N = c(50, 50),
     theta = 0.92, 
-    ppp = 0.1, 
-    p0 = 0.1, 
-    direction = "greater",
-    delta = NULL, 
+    ppp = 0.05, 
+    p0 = NULL, 
+    direction = "greater", 
+    delta = 0, 
     prior = c(0.5, 0.5), 
     S = 5000
-  )
+    )
 \end{Sinput}
 \end{Schunk}
 
-\begin{Schunk}
-\begin{Sinput}
-one_sample_decision_tbl
-\end{Sinput}
-\begin{Soutput}
-#> # A tibble: 19 x 3
-#>        n     r     ppp
-#>    <dbl> <int>   <dbl>
-#>  1     5    NA NA     
-#>  2    10     0  0.0634
-#>  3    15     0  0.022 
-#>  4    20     1  0.0844
-#>  5    25     1  0.0326
-#>  6    30     2  0.0702
-#>  7    35     2  0.0288
-#>  8    40     3  0.0536
-#>  9    45     4  0.0708
-#> 10    50     4  0.0344
-#> 11    55     5  0.0478
-#> 12    60     6  0.0622
-#> 13    65     7  0.0888
-#> 14    70     8  0.095 
-#> 15    75     8  0.033 
-#> 16    80     9  0.0326
-#> 17    85    10  0.0346
-#> 18    90    11  0.0162
-#> 19    95    13  0
-\end{Soutput}
-\end{Schunk}
+The resulting table contains all possible combinations of responses in
+the two arms, so is quite long. We can visualize the resulting decision
+rules by passing the results of the call to the
+\texttt{calc\_decision\_rules()} function to the \texttt{plot()}
+function, which returns a faceted plot according to the interim look.
+The color denotes whether the trial should proceed (green) or stop (red)
+for a given combination of number of responses in the control arm
+(x-axis) and number of responses on the experimental arm (y-axis). For
+example, we see that at the second interim look when there are 20
+patients enrolled on each arm, if there were 10 responses in the control
+arm, we would stop the trial if there were 8 or fewer responses on the
+experimental arm; otherwise we would proceed with enrollment.
 
 \begin{Schunk}
 \begin{Sinput}
-plot(one_sample_decision_tbl, plotly = FALSE)
+plot(two_sample_decision_tbl, plotly = FALSE)
 \end{Sinput}
 \begin{figure}
-\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-17-1} \caption[Plot of decision rules made with ggplot]{Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis.}(\#fig:unnamed-chunk-17)
+\includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-13-1} \caption[Plot of decision rules made with ggplot]{Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis.}(\#fig:unnamed-chunk-13)
 \end{figure}
 \end{Schunk}
 
