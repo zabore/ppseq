@@ -1,3 +1,5 @@
+# ppseq 0.2.1
+
 # ppseq 0.2.0
 
 * added weighting options to `optimize_design()` (Closed Issue #7)
