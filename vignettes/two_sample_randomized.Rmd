@@ -55,12 +55,12 @@ We will demonstrate the use of the functions in {ppseq} to re-design the phase I
 
 The posterior probability is calculated from the posterior distribution based on the specified priors and the data observed so far, and represents the probability of success based only on the data accrued so far. A posterior probability threshold would be set during the design stage and if, at the end of the trial, the posterior probability exceeded the pre-specified threshold, the trial would be declared a success. The posterior predictive probability is the probability that, at a given interim monitoring point, the treatment will be declared efficacious at the end of the trial when full enrollment is reached, conditional on the currently observed data and the specified priors. Predictive probability provides an intuitive monitoring framework that tells an investigator what the chances are of declaring the treatment efficacious at the end of the trial if we were to continue enrolling to the maximum planned sample size, given the data observed so far in the trial. If this probability drops below a certain threshold, which is pre-specified during the design stage, the trial would be stopped early. Predictive probability thresholds closer to 0 lead to less frequent stopping for futility, whereas thresholds near 1 lead to frequent stopping unless there is almost certain probability of success. 
 
-We consider a grid of thresholds so that we have a range of possible designs from which to select a design with optimal operating characteristics such as type I error, power, and sample size under the null and alternative. In this example we will consider posterior thresholds of 0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, and 0.99, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2. 
+We consider a grid of thresholds so that we have a range of possible designs from which to select a design with optimal operating characteristics such as type I error, power, and sample size under the null and alternative. In this example we will consider posterior thresholds of 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, and 0.99, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2. 
 
 
 # Using `calibrate_thresholds()` to obtain design options
 
-To conduct the case study re-design, we use the `calibrate_thresholds()` function from the {ppseq} package. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment and their simulation setup prior to running the function. In this example, we used the following code on a Unix server with 192 cores, with the goal of utilizing 56 cores since our grid of thresholds to consider was 14 posterior thresholds by 4 predictive thresholds. 
+To conduct the case study re-design, we use the `calibrate_thresholds()` function from the {ppseq} package. This function is written using the `future` and `furrr` packages, but the user will have to set up a call to `future::plan` that is appropriate for their operating environment and their simulation setup prior to running the function. In this example, we used the following code on a Unix server with 192 cores, with the goal of utilizing 40 cores since our grid of thresholds to consider was 10 posterior thresholds by 4 predictive thresholds. 
 
 The `calibrate_thresholds()` function will simulate `nsim` datasets under the null hypothesis and `nsim` datasets under the alternative hypothesis. For each simulated dataset, every combination of posterior and predictive thresholds will be considered and the final sample size and whether or not the trial was positive will be saved. Then across all simulated datasets, `calibrate_thresholds()` will return the average sample size under the null, the average sample size under the alternative, the proportion of positive trials under the null (i.e. the type I error), and the proportion of positive trials under the alternative (i.e. the power).
 
@@ -73,16 +73,14 @@ The inputs to `calibrate_thresholds()` for our case study re-design include `p_n
 ```{r eval = FALSE}
 set.seed(123)
 
-future::plan(future::multicore(workers = 56))
+future::plan(future::multicore(workers = 40))
 
 two_sample_cal_tbl <- 
   calibrate_thresholds(p_null = c(0.1, 0.1), 
                        p_alt = c(0.1, 0.25), 
                        n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
                        N = c(50, 50), 
-                       pp_threshold = c(0.7, 0.74, 0.78, 0.82, 0.86, 0.9, 
-                                        0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 
-                                        0.98, 0.99),
+                       pp_threshold = seq(0.9, 0.99, 0.01),
                        ppp_threshold = seq(0.05, 0.2, 0.05),
                        direction = "greater", 
                        delta = 0, 
@@ -114,7 +112,7 @@ gt(dplyr::filter(two_sample_cal_tbl$res_summary, prop_pos_null >= 0.05,
                  prop_pos_null <= 0.1, prop_pos_alt >= 0.7))
 ```
 
-We find that 5 of the 56 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
+We find that 4 of the 40 considered combinations of posterior and predictive thresholds result in a design within our acceptable range of type I error and minimal power. The column labeled `prop_pos_null` contains the proportion of positive trials under the null, which represents the type I error rate, and the column labeled `prop_pos_alt` contains the proportion of positive trials under the alternative, which represents the power. The column labeled `mean_n1_null` contains the average sample size under the null whereas the column labeled `mean_n1_alt` contains the average sample size under the alternative.
 
 ## `optimize_design()` 
 
@@ -126,15 +124,15 @@ optimize_design(two_sample_cal_tbl,
                 minimum_power = 0.7)
 ```
 
-The optimal accuracy design is the one with posterior threshold 0.86 and predictive threshold 0.1. It has a type I error of 0.1, power of 0.751, average sample size under the null of 29 per arm, and average sample size under the alternative of 45 per arm. 
+The optimal accuracy design is the one with posterior threshold 0.9 and predictive threshold 0.05. It has a type I error of 0.083, power of 0.738, average sample size under the null of 30 per arm, and average sample size under the alternative of 46 per arm. 
 
-The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.05. It has a type I error of 0.07, power of 0.701, average sample size under the null of 29 per arm, and average sample size under the alternative of 46 per arm.
+The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.05. It has a type I error of 0.07, power of 0.7, average sample size under the null of 29 per arm, and average sample size under the alternative of 46 per arm.
 
 We find that either the optimal accuracy or the optimal efficiency sequential predictive probability design reasonable type I error and power to detect the effect of interest, and results in a much lower average total sample size under both the null and alternative than the 310 actually used in the phase II study of atezolizumab. Additionally, this randomized design would allow direct estimation of the response rate to both the experimental treatment and to the standard of care treatment in the biomarker subgroup of interest, thus avoiding the issues with historical control rates that arose in the original atezolizumab study. While this design would not prevent the problem of the targeted biomarker being prognostic rather than predictive, it uses fewer patients and avoids continuation to phase III when it is unwarranted.
 
 ## `calc_decision_rules()`
 
-Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.1` specifies that we are interested in a predictive probability threshold of 0.1, as determined by the optimal efficiency design above. Note that due to the computational time involved, the object produced from the below example code `one_sample_decision_tbl` is available as a dataset in the {ppseq} package.
+Once we have selected the design of interest, we need to obtain the decision rules at each futility monitoring time for easy implementation of our trial. We can do so by passing the parameters of our selected design to `calc_decision_rules()`. The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and `N` are the same as in `calibrate_thresholds()`. The input parameter `theta = 0.92` specifies that we are interested in a posterior probability threshold of 0.92 and the input parameter `ppp = 0.05` specifies that we are interested in a predictive probability threshold of 0.05, as determined by the optimal efficiency design above. Note that due to the computational time involved, the object produced from the below example code `two_sample_decision_tbl` is available as a dataset in the {ppseq} package.
 
 <!-- The below code was run on the server from H:\ppseq-papers\two_sample_decision_tbl-server.R -->
 
@@ -168,7 +166,7 @@ Above are the first 11 rows of the resulting table, which contains all possible 
 
 ## `plot()` 
 
-Passing the results of `calibrate_thresholds()` to `plot()` returns two plots, one of type I error by power, and one of average sample size under the null by average sample size under the alternative. The arguments `type1_range` and `power` are used in the same way as for the `print()` function. The argument `plotly` defaults to FALSE, which results in a pair of side-by-side ggplots being returned. If set to TRUE, two individual interactive plotly plots will be returned, as demonstrated below.
+Passing the results of `calibrate_thresholds()` to `plot()` returns two plots, one of type I error by power, and one of average sample size under the null by average sample size under the alternative. The arguments `type1_range` and `power` are used in the same way as for the `print()` function. The argument `plotly` defaults to FALSE, which results in a pair of side-by-side plots produced with the {ggplot2} package. If set to TRUE, two individual interactive plots produced with the {plotly} package will be returned, as demonstrated below.
 
 ```{r eval = FALSE}
 plot(two_sample_cal_tbl, 

@@ -133,7 +133,7 @@ We use `optimize_design()` to identify the optimal accuracy and optimal efficien
 optimize_design(cal_thresh, type1_range = c(0.025, 0.1), minimum_power = 0.75)
 ```
 
-And to ease interim analysis during the course of the trial, we obtain the decision table using the `calc_decision_rules` function, with the thresholds of our selected optimal efficiency design passed as `theta = 0.9` and `ppp_threshold = 0.2`. For computational speed in this basic example, we set `S=50`, but in practice we would want to draw many more posterior samples, and values of 5000 or more should be considered.
+And to ease interim analysis during the course of the trial, we obtain the decision table using the `calc_decision_rules` function, with the thresholds of our selected optimal efficiency design passed as `theta = 0.9` and `ppp_threshold = 0.2`. For computational speed in this basic example, we set `S=50`, but in practice we would want to draw many more posterior samples, and values of 5000 or more should be considered. If any `NA` value was returned in this table, it would indicate that at that interim look you would never stop, regardless of the number of responses.
 
 ```{r}
 calc_decision_rules(
@@ -178,20 +178,20 @@ two_sample_cal_tbl <-
   )
 ```
 
-To compare these optimal designs with all other designs, we can use the `plot()` function with the `plotly = TRUE` option to obtain interactive visualizations, or the `plotly = FALSE` option to obtain static visualizations.
+We can compare the design options that meet our desired range of type I error and minimum power by passing the results of our call to the `calibrate_thresholds()` function to the `plot()` function. The `plotly = TRUE` option produces interactive visualizations or the `plotly = FALSE` option produces static visualizations.
 
 ```{r eval = FALSE}
 plot(
-  one_sample_cal_tbl, 
+  two_sample_cal_tbl, 
   type1_range = c(0.05, 0.1), 
   minimum_power = 0.7,
   plotly = TRUE
 )
 ```
 
-```{r echo = FALSE, fig.width = 8, fig.height = 4.4, out.width = "110%", include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with ggplot2. The accuracy designs are in the plot on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."}
+```{r echo = FALSE, fig.width = 8, fig.height = 4.4, out.width = "110%", include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with the {ggplot2} package. The accuracy designs are on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."}
 p <- plot(
-  one_sample_cal_tbl,
+  two_sample_cal_tbl,
   type1_range = c(0.05, 0.1),
   minimum_power = 0.7,
   plotly = FALSE
@@ -199,7 +199,7 @@ p <- plot(
 p
 ```
 
-```{r echo = FALSE, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of efficiency design options made with plotly. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond. A similar plot is available for the accuracy design options."}
+```{r echo = FALSE, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of efficiency design options made with the {plotly} package. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond. A similar plot is available for the accuracy design options."}
 
 # Right now only including the efficiency design plot in the html paper version
 p <- plot(
@@ -212,185 +212,44 @@ p <- plot(
 p[[2]]
 ```
 
-We use the `optimize_design()` function to obtain the details of the optimal accuracy and optimal efficiency designs, limited to our desired range of type I error and minimum power. We find that the optimal accuracy design is the one with posterior threshold 0.9 and predictive threshold 0.05. It has a type I error of 0.072, power of 0.883, average sample size under the null of 51, and average sample size under the alternative of 91. The optimal efficiency design is the one with posterior threshold of 0.92 and predictive threshold of 0.1. It has a type I error of 0.06, power of 0.796, average sample size under the null of 39, and average sample size under the alternative of 82. For comparison, the original design of the atezolizumab expansion cohort in mUC, with a single look for futility after the first 14 patients, has a type I error of 0.005, power of 0.528, average sample size under the null of 76, and average sample size under the alternative of 92. 
+We see that the optimal efficiency design is the one with posterior threshold 0.92 and predictive threshold 0.05. It has a type I error of 0.07, power of 0.7, average sample size under the null of 29 per arm, and average sample size under the alternative of 46 per arm. This design would allow us to stop early if the treatment were inefficacious, thus preserving valuable financial resources for use in studying more promising treatments and preventing our human subjects from continuing an ineffective treatment.
 
 ```{r}
 optimize_design(
-  one_sample_cal_tbl, 
+  two_sample_cal_tbl, 
   type1_range = c(0.05, 0.1), 
   minimum_power = 0.7
 )
 ```
 
-
-
-```{r, echo = FALSE, include=knitr::is_html_output(), eval=FALSE, fig.cap = "Plot of design options made with plotly. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."}
-
-# Not currently evaluating this code chunk. I was trying to further manipulate the interactive plots to get them to be placed side-by-side, but I just don't think it's possible with two legends
-
-# Above instead I think it is best to only include one of the plots as an example in the html paper version
-library(dplyr)
-x <- one_sample_cal_tbl
-type1_range <- c(0.05, 0.1)
-minimum_power <- 0.7
-
-plot_x <-
-  rename(
-    mutate(
-      filter(
-        x$res_summary,
-        prop_pos_null >= type1_range[1] &
-          prop_pos_null <= type1_range[2] &
-          prop_pos_alt >= minimum_power
-      ),
-      Design = paste0(
-        "Posterior threshold = ", pp_threshold,
-        " and predictive threshold = ", ppp_threshold
-      ),
-      ab_dist_metric = ((prop_pos_null - 0)^2 +
-        (prop_pos_alt - 1)^2)^(1 / 2),
-      n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 +
-        (mean_n1_alt - max(mean_n1_alt))^2)^(1 / 2)
-    ),
-    `Type I error` = prop_pos_null,
-    Power = prop_pos_alt,
-    `Average N under the null` = mean_n1_null,
-    `Average N under the alternative` = mean_n1_alt,
-    `Distance to optimal efficiency` = n_dist_metric,
-    `Distance to optimal accuracy` = ab_dist_metric
-  )
-
-plot_ab <-
-  mutate(
-    ungroup(
-      slice(
-        group_by(
-          arrange(
-            plot_x,
-            `Distance to optimal accuracy`,
-            -pp_threshold,
-            -ppp_threshold
-          ),
-          `Distance to optimal accuracy`
-        ),
-        1
-      )
-    ),
-    optimal_accuracy = ifelse(row_number() == 1, TRUE, FALSE)
-  )
-
-plot_nn <-
-  mutate(
-    ungroup(
-      slice(
-        group_by(
-          arrange(
-            plot_x,
-            `Distance to optimal efficiency`,
-            -pp_threshold, -ppp_threshold
-          ),
-          `Distance to optimal efficiency`
-        ),
-        1
-      )
-    ),
-    optimal_efficiency = ifelse(row_number() == 1, TRUE, FALSE)
-  )
-
-p1 <-
-  ggplot(
-    plot_ab,
-    aes(
-      x = `Type I error`,
-      y = Power,
-      color = `Distance to optimal accuracy`,
-      Design = Design,
-      `Average N under the null` = `Average N under the null`,
-      `Average N under the alternative` = `Average N under the alternative`
-    )
-  ) +
-  geom_point(
-    shape = ifelse(plot_ab$optimal_accuracy == TRUE, 18, 19),
-    size = ifelse(plot_ab$optimal_accuracy == TRUE, 4, 2)
-  ) +
-  ylim(0, 1) +
-  xlim(0, 1) +
-  labs(
-    x = "Type I error",
-    y = "Power"
-  ) +
-  scale_color_viridis_c() +
-  theme_bw() +
-  theme(legend.position = "bottom")
-
-p2 <-
-  ggplot(
-    plot_nn,
-    aes(
-      x = `Average N under the null`,
-      y = `Average N under the alternative`,
-      color = `Distance to optimal efficiency`,
-      Design = Design,
-      `Type I error` = `Type I error`,
-      Power = Power
-    )
-  ) +
-  geom_point(
-    shape = ifelse(plot_nn$optimal_efficiency == TRUE, 18, 19),
-    size = ifelse(plot_nn$optimal_efficiency == TRUE, 4, 2)
-  ) +
-  ylim(
-    min(plot_x$`Average N under the null`),
-    max(plot_x$`Average N under the alternative`)
-  ) +
-  xlim(
-    min(plot_x$`Average N under the null`),
-    max(plot_x$`Average N under the alternative`)
-  ) +
-  labs(
-    x = "Average N under the null",
-    y = "Average N under the alternative"
-  ) +
-  scale_color_viridis_c() +
-  theme_bw() +
-  theme(legend.position = "bottom")
-
-ggplotly(p1, width = 4, height = 4)
-# ggplotly(p2, width = 4, height = 4)
-```
-
-In this case we may choose to use the optimal efficiency design, which has the desirable trait of a very small average sample size under the null of just 39 patients, while still maintaining reasonable type I error of 0.06 and power of 0.796. This design would allow us to stop early if the treatment were inefficacious, thus preserving valuable financial resources for use in studying more promising treatments and preventing our human subjects from continuing an ineffective treatment. Finally, we generate the decision table associated with the selected design for use in making decision at each interim analysis during the conduct of the trial. Because of the computational time involved, the results of the below example code are available as a dataset called `one_sample_decision_tbl` included in the \CRANpkg{ppseq} package. In the results table, we see that at the first interim futility look after just 5 patients, we would not stop the trial. After the first 10 patients we would stop the trial if there were 0 responses, and so on. At the end of the trial when all 95 patients have accrued, we would declare the treatment promising of further study if there were greater than or equal to 14 responses.
+Finally, we generate the decision table associated with the selected design for use in making decisions at each interim analysis during the conduct of the trial. Because of the computational time involved, the results of the below example code are available as a dataset called `two_sample_decision_tbl` included in the \CRANpkg{ppseq} package. In the results table, we see that at the first interim futility look after just 5 patients, we would not stop the trial. After the first 10 patients we would stop the trial if there were 0 responses, and so on. At the end of the trial when all 95 patients have accrued, we would declare the treatment promising of further study if there were greater than or equal to 14 responses.
 
 ```{r eval = FALSE}
 set.seed(123)
 
-one_sample_decision_tbl <- 
+two_sample_decision_tbl <- 
   calc_decision_rules(
-    n = seq(5, 95, 5),
-    N = 95, 
+    n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+    N = c(50, 50),
     theta = 0.92, 
-    ppp = 0.1, 
-    p0 = 0.1, 
-    direction = "greater",
-    delta = NULL, 
+    ppp = 0.05, 
+    p0 = NULL, 
+    direction = "greater", 
+    delta = 0, 
     prior = c(0.5, 0.5), 
     S = 5000
-  )
+    )
 ```
 
-```{r}
-one_sample_decision_tbl
-```
+The resulting table contains all possible combinations of responses in the two arms, so is quite long. We can visualize the resulting decision rules by passing the results of the call to the `calc_decision_rules()` function to the `plot()` function, which returns a faceted plot according to the interim look. The color denotes whether the trial should proceed (green) or stop (red) for a given combination of number of responses in the control arm (x-axis) and number of responses on the experimental arm (y-axis). For example, we see that at the second interim look when there are 20 patients enrolled on each arm, if there were 10 responses in the control arm, we would stop the trial if there were 8 or fewer responses on the experimental arm; otherwise we would proceed with enrollment.
 
 ```{r message = FALSE, fig.height = 9, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
-plot(one_sample_decision_tbl, plotly = FALSE)
+plot(two_sample_decision_tbl, plotly = FALSE)
 ```
-
 
 ```{r message = FALSE, fig.height = 9, fig.width = 6, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with plotly. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
-plot(one_sample_decision_tbl)
+plot(two_sample_decision_tbl)
 ```
-
 
 
 # Summary
