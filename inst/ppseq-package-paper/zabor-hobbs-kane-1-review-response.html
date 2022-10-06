@@ -368,6 +368,7 @@ Predictive Probability Monitoring</h1>
 </div>
 
 
+<p><br> <br></p>
 <blockquote>
 <p><strong>Reviewer 1</strong></p>
 </blockquote>
@@ -384,7 +385,8 @@ implementation. Some comments to follow:</p>
 <p>Thank you for this thorough review. We agree that there were parts of
 the paper that were unclear or lacked sufficient detail, and have
 strived to address all of your comments in an effort to improve the
-clarify and accuracy throughout.</p>
+clarify and accuracy throughout. Please see our detailed responses that
+follow.</p>
 <blockquote>
 <p>Major comments:</p>
 </blockquote>
@@ -394,8 +396,8 @@ clarify and accuracy throughout.</p>
 clearly stated in the abstract/introduction.</li>
 </ul>
 </blockquote>
-<p>Thank you for pointing this out. We agree, and have added this detail
-to both the abstract and the last paragraph of the introduction.</p>
+<p>Thank you for pointing this out. We have added this important detail
+to both the Abstract and the last paragraph of the Introduction.</p>
 <blockquote>
 <ul>
 <li>I am not sure what is the point of second paragraph of the
@@ -408,8 +410,9 @@ clarity of this paragraph.</li>
 <p>The goal of this paragraph was to introduce readers to the often
 large sample sizes that have been used in recent expansion cohorts,
 which is part of the problem addressed by this package. We see how the
-wording did not emphasize this point properly, though, and have reworded
-in response to this comment. Thank you.</p>
+wording did not emphasize this point properly, though, and have
+rewritten the entire paragraph in response to this comment. Thank
+you.</p>
 <blockquote>
 <ul>
 <li>In the third paragraph of the introduction the author claims that
@@ -420,8 +423,11 @@ constraints , which is the whole point of the calibration exercise that
 motivate this package.</li>
 </ul>
 </blockquote>
-<p>We agree that the way this sentence was worded was not accurate. We
-have reworded this section to improve clarity and accuracy.</p>
+<p>We agree that the way this sentence was worded was not accurate. Our
+intention was to introduce the reader to the possibility of implementing
+Bayesian designs with consideration of frequentist type I error and
+power. We have reworded this section to improve clarity and
+accuracy.</p>
 <blockquote>
 <ul>
 <li>In the introduction and later in the paper, the authors introduce
@@ -495,9 +501,12 @@ an important point to discuss, and can have a large impact on the
 result.</li>
 </ul>
 </blockquote>
-<p>Thank you, we have written the case study a bit to be a two-sample
+<p>Thank you, we have rewritten the case study a bit to be a two-sample
 example in order to differentiate from the added basic example, and have
-also added some information justifying the selected thresholds.</p>
+also added some information justifying the selected thresholds. The
+previous thresholds were a holdover from another application, and we
+apologize for not cleaning this up. The thresholds now represent an
+equi-spaced grid as appropriate in this setting.</p>
 <blockquote>
 <ul>
 <li>In the code snipped at page 4 the parameters <code>S</code> and
@@ -516,23 +525,39 @@ the left panel and 35-55 for the right panel). The plot would be easier
 to read.</li>
 </ul>
 </blockquote>
-<p>Thank you for this suggestion, we have rescaled the axes.</p>
+<p>Thank you for this suggestion, we have rescaled the axes so that the
+accuracy plot axes are limited to the ranges of considered values, and
+the efficiency plot is a close-up square.</p>
 <blockquote>
 <ul>
 <li>Page 7: In the first line of the tibble
 <code>one_sample_decision_tbl</code> there is NA,NA. If I am not
 mistaken this is interpreted as “never stop”. I will explicitly indicate
 this.</li>
+</ul>
+</blockquote>
+<p>Thank you, we have changed to a basic example that can easily be run
+so now there is no NA, but we have still made a note that “If any NA
+value was returned in this table, it would indicate that at that interim
+look you would never stop, regardless of the number of responses.”</p>
+<blockquote>
+<ul>
 <li>There are some typos in the bibliography. For example, “r” in place
 of “R”, “phase i” in place of “phase I”. Please double check.</li>
+</ul>
+</blockquote>
+<p>These corrections have been made, thank you.</p>
+<blockquote>
+<ul>
 <li>I think that the paper would benefit of an additional toy example
 that can be run on a personal computer rather than on a server. This
 would allow to familiarize with the functions before running large scale
 simulations.</li>
 </ul>
 </blockquote>
-<p>We agree, and have added a toy example that can easily be run
-interactively prior to presenting the more realistic case study.</p>
+<p>We agree, and have added a basic example to the Package demonstration
+section that can easily be run interactively, which is followed by an
+altered Case study section.</p>
 <blockquote>
 <p>Minor comments:</p>
 </blockquote>
@@ -549,14 +574,14 @@ clarity.</p>
 <li>Page 2: Define the acronym RECIST.</li>
 </ul>
 </blockquote>
-<p>In parentheses we have added the definition of the acronym RECIST:
-Response Evaluation Criteria in Solid Tumors.</p>
+<p>In parentheses we have added the definition of the acronym RECIST
+(Response Evaluation Criteria in Solid Tumors)</p>
 <blockquote>
 <ul>
 <li>Page 2: Bayes rule -&gt; Bayes’s theorem.</li>
 </ul>
 </blockquote>
-<p>Thank you, we have made this correction.</p>
+<p>We have made this correction, thank you.</p>
 <blockquote>
 <ul>
 <li>Page2: when naming distribution (e.g., Beta-Binomial) I suggest to
@@ -578,8 +603,10 @@ define this.</li>
 compilation error.</p>
 </blockquote>
 <p>This is indeed a compilation error. I am not sure why this is being
-generated or how to suppress it, so hopefully it can be fixed when the
-article is finalized for publication,</p>
+generated or how to suppress it, so we will work with the editorial team
+to ensure it isn’t displayed when the article is finalized for
+publication.</p>
+<p><br> <br></p>
 <blockquote>
 <p><strong>Reviewer 5</strong></p>
 </blockquote>
@@ -605,7 +632,8 @@ below.</p>
 follow. We hope the changes have made it more understandable, and that
 all of the needed detail is now included. Thank you for taking the time
 to conduct such a thorough review of our paper, we do believe that it
-has been improved as a result.</p>
+has been improved as a result. Please see our detailed responses
+below.</p>
 <blockquote>
 <ol style="list-style-type: decimal">
 <li>I found the Package Overview section difficult to follow, since it
@@ -625,18 +653,19 @@ computational resources (see also point 3)?</li>
 <p>Thank you for this comment, we agree that much detail was overlooked
 in the Package Overview section, and we have expanded this section to
 include much more detail of the underlying algorithm, and to link the
-notation to the preceding section. We believe this is much easier to
-follow now. We have also added a section for a toy example that can
-easily be run interactively prior to presenting the more detailed case
-study.</p>
+notation from the preceding section to the function arguments. We
+believe this section is much easier to follow now. We have also added a
+new section called Package demonstration that includes a basic example
+that can easily be run interactively, which is followed by an altered
+Case study section.</p>
 <p>We do think this package is useful despite the potentially long
 computational time. This is meant to be used at the design stage of a
 clinical trial, when there is ample time to allow for computation. Once
-the design has been selected and decided, no additional computations are
-required throughout the conduct of the trial, as the decision table
-resulting from <code>calc_decision_rules()</code> is available for
-decisions at each interim look, making trial conduct fast at seamless at
-each interim analysis and at the end of the trial.</p>
+the design has been selected and the decision table generated with the
+function <code>calc_decision_rules()</code>, no additional computations
+are required throughout the conduct of the trial. As a result, the trial
+can be conducted seamlessly at each interim analysis, and through the
+end of the trial.</p>
 <blockquote>
 <ol start="2" style="list-style-type: decimal">
 <li>I was a little confused by the notation, some more detail would make
@@ -666,12 +695,13 @@ was something roughly like the following. For nsim iterations:</li>
 </ol>
 <ol style="list-style-type: lower-roman">
 <li>Simulate a realization of <span class="math inline">\(p^r\)</span>
-from the prior <span class="math inline">\(\Beta(a_0, b_0)\)</span></li>
+from the prior <span class="math inline">\(\mbox{Beta}(a_0,
+b_0)\)</span></li>
 <li>Simulate a realization of <span class="math inline">\(x^r | n, p^r ~
-\Binomial(n, p^r)\)</span></li>
-<li>Calculate the probability of success in that trial
-$$PP<sup>r=(p</sup>r&gt;p_0|x^r, N, n)=<em>{p_0}^1 f_p(q|x^r, N,
-n),dq=</em>{x^*}^{N-n}_{p_0}<sup>1(X</sup><em>=x<sup><em>|q,N-n)f_p(q|x<sup>r,N,X</sup></em>=x</sup></em>),dq</li>
+\mbox{Binomial}(n, p^r)\)</span></li>
+<li>Calculate the probability of success in that trial <span class="math display">\[PP^r=\Pr(p^r&gt;p_0|x^r, N, n)=\int_{p_0}^1
+f_p(q|x^r, N,
+n)\,dq=\sum_{x^*}^{N-n}\int_{p_0}^1\Pr(X^*=x^*|q,N-n)f_p(q|x^r,N,X^*=x^*)\,dq\]</span></li>
 </ol>
 </blockquote>
 <blockquote>
@@ -683,10 +713,16 @@ functions in this package. I may of course be completely wrong about
 what the function is doing, but it would help to have some clarification
 so we know the function is doing what the user expects.</p>
 </blockquote>
-<p>Thank you for drawing our attention to this oversight. We have added
-much more detail about the underlying computational algorithm for the
-<code>calibrate_thresholds()</code> function in the Package Overview
-section, and hope that this clarifies the functionality.</p>
+<p>We apologize that the description in the Package overview was not
+clear. Please see the expanded section, which now includes all of the
+details of the implemented algorithm. Posterior sampling is required to
+account for the uncertainty in <span class="math inline">\(p\)</span>.
+In the algorithm you describe above, using a single estimate <span class="math inline">\(p^r\)</span> will result in a too-narrow
+predictive distribution. In our scheme and using your notation, we
+rather draw <code>nsim</code> iterations <span class="math inline">\(x^r
+| n, p^r ~ \mbox{Binomial}(n, p^r)\)</span>, then we take <code>S</code>
+posterior samples <span class="math inline">\(p^s|x^r \sim
+\mbox{Beta}(a_0 + x^r, b_0 + n - x^r)\)</span>.</p>
 <blockquote>
 <ol start="4" style="list-style-type: decimal">
 <li>The section “Optimisation” mentions minimizing Euclidean distance on
@@ -699,7 +735,7 @@ have added much more detail about the computations being done, with
 notation, to this section, and hope it is now more clear. Additionally,
 in response to another reviewer’s comment we have renamed this section
 “Design selection” and removed reference to optimization, since no true
-mathematical optimization was being conducted.</p>
+mathematical optimization is being conducted.</p>
 
 
 

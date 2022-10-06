@@ -30,9 +30,7 @@ the context of cytotoxic treatments. Most cytotoxic treatments exhibit
 increases in both efficacy and toxicity with increasing dose. As a
 result, phase I trials were centered on identifying the maximum
 tolerated dose (MTD), defined as the highest dose that did not exceed a
-pre-specified toxicity threshold. Phase I dose-escalation trials were
-designed using the rule-based 3+3 method or the model-based continual
-reassessment method, among others. But advances in drug discovery have
+pre-specified toxicity threshold. But advances in drug discovery have
 produced numerous biomarker-guided non-cytotoxic therapies such as small
 molecule inhibitors, antibody drug conjugates, immune checkpoint
 inhibitors, and monoclonal antibodies. These therapies typically do not
@@ -40,42 +38,43 @@ exhibit the same pattern of increases in both efficacy and toxicity with
 increasing dose, so the MTD as traditionally defined may not exist.
 Instead, lower doses may have equivalent efficacy but lower toxicity as
 compared to higher doses. As a result, these therapies can be difficult
-to study with traditional dose-escalation designs \citep{Pestana2020}.
-To address this issue, recent phase I trials have included large
-dose-expansion cohorts, in which additional patients are enrolled in
-phase 1 after the dose-escalation phase is complete. In this setup, the
-dose-escalation phase is considered phase 1a and used to assess the
-initial safety of multiple doses, then the dose-expansion phase is
-considered phase 1b and can have a variety of aims including to further
-refine the safety of one or more doses, to assess preliminary efficacy,
-to explore the treatment in various disease-specific subtypes, or to
-further characterize the pharmacokinetics and/or pharmacodynamics. The
-use of dose-expansion cohorts increased from 12\% in 2006 to 38\% in
+to study with traditional dose-escalation designs such as the rule-based
+3+3 and the model-based continual reassessment method, among others
+\citep{Pestana2020}. To address this issue, recent phase I trials have
+included large dose-expansion cohorts, in which additional patients are
+enrolled in phase I after the dose-escalation phase is complete. In this
+setup, the dose-escalation phase is considered phase Ia and used to
+assess the initial safety of multiple doses, then the dose-expansion
+phase is considered phase Ib and can have a variety of aims including to
+further refine the safety of one or more doses, to assess preliminary
+efficacy, to explore the treatment in various disease-specific subtypes,
+or to further characterize the pharmacokinetics and/or pharmacodynamics.
+The use of dose-expansion cohorts increased from 12\% in 2006 to 38\% in
 2011 \citep{Manji2013} and trials with dose-expansion cohorts led to
-higher response rates and more frequent success in phase 2 trials
+higher response rates and more frequent success in phase II trials
 \citep{Bugano2017}.
 
 But despite these successes, recent dose-expansion cohorts have not
 always been planned in advance, leading to uncertain statistical
 properties, and have at times included samples sizes that far exceed
-those typically seen in early phase trials of cytotoxic treatments. For
-example, the KEYNOTE-001 trial of pembrolizumab, initially designed as a
-3+3 dose-escalation trial, included multiple protocol amendments and
-ultimately enrolled a total of 655 patients across five melanoma
-expansion cohorts and 550 patients across four non-small-cell lung
-cancer expansion cohorts \citep{Khoja2015}. In a basket trial of
-atezolizumab, an anti-PD-L1 treatment in patients with a variety of
-cancers and both with and without PD-L1 expression, an expansion cohort
-in metastatic urothelial bladder cancer ultimately enrolled 97 patients
-and evaluated 95, despite the fact that no expansion cohort in this
-disease subtype was originally planned in the trial protocol. The
-expansion cohort in metastatic urothelial carcinoma was rather added
-later in a protocol amendment in which the sample size was increased
-from what was initially planned \citep{Petrylak2018, Powles2014}. These
-enlarged sample sizes raise ethical concerns for patients who enroll in
-clinical trials, and emphasize the need for rigorous statistical designs
-to ensure that trials can stop early for futility while maintaining
-traditional control of type I error and power.
+those typically seen in early phase trials. For example, the KEYNOTE-001
+trial of pembrolizumab, initially designed as a 3+3 dose-escalation
+trial, included multiple protocol amendments and ultimately enrolled a
+total of 655 patients across five melanoma expansion cohorts and 550
+patients across four non-small-cell lung cancer expansion cohorts
+\citep{Khoja2015}. In a basket trial of atezolizumab, an anti-PD-L1
+treatment in patients with a variety of cancers and both with and
+without PD-L1 expression, an expansion cohort in metastatic urothelial
+carcinoma ultimately evaluated 95 patients, despite the fact that no
+expansion cohort in this disease subtype was originally planned in the
+trial protocol. The expansion cohort in metastatic urothelial carcinoma
+was added through a protocol amendment, and the sample size later was
+increased from what was initially planned
+\citep{Petrylak2018, Powles2014}. These enlarged sample sizes raise
+ethical concerns for patients who enroll in clinical trials, and
+emphasize the need for rigorous statistical designs to ensure that
+trials can stop early for futility while maintaining traditional control
+of type I error and power.
 
 Bayesian predictive probability has been proposed as an approach for
 sequential monitoring in early phase oncology trials
@@ -86,15 +85,17 @@ properties. To our knowledge no such software currently exists in the R
 programming language. This paper introduces the \CRANpkg{ppseq} package
 for the R software language \citep{RCT2020}, which provides functions to
 design early phase clinical trials of binary endpoints using sequential
-predictive probability monitoring for futility. Interactive plots
-produced using the \CRANpkg{ggplot2} package \citep{Wickham2016} and the
-\CRANpkg{plotly} package \citep{Sievert2020} compare designs based on
-different thresholds for decision making. Moreover, we demonstrate
-criteria for selecting an ideal predictive probability monitoring design
-using the \CRANpkg{ppseq} package. While the \CRANpkg{ppseq} package was
-developed with early phase oncology clinical trials in mind, the
-methodology is general and can be applied to any application of
-sequential futility monitoring in clinical trial design.
+predictive probability monitoring for futility. Static plots produced
+using the \CRANpkg{ggplot2} package \citep{Wickham2016} and interactive
+plots produced using the \CRANpkg{plotly} package \citep{Sievert2020}
+compare design options based on frequentist type I error and power.
+Moreover, the \CRANpkg{ppseq} package implements two criteria for
+selecting an ideal predictive probability monitoring design from among
+the options formed by combinations of posterior and predictive decision
+thresholds. While the \CRANpkg{ppseq} package was developed with early
+phase oncology clinical trials in mind, the methodology is general and
+can be applied to any application of sequential futility monitoring in
+clinical trial design.
 
 \hypertarget{predictive-probability-monitoring}{%
 \section{Predictive probability
@@ -109,14 +110,14 @@ also available for the two-sample setting, in which patients are
 enrolled onto two different treatment arms, or a treatment and a control
 arm, for comparative purposes. Each patient, denoted by \(i\), enrolled
 in the trial either has a response such that \(x_i = 1\) or does not
-have a response such that \(x_i = 0\). Then \(X = \sum_{i=1}^n x_i\)
-represents the number of responses out of \(n\) currently observed
-patients up to a maximum of \(N\) total patients. Let \(p\) represent
-the true probability of response. Fix \(p_0\) as the threshold for
-unacceptable response rate and \(p_1\) as the threshold for acceptable
-response rate. Most dose-expansion studies with an efficacy aim will
-wish to test the null hypothesis \(H_0: p \leq p_0\) versus the
-alternative hypothesis \(H_1: p \geq p_1\).
+have a response such that \(x_i = 0\). Then \(X = \sum_{i=1}^n x_i\) is
+the number of responses out of \(n\) currently observed patients up to a
+maximum of \(N\) total patients. Let \(p\) represent the true
+probability of response. Fix \(p_0\) as the threshold for unacceptable
+response rate and \(p_1\) as the threshold for acceptable response rate.
+Most dose-expansion studies with an efficacy aim will wish to test the
+null hypothesis \(H_0: p \leq p_0\) versus the alternative hypothesis
+\(H_1: p \geq p_1\).
 
 The Bayesian paradigm of statistics is founded on Bayes' theorem, which
 is a mathematical theory that specifies how to combine the prior
@@ -131,9 +132,9 @@ the prior, we obtain the posterior distribution of the response rate,
 which follows the beta distribution
 \(p|x \sim \mbox{Beta}(a_0 + x, b_0 + n - x)\). A posterior probability
 threshold \(\theta\) would be pre-specified during the trial design
-stage. At the end of the trial if the posterior probability exceeded the
-pre-specified threshold, i.e.~if \(\Pr(p>p_0 | X) > \theta\), the trial
-would be declared a success.
+stage. At the end of the trial, if the posterior probability exceeded
+the pre-specified threshold, i.e.~if \(\Pr(p>p_0 | X) > \theta\), the
+trial would be declared a success.
 
 The posterior predictive distribution of the number of future responses
 \(X^*\) in the remaining \(n^*=N-n\) future patients follows a
@@ -182,7 +183,7 @@ to the alternative hypothesis \(H_1: p \geq p_1\). The hyperparameters
 of the prior beta distribution are specified with the argument
 \texttt{prior} and default to \texttt{c(0.5,\ 0.5)}, which denotes a
 \(\mbox{Beta}(0.5, 0.5)\) distribution. The number of posterior samples
-are specified with the argument \texttt{S}, which defaults to
+is specified with the argument \texttt{S}, which defaults to
 \texttt{5000} samples, and the number of simulated trial datasets is
 specified with the argument \texttt{nsim}, which defaults to
 \texttt{1000}. The additional argument \texttt{delta}, which defaults to
@@ -250,11 +251,11 @@ the type I error, and the proportion of trials simulated under the
 alternative hypothesis for which the null hypothesis was rejected is an
 estimate of the power. The \texttt{print()} option will print the
 results summary for each combination of thresholds, filtered by an
-acceptable range of type I error and minimum power, if desired. Note
-that the results will be sensitive to the choice of \texttt{nsim} and
-\texttt{S}. We have set what we believe are reasonable defaults and
-would caution users against reducing these values without careful
-consideration.
+acceptable range of frequentist type I error and minimum power, if
+desired. Note that the results will be sensitive to the choice of
+\texttt{nsim} and \texttt{S}. We have set what we believe are reasonable
+defaults and would caution users against reducing these values without
+careful consideration.
 
 \hypertarget{design-selection}{%
 \subsection{Design selection}\label{design-selection}}
@@ -411,7 +412,10 @@ cal_thresh <-
 \end{Schunk}
 
 Since there are only four design options in this toy example, we print
-the entire results table using a call to \texttt{print()}:
+the entire results table using a call to \texttt{print()}. Each row
+represents a different combination of the considered posterior and
+predictive thresholds, denotes \texttt{pp\_threshold} and
+\texttt{ppp\_threshold}, respectively.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -434,10 +438,11 @@ print(cal_thresh)
 \end{Soutput}
 \end{Schunk}
 
-We use \texttt{optimize\_design()} to identify the optimal accuracy and
-optimal efficiency designs, subject to type I error between 0.025 and
-0.1, specified by \texttt{type1\_range\ =\ c(0.025,\ 0.1)}, and power of
-at least 0.75, specified by \texttt{minimum\_power\ =\ 0.75}:
+We use the \texttt{optimize\_design()} function to identify the optimal
+accuracy and optimal efficiency designs. We constrain consideration to
+designs with type I error between 0.025 and 0.1, specified by
+\texttt{type1\_range\ =\ c(0.025,\ 0.1)}, and power of at least 0.75,
+specified by \texttt{minimum\_power\ =\ 0.75}.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -464,9 +469,9 @@ optimize_design(cal_thresh, type1_range = c(0.025, 0.1), minimum_power = 0.75)
 \end{Soutput}
 \end{Schunk}
 
-And to ease interim analysis during the course of the trial, we obtain
-the decision table using the \texttt{calc\_decision\_rules} function,
-with the thresholds of our selected optimal efficiency design passed as
+To ease interim analysis during the course of the trial, we obtain the
+decision table using the \texttt{calc\_decision\_rules()} function, with
+the thresholds of our selected optimal efficiency design passed as
 \texttt{theta\ =\ 0.9} and \texttt{ppp\_threshold\ =\ 0.2}. For
 computational speed in this basic example, we set \texttt{S=50}, but in
 practice we would want to draw many more posterior samples, and values
@@ -496,15 +501,15 @@ calc_decision_rules(
 \end{Schunk}
 
 This table tells us that at the first interim analysis after we have
-observed the first five patients for response, we would stop the trial
-if no responses had been observed, and would continue enrolling if at
-least one response had been observed. At the second interim analysis
-after we have observed the first ten patients for response, we would
-stop the trial if zero or one responses had been observed, and would
-continue enrolling if at least two responses had been observed. At the
-end of the trial after all 15 patients have been observed for response,
-we would declare the new treatment promising if at least three responses
-had been observed.
+observed \(n=5\) patients for response, we would stop the trial if
+\(\leq r=0\) responses had been observed, and would continue enrolling
+if \(> r=0\) responses had been observed. At the second interim analysis
+after we have observed \(n=10\) patients for response, we would stop the
+trial if \(\leq r=1\) responses had been observed, and would continue
+enrolling if \(> r=1\) responses had been observed. At the end of the
+trial after all \(n=N=15\) patients have been observed for response, we
+would declare the new treatment promising if \(> r=2\) responses had
+been observed.
 
 \hypertarget{case-study}{%
 \section{Case study}\label{case-study}}
@@ -583,7 +588,7 @@ arguments, including the defaults of \texttt{S=5000} and
 \texttt{nsim=1000}, which we believe are sufficient to obtain stable
 results. Because of the inherent computational intensity in these
 calculations, this function relies on the \CRANpkg{future}
-\citep{Bengtsson2020} and \CRANpkg{furrr} \citep{Vaughan2021} packages
+\citep{Bengtsson2021} and \CRANpkg{furrr} \citep{Vaughan2021} packages
 to parallelize computations. The user will be responsible for setting up
 a call to \texttt{future::plan()} that is appropriate to their operating
 environment and simulation setting. Because the code takes some time to
@@ -724,7 +729,10 @@ experimental arm; otherwise we would proceed with enrollment.
 
 \begin{Schunk}
 \begin{Sinput}
-plot(two_sample_decision_tbl, plotly = FALSE)
+dtp <- plot(two_sample_decision_tbl, plotly = FALSE)
+
+dtp + 
+  theme(legend.position="bottom")
 \end{Sinput}
 \begin{figure}
 \includegraphics{zabor-hobbs-kane_files/figure-latex/unnamed-chunk-13-1} \caption[Plot of decision rules made with ggplot]{Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis.}(\#fig:unnamed-chunk-13)
