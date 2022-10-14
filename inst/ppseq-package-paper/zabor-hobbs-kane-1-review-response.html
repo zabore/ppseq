@@ -597,7 +597,14 @@ to achieve the proper font/spacing.</p>
 define this.</li>
 </ul>
 </blockquote>
-<p>We have reworded this for clarity, thank you.</p>
+<p>We have reworded this for clarity, thank you. The trial would stop at
+a given look if the number of observed responses is less than or equal
+to <span class="math inline">\(r\)</span>, otherwise the trial would
+continue enrolling if the number of observed responses is greater than
+<span class="math inline">\(r\)</span>. At the end of the trial when the
+maximum planned sample size is reached, the treatment would be
+considered promising if the number of observed responses is greater than
+<span class="math inline">\(r\)</span>.</p>
 <blockquote>
 <p>-Figure 1: in the legend (#fig:unnamed-chunk-7). I suppose this is a
 compilation error.</p>
@@ -630,9 +637,9 @@ below.</p>
 </blockquote>
 <p>We are sorry that the article in it’s original form was difficult to
 follow. We hope the changes have made it more understandable, and that
-all of the needed detail is now included. Thank you for taking the time
-to conduct such a thorough review of our paper, we do believe that it
-has been improved as a result. Please see our detailed responses
+all of the needed details are now included. Thank you for taking the
+time to conduct such a thorough review of our paper, we do believe that
+it has been improved as a result. Please see our detailed responses
 below.</p>
 <blockquote>
 <ol style="list-style-type: decimal">
@@ -720,9 +727,9 @@ account for the uncertainty in <span class="math inline">\(p\)</span>.
 In the algorithm you describe above, using a single estimate <span class="math inline">\(p^r\)</span> will result in a too-narrow
 predictive distribution. In our scheme and using your notation, we
 rather draw <code>nsim</code> iterations <span class="math inline">\(x^r
-| n, p^r ~ \mbox{Binomial}(n, p^r)\)</span>, then we take <code>S</code>
-posterior samples <span class="math inline">\(p^s|x^r \sim
-\mbox{Beta}(a_0 + x^r, b_0 + n - x^r)\)</span>.</p>
+| n, p^r \sim \mbox{Binomial}(n, p^r)\)</span>, then we take
+<code>S</code> posterior samples <span class="math inline">\(p^s|x^r
+\sim \mbox{Beta}(a_0 + x^r, b_0 + n - x^r)\)</span>.</p>
 <blockquote>
 <ol start="4" style="list-style-type: decimal">
 <li>The section “Optimisation” mentions minimizing Euclidean distance on

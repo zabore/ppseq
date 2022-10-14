@@ -90,7 +90,7 @@ Thank you for this suggestion, we have used it for all distributions to achieve 
 
 > - In the section decision rules, what is a decision point “r”? Please define this.
 
-We have reworded this for clarity, thank you.
+We have reworded this for clarity, thank you. The trial would stop at a given look if the number of observed responses is less than or equal to $r$, otherwise the trial would continue enrolling if the number of observed responses is greater than $r$. At the end of the trial when the maximum planned sample size is reached, the treatment would be considered promising if the number of observed responses is greater than $r$. 
 
 > -Figure 1: in the legend (#fig:unnamed-chunk-7). I suppose this is a compilation error.
 
@@ -103,7 +103,7 @@ This is indeed a compilation error. I am not sure why this is being generated or
 
 > The article describes the ppseq package for R, which provides several functions to facilitate clinical trial design using sequential predictive probability monitoring. A user looking to design an early phase trial can use Bayesian methods to ask what the probability of early stopping is and what expected sample sizes would be under different assumptions about outcomes in treatment and control groups and with different stopping rules, while maintaining desired type I error rates. The package is small, providing only three user-facing functions reported in the manuscript, along with plot and print methods. However, the functions are user friendly with obvious options, and the article provides a clear use case and justification for the methods. However, the article itself is quite difficult to follow, which is not helped by the example not being feasible to run for a user with a standard desktop or laptop computer (the example is reportedly run here on a 192 core computing cluster!). I have provided some queries, recommendations below.
 
-We are sorry that the article in it's original form was difficult to follow. We hope the changes have made it more understandable, and that all of the needed detail is now included. Thank you for taking the time to conduct such a thorough review of our paper, we do believe that it has been improved as a result. Please see our detailed responses below.
+We are sorry that the article in it's original form was difficult to follow. We hope the changes have made it more understandable, and that all of the needed details are now included. Thank you for taking the time to conduct such a thorough review of our paper, we do believe that it has been improved as a result. Please see our detailed responses below.
 
 > 1. I found the Package Overview section difficult to follow, since it provides only a narrative description of the inputs of the functions and options. It would be useful to link the description to the statistical discussion in the previous section, explaining which option relates to which parameter, and what each output reports in terms of the statistical notation. It may help to integrate the case study into the package description so that the reader can see what the text means in terms of the example. However, I would also strongly recommend providing an example(s) that a user can implement themselves in a reasonable amount of time, as this often helps when using a package for the first time. Indeed, is the package useful if it requires such significant computational resources (see also point 3)?
 
@@ -124,7 +124,7 @@ Thank you for pointing out the lack of clarity here. We have revised the wording
 
 >Then the PPP is the the proportion of $PP^r>\theta^*$. If this is the case, then the integral term has a closed form and posterior simulations do not seem necessary, in which case the function should run much quicker than it currently does. Running time does seem like a key issue for the functions in this package. I may of course be completely wrong about what the function is doing, but it would help to have some clarification so we know the function is doing what the user expects.
 
-We apologize that the description in the Package overview was not clear. Please see the expanded section, which now includes all of the details of the implemented algorithm. Posterior sampling is required to account for the uncertainty in $p$. In the algorithm you describe above, using a single estimate $p^r$ will result in a too-narrow predictive distribution. In our scheme and using your notation, we rather draw `nsim` iterations $x^r | n, p^r ~ \mbox{Binomial}(n, p^r)$, then we take `S` posterior samples $p^s|x^r \sim \mbox{Beta}(a_0 + x^r, b_0 + n - x^r)$.
+We apologize that the description in the Package overview was not clear. Please see the expanded section, which now includes all of the details of the implemented algorithm. Posterior sampling is required to account for the uncertainty in $p$. In the algorithm you describe above, using a single estimate $p^r$ will result in a too-narrow predictive distribution. In our scheme and using your notation, we rather draw `nsim` iterations $x^r | n, p^r \sim \mbox{Binomial}(n, p^r)$, then we take `S` posterior samples $p^s|x^r \sim \mbox{Beta}(a_0 + x^r, b_0 + n - x^r)$.
 
 >4. The section “Optimisation” mentions minimizing Euclidean distance on different plots, however it isn’t clear what this means without notation or until the example is provided.
 
