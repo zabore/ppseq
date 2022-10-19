@@ -12,8 +12,8 @@ Functions are available to calibrate designs over a range of posterior and predi
 Useful links:
 \itemize{
   \item \url{https://github.com/zabore/ppseq}
-  \item \url{https://www.emilyzabor.com/ppseq/}
-  \item Report bugs at \url{https://github.com/zabore/ppseq/issues}
+  \item \url{https://www.emilyzabor.me/ppseq/}
+  \item Report bugs at \url{https://github.me/zabore/ppseq/issues}
 }
 
 }

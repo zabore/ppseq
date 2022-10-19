@@ -10,7 +10,7 @@ author:
     address:
     - 9500 Euclid Ave. CA-60
     - Cleveland, OH 44195 USA
-    url: http://www.emilyzabor.com/
+    url: http://www.emilyzabor.me/
     orcid: 0000-0002-1402-4498
     email:  zabore2@ccf.org
   - name: Brian P. Hobbs

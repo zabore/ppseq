@@ -22,7 +22,7 @@ optimize_design."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">ppseq</a>
 
-    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-default me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@ optimize_design."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Calculate a decision rule table for interim monitoring of a pre-specified
 design</h1>
-      <small class="dont-index">Source: <a href="https://github.com/zabore/ppseq/blob/HEAD/R/calc_decision_rules.R" class="external-link"><code>R/calc_decision_rules.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.me/zabore/ppseq/blob/HEAD/R/calc_decision_rules.R" class="external-link"><code>R/calc_decision_rules.R</code></a></small>
       <div class="d-none name"><code>calc_decision_rules.Rd</code></div>
     </div>
 
@@ -82,17 +82,17 @@ optimal design using the functions <code>calibrate_thresholds</code> and
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">calc_decision_rules</span><span class="op">(</span>
-  <span class="va">n</span>,
-  <span class="va">N</span>,
-  <span class="va">theta</span>,
-  <span class="va">ppp</span>,
-  <span class="va">p0</span>,
-  direction <span class="op">=</span> <span class="st">"greater"</span>,
-  delta <span class="op">=</span> <span class="cn">NULL</span>,
-  prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,
-  S <span class="op">=</span> <span class="fl">5000</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calc_decision_rules</span><span class="op">(</span></span>
+<span>  <span class="va">n</span>,</span>
+<span>  <span class="va">N</span>,</span>
+<span>  <span class="va">theta</span>,</span>
+<span>  <span class="va">ppp</span>,</span>
+<span>  <span class="va">p0</span>,</span>
+<span>  direction <span class="op">=</span> <span class="st">"greater"</span>,</span>
+<span>  delta <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>  S <span class="op">=</span> <span class="fl">5000</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -174,17 +174,17 @@ stopping the trial.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># One-sample case</span></span>
-<span class="r-in"><span class="fu">calc_decision_rules</span><span class="op">(</span></span>
-<span class="r-in">  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>, </span>
-<span class="r-in">  N <span class="op">=</span> <span class="fl">25</span>, </span>
-<span class="r-in">  theta <span class="op">=</span> <span class="fl">0.86</span>, </span>
-<span class="r-in">  ppp <span class="op">=</span> <span class="fl">0.2</span>, </span>
-<span class="r-in">  p0 <span class="op">=</span> <span class="fl">0.1</span>, </span>
-<span class="r-in">  S <span class="op">=</span> <span class="fl">50</span></span>
-<span class="r-in">  <span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># One-sample case</span></span></span>
+<span class="r-in"><span><span class="fu">calc_decision_rules</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>  N <span class="op">=</span> <span class="fl">25</span>, </span></span>
+<span class="r-in"><span>  theta <span class="op">=</span> <span class="fl">0.86</span>, </span></span>
+<span class="r-in"><span>  ppp <span class="op">=</span> <span class="fl">0.2</span>, </span></span>
+<span class="r-in"><span>  p0 <span class="op">=</span> <span class="fl">0.1</span>, </span></span>
+<span class="r-in"><span>  S <span class="op">=</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       n     r   ppp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -193,18 +193,18 @@ stopping the trial.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>    15     1  0.08</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>    20     2  0.1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>    25     3  0   </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Two-sample case</span></span>
-<span class="r-in"><span class="fu">calc_decision_rules</span><span class="op">(</span></span>
-<span class="r-in">  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, </span>
-<span class="r-in">  N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>,</span>
-<span class="r-in">  theta <span class="op">=</span> <span class="fl">0.86</span>, </span>
-<span class="r-in">  ppp <span class="op">=</span> <span class="fl">0.2</span>, </span>
-<span class="r-in">  p0 <span class="op">=</span> <span class="cn">NULL</span>, </span>
-<span class="r-in">  direction <span class="op">=</span> <span class="st">"greater"</span>, </span>
-<span class="r-in">  delta <span class="op">=</span> <span class="fl">0</span>, </span>
-<span class="r-in">  S <span class="op">=</span> <span class="fl">50</span></span>
-<span class="r-in">  <span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Two-sample case</span></span></span>
+<span class="r-in"><span><span class="fu">calc_decision_rules</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>  N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">25</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  theta <span class="op">=</span> <span class="fl">0.86</span>, </span></span>
+<span class="r-in"><span>  ppp <span class="op">=</span> <span class="fl">0.2</span>, </span></span>
+<span class="r-in"><span>  p0 <span class="op">=</span> <span class="cn">NULL</span>, </span></span>
+<span class="r-in"><span>  direction <span class="op">=</span> <span class="st">"greater"</span>, </span></span>
+<span class="r-in"><span>  delta <span class="op">=</span> <span class="fl">0</span>, </span></span>
+<span class="r-in"><span>  S <span class="op">=</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 80 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       n0    n1    r0    r1   ppp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -219,7 +219,7 @@ stopping the trial.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>    10    10     2    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10    10     3    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 70 more rows</span></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

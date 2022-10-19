@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
 ## ppseq
 
-The {ppseq} package provides functions to design clinical trials using Bayesian sequential predictive probability monitoring. Functionality is available to design [one-arm](https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html) or [two-arm](https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html) trials by searching over a grid of combinations of posterior and predictive thresholds and identifying the optimal design according to two criteria: accuracy and efficiency. Interactive plotting allows easy comparison of the various design options and easy trial implementation through decision rule plots.
+The {ppseq} package provides functions to design clinical trials using Bayesian sequential predictive probability monitoring. Functionality is available to design [one-arm](https://www.emilyzabor.me/ppseq/articles/one_sample_expansion.html) or [two-arm](https://www.emilyzabor.me/ppseq/articles/two_sample_randomized.html) trials by searching over a grid of combinations of posterior and predictive thresholds and identifying the optimal design according to two criteria: accuracy and efficiency. Interactive plotting allows easy comparison of the various design options and easy trial implementation through decision rule plots.
 
 
 ## Installation
@@ -116,7 +116,7 @@ plot(opteffrules, plotly = FALSE)
 knitr::include_graphics("D:/ppseq/man/figures/README-opteffrules-plot.png")
 ```
 
-See the vignettes for the [one-sample](https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html) and [two-sample](https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html) cases for additional details about available features and options.
+See the vignettes for the [one-sample](https://www.emilyzabor.me/ppseq/articles/one_sample_expansion.html) and [two-sample](https://www.emilyzabor.me/ppseq/articles/two_sample_randomized.html) cases for additional details about available features and options.
 
 
 
