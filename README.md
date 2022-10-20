@@ -18,9 +18,9 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 The {ppseq} package provides functions to design clinical trials using
 Bayesian sequential predictive probability monitoring. Functionality is
 available to design
-[one-arm](https://www.emilyzabor.me/ppseq/articles/one_sample_expansion.html)
+[one-arm](https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html)
 or
-[two-arm](https://www.emilyzabor.me/ppseq/articles/two_sample_randomized.html)
+[two-arm](https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html)
 trials by searching over a grid of combinations of posterior and
 predictive thresholds and identifying the optimal design according to
 two criteria: accuracy and efficiency. Interactive plotting allows easy
@@ -128,7 +128,7 @@ plot(opteffrules, plotly = FALSE)
 <img src="man/figures/README-opteffrules-plot.png" width="100%" />
 
 See the vignettes for the
-[one-sample](https://www.emilyzabor.me/ppseq/articles/one_sample_expansion.html)
+[one-sample](https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html)
 and
-[two-sample](https://www.emilyzabor.me/ppseq/articles/two_sample_randomized.html)
+[two-sample](https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html)
 cases for additional details about available features and options.
