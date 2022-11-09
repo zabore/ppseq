@@ -145,7 +145,7 @@ optimize_design(
 #>     )
 
 
-## ----message = FALSE, fig.height = 6, fig.width = 7, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
+## ----message = FALSE, fig.height = 6, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."----
 dtp <- plot(two_sample_decision_tbl, plotly = FALSE)
 
 dtp + 
