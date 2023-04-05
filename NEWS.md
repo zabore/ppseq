@@ -1,5 +1,8 @@
 # ppseq (development version)
 
+* corrected a code bug in `calibrate_thresholds()` (Closed Issue #19)
+* replaced `purrr::cross_df()` (deprecated) with `tidyr::expand_grid()`
+
 # ppseq 0.2.1
 
 * updated both datasets to use different predictive thresholds
