@@ -62,5 +62,5 @@
       pp_threshold ppp_threshold mean_n0_null mean_n1_null prop_pos_null
     1          0.9           0.2        15.25        15.25          0.07
       prop_stopped_null mean_n0_alt mean_n1_alt prop_pos_alt prop_stopped_alt
-    1                 0       23.95       23.95         0.88                0
+    1              0.65       23.95       23.95         0.88             0.07
 

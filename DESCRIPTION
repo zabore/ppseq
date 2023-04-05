@@ -1,6 +1,6 @@
 Package: ppseq
 Title: Design Clinical Trials using Sequential Predictive Probability Monitoring
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
   c(person(given = "Emily C.",
           family = "Zabor",
@@ -45,4 +45,4 @@ Imports:
     tidyr
 Config/testthat/edition: 3
 Language: en-US
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

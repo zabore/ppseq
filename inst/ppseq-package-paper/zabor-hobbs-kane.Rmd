@@ -31,7 +31,8 @@ date: "August 20, 2021"
 type: package
 creative_commons: CC BY
 output: 
-  rjtools::rjournal_web_article
+  rjtools::rjournal_web_article:
+    self_contained: yes
 bibliography: zabor-hobbs-kane.bib
 ---
 
@@ -48,7 +49,7 @@ Statistical methods for early phase oncology trials were developed in the contex
 
 But despite these successes, recent dose-expansion cohorts have not always been planned in advance, leading to uncertain statistical properties, and have at times included samples sizes that far exceed those typically seen in early phase trials. For example, the KEYNOTE-001 trial of pembrolizumab, initially designed as a 3+3 dose-escalation trial, included multiple protocol amendments and ultimately enrolled a total of 655 patients across five melanoma expansion cohorts and 550 patients across four non-small-cell lung cancer expansion cohorts [@Khoja2015]. In a basket trial of atezolizumab, an anti-PD-L1 treatment in patients with a variety of cancers and both with and without PD-L1 expression, an expansion cohort in metastatic urothelial carcinoma ultimately evaluated 95 patients, despite the fact that no expansion cohort in this disease subtype was originally planned in the trial protocol. The expansion cohort in metastatic urothelial carcinoma was added through a protocol amendment, and the sample size later was increased from what was initially planned [@Petrylak2018; @Powles2014]. These enlarged sample sizes raise ethical concerns for patients who enroll in clinical trials, and emphasize the need for rigorous statistical designs to ensure that trials can stop early for futility while maintaining traditional control of type I error and power.
 
-Bayesian predictive probability has been proposed as an approach for sequential monitoring in early phase oncology trials [@Dmitrienko2006; @Lee2008; @Hobbs2018; @Saville2014]. However, in order to be useful to investigators designing such trials, software must be made available to calibrate the design for the desired statistical properties. To our knowledge no such software currently exists in the R programming language. This paper introduces the \CRANpkg{ppseq} package for the R software language [@RCT2020], which provides functions to design early phase clinical trials of binary endpoints using sequential predictive probability monitoring for futility. Static plots produced using the \CRANpkg{ggplot2} package [@Wickham2016] and interactive plots produced using the \CRANpkg{plotly} package [@Sievert2020] compare design options based on frequentist type I error and power. Moreover, the \CRANpkg{ppseq} package implements two criteria for selecting an ideal predictive probability monitoring design from among the options formed by combinations of posterior and predictive decision thresholds. While the \CRANpkg{ppseq} package was developed with early phase oncology clinical trials in mind, the methodology is general and can be applied to any application of sequential futility monitoring in clinical trial design.
+Bayesian predictive probability has been proposed as an approach for sequential monitoring in early phase oncology trials [@Dmitrienko2006; @Lee2008; @Hobbs2018; @Saville2014]. However, in order to be useful to investigators designing such trials, software must be made available to calibrate the design for the desired statistical properties. To our knowledge no such software currently exists in the R programming language. This paper introduces the \CRANpkg{ppseq} package for the R software language, which provides functions to design early phase clinical trials of binary endpoints using sequential predictive probability monitoring for futility. Static plots produced using the \CRANpkg{ggplot2} package [@Wickham2016] and interactive plots produced using the \CRANpkg{plotly} package [@Sievert2020] compare design options based on frequentist type I error and power. Moreover, the \CRANpkg{ppseq} package implements two criteria for selecting an ideal predictive probability monitoring design from among the options formed by combinations of posterior and predictive decision thresholds. While the \CRANpkg{ppseq} package was developed with early phase oncology clinical trials in mind, the methodology is general and can be applied to any application of sequential futility monitoring in clinical trial design.
 
 
 # Predictive probability monitoring
@@ -190,7 +191,7 @@ plot(
 )
 ```
 
-```{r echo = FALSE, message = FALSE, fig.width = 8, fig.height = 4.4, out.width = "110%", include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with the {ggplot2} package. The accuracy designs are on the left and the efficiency designs are on the right. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond."}
+```{r echo = FALSE, message = FALSE, fig.width = 8, fig.height = 4.4, out.width = "110%", include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of design options made with the {ggplot2} package. The accuracy designs are on the left, with type I error on the x-axis and power on the y-axis, and the efficiency designs are on the right, with the average sample size under the null on the x-axis and the average sample size under the alternative on the y-axis. Each point represents one potential design based on a specific combination of posterior and predictive thresholds. The color represents the Euclidean distance to the top left point. The optimal design is indicated by a diamond. The optimal accuracy design is the one with posterior threshold 0.86 and predictive threshold 0.1. The optimal efficiency design is the one with posterior threshold 0.92 and predictive threshold 0.05."}
 p <- plot(
   two_sample_cal_tbl,
   type1_range = c(0.05, 0.1),
@@ -211,7 +212,7 @@ p2_v2 <-
 p1_v2 + p2_v2
 ```
 
-```{r echo = FALSE, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of efficiency design options made with the {plotly} package. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond. A similar plot is available for the accuracy design options."}
+```{r echo = FALSE, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of efficiency design options made with the {plotly} package. The average sample size under the null is on the x-axis and the average sample size under the alternative is on the y-axis. The color represents the Euclidean distance to the top left point and the optimal design is indicated by a diamond. The optimal efficiency design is the one with posterior threshold 0.92 and predictive threshold 0.05. A similar plot is available for the accuracy design options."}
 p <- plot(
   two_sample_cal_tbl,
   type1_range = c(0.05, 0.1),
@@ -258,15 +259,18 @@ two_sample_decision_tbl <-
 
 The resulting table contains all possible combinations of responses in the two arms, so is quite long. We can visualize the resulting decision rules by passing the results of the call to the `calc_decision_rules()` function to the `plot()` function, which returns a faceted plot according to the interim look. The color denotes whether the trial should proceed (green) or stop (red) for a given combination of number of responses in the control arm (x-axis) and number of responses on the experimental arm (y-axis). For example, we see that at the second interim look when there are 20 patients enrolled on each arm, if there were 10 responses in the control arm, we would stop the trial if there were 8 or fewer responses on the experimental arm; otherwise we would proceed with enrollment.
 
-```{r message = FALSE, fig.height = 6, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with ggplot. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
+```{r message = FALSE, fig.height = 6, fig.width = 6, include = knitr::is_latex_output(), eval = knitr::is_latex_output(), fig.cap = "Plot of decision rules made with {ggplot2}. Each facet is for the total sample size at a pre-specified interim analysis. The number of responses in the control arm is on the x-axis and the number of responses in the experimental arm is on the y-axis. The fill color indicates whether the trial should stop (purple) or proceed (yellow) for a given combination of number of responses in the two arms at each interim analysis. At a given interim analysis, one can look up the number of observed responses to make a decision about whether the trial should stop or proceed enrollment."}
 dtp <- plot(two_sample_decision_tbl, plotly = FALSE)
 
 dtp + 
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") + 
+  scale_fill_viridis_d()
 ```
 
-```{r message = FALSE, fig.height = 6, fig.width = 8, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with plotly. The color indicates whether the trial should stop or proceed for a given number of responses at each interim analysis."}
-plot(two_sample_decision_tbl)
+```{r message = FALSE, fig.height = 6, fig.width = 8, include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.cap = "Plot of decision rules made with {plotly}. Each facet is for the total sample size at a pre-specified interim analysis. The number of responses in the control arm is on the x-axis and the number of responses in the experimental arm is on the y-axis. The fill color indicates whether the trial should stop (purple) or proceed (yellow) for a given combination of number of responses in the two arms at each interim analysis. At a given interim analysis, one can look up the number of observed responses to make a decision about whether the trial should stop or proceed enrollment."}
+ggplotly(
+  plot(two_sample_decision_tbl, plotly = FALSE) + scale_fill_viridis_d()
+)
 ```
 
 
