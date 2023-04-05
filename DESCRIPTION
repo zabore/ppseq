@@ -45,4 +45,4 @@ Imports:
     tidyr
 Config/testthat/edition: 3
 Language: en-US
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

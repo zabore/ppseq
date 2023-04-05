@@ -257,7 +257,8 @@ eval_thresh <- function(data, pp_threshold, ppp_threshold, p0, N,
 #'   nsim = 10
 #'   )
 #' 
-#' @importFrom purrr pmap_dfr map cross_df
+#' @importFrom purrr pmap_dfr map 
+#' @importFrom tidyr expand_grid
 #' @importFrom furrr future_map furrr_options
 #' @importFrom dplyr bind_rows full_join select rename ungroup summarize
 #' @export
@@ -275,10 +276,10 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
     map(seq_len(nsim), ~ sim_dat1(p = p_alt, n = n))
   
   cross_threshold <-
-    cross_df(list(
+    expand_grid(
       pp_threshold = pp_threshold,
       ppp_threshold = ppp_threshold
-    ))
+    )
   
   p0 <- if(length(p_null) == 1) 
     p_null else if(length(p_null) == 2)
@@ -362,11 +363,11 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
           mean_n0_null = mean(n0_null),
           mean_n1_null = mean(n1_null),
           prop_pos_null = mean(positive_null),
-          prop_stopped_null = mean(sum(n0_null, n1_null) < sum(N)),
+          prop_stopped_null = mean((n0_null + n1_null) < sum(N)),
           mean_n0_alt = mean(n0_alt),
           mean_n1_alt = mean(n1_alt),
           prop_pos_alt = mean(positive_alt),
-          prop_stopped_alt = mean(sum(n0_alt, n1_alt) < sum(N))
+          prop_stopped_alt = mean((n0_alt + n1_alt) < sum(N))
         )
       )
   } else if (length(p_null) == 1) {
