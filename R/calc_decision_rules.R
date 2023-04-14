@@ -105,8 +105,13 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
     
     
     ystart1 <- 0
+    ns <- paste0(c(res[[1, "n0"]], res[[1, "n1"]]),collapse=",")
     for(i in 1:nrow(res)) {
       pred <- 0
+      if( paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")!=ns ){
+       ns <- paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")
+       ystart1 <- 0
+      }      
       for (j in ystart1:res[[i, "n1"]]) {
         pred <- calc_predictive(
           y = c(res[[i, "r0"]], j),
