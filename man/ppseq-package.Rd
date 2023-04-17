@@ -13,7 +13,7 @@ Useful links:
 \itemize{
   \item \url{https://github.com/zabore/ppseq}
   \item \url{https://www.emilyzabor.com/ppseq/}
-  \item Report bugs at \url{https://github.me/zabore/ppseq/issues}
+  \item Report bugs at \url{https://github.com/zabore/ppseq/issues}
 }
 
 }
