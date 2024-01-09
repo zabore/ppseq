@@ -1,5 +1,7 @@
 # ppseq 0.2.3
 
+* added R Journal citation
+
 # ppseq 0.2.2
 
 * updated two-sample vignette results (Closed Issue #23)
