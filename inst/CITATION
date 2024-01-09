@@ -1,0 +1,18 @@
+citHeader("To cite ppseq in publications use:")
+
+bibentry(
+  bibtype  = "Article",
+  key      = "ppseq",
+  title    = "ppseq: An R Package for Sequential Predictive Probability Monitoring",
+  author   = c(person("Emily C.", "Zabor"),
+               person("Brian P.", "Hobbs"),
+               person("Michael J.", "Kane")),
+  journal  = "{The R Journal}",
+  year     = "2023",
+  volume   = "14",
+  number   = "4",
+  pages    = "280-290",
+  url      = "https://doi.org/10.32614/RJ-2023-017",
+  doi      = "10.32614/RJ-2023-017",
+  textVersion = "Zabor EC, Hobbs BP, Kane MJ. ppseq: An R Package for Sequential Predictive Probability Monitoring. The R Journal 2023;14(4):280-290. https://doi.org/10.32614/RJ-2023-017."
+)
