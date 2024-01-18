@@ -6,7 +6,7 @@ There was one NOTE:
 ❯ checking installed package size ... NOTE
    installed size is 11.0Mb
        sub-directories of 1Mb or more:
-         doc  10.4Mb
+         doc  10.5Mb
 
 
 ## Downstream dependencies
