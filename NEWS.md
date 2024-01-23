@@ -1,6 +1,7 @@
 # ppseq 0.2.3
 
 * added R Journal citation
+* removed plot tests because snapshots were failing on continuous integration even though they pass locally
 
 # ppseq 0.2.2
 
