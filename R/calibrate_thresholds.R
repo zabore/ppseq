@@ -353,7 +353,8 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
                  positive_alt = positive
           ),
           -ppp, -y0, -y1
-        )
+        ),
+        by = c("sim_num", "pp_threshold", "ppp_threshold")
       )
     
     res_summary <-
@@ -380,7 +381,8 @@ calibrate_thresholds <- function(p_null, p_alt, n, N,
         select(
           rename(res_df_alt, n1_alt = n1, positive_alt = positive),
           -ppp, -y1
-        )
+        ),
+        by = c("sim_num", "pp_threshold", "ppp_threshold")
       )
     
     res_summary <-

@@ -316,7 +316,9 @@ plot.calc_decision_rules <- function(x, plotly = TRUE, ...) {
             fill(
               group_by(
                 full_join(
-                  shell, x_2
+                  shell, 
+                  x_2,
+                  by = c("n0", "n1", "r0", "r1")
                   ),
                 r0
                 ),
@@ -369,7 +371,9 @@ plot.calc_decision_rules <- function(x, plotly = TRUE, ...) {
             fill(
               group_by(
                 full_join(
-                  shell, x_2
+                  shell, 
+                  x_2,
+                  by = c("r", "n")
                   ),
                 n
                 ),
