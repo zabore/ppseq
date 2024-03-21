@@ -1,3 +1,5 @@
+# ppseq 0.2.4
+
 # ppseq 0.2.3
 
 * added R Journal citation
