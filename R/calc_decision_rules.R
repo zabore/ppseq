@@ -103,34 +103,69 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
         ppp = NA_real_
       )
     
-    
-    ystart1 <- 0
-    ns <- paste0(c(res[[1, "n0"]], res[[1, "n1"]]),collapse=",")
-    for(i in 1:nrow(res)) {
-      pred <- 0
-      if( paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")!=ns ){
-       ns <- paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")
-       ystart1 <- 0
-      }      
-      for (j in ystart1:res[[i, "n1"]]) {
-        pred <- calc_predictive(
-          y = c(res[[i, "r0"]], j),
-          n = c(res[[i, "n0"]], res[[i, "n1"]]),
-          direction = direction,
-          p0 = p0,
-          delta = delta,
-          prior = prior,
-          S = S,
-          N = N,
-          theta = theta
-        )
-        if(pred > ppp) break else {
-          ystart1 <- ifelse(j > 0, j - 1, j)
-          
-          res[i, "r1"] <- j
-          res[i, "ppp"] <- pred
+    if(direction == "greater") {
+      
+      ystart1 <- 0
+      ns <- paste0(c(res[[1, "n0"]], res[[1, "n1"]]),collapse=",")
+      for(i in 1:nrow(res)) {
+        pred <- 0
+        if( paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")!=ns ){
+          ns <- paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")
+          ystart1 <- 0
+        }      
+        for (j in ystart1:res[[i, "n1"]]) {
+          pred <- calc_predictive(
+            y = c(res[[i, "r0"]], j),
+            n = c(res[[i, "n0"]], res[[i, "n1"]]),
+            direction = direction,
+            p0 = p0,
+            delta = delta,
+            prior = prior,
+            S = S,
+            N = N,
+            theta = theta
+          )
+          if(pred > ppp) break else {
+            ystart1 <- ifelse(j > 0, j - 1, j)
+            
+            res[i, "r1"] <- j
+            res[i, "ppp"] <- pred
+          }
         }
       }
+      
+    } else if(direction == "less") {
+      
+      ystart1 <- 0
+      ns <- paste0(c(res[[1, "n0"]], res[[1, "n1"]]),collapse=",")
+      for(i in 1:nrow(res)) {
+        pred <- 0
+        if( paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")!=ns ){
+          ns <- paste0(c(res[[i, "n0"]], res[[i, "n1"]]),collapse=",")
+          ystart1 <- 0
+        }      
+        for (j in ystart1:res[[i, "n1"]]) {
+          pred <- calc_predictive(
+            y = c(res[[i, "r0"]], j),
+            n = c(res[[i, "n0"]], res[[i, "n1"]]),
+            direction = direction,
+            p0 = p0,
+            delta = delta,
+            prior = prior,
+            S = S,
+            N = N,
+            theta = theta
+          )
+          if(pred < ppp) {
+            ystart1 <- ifelse(j > 0, j - 1, j)
+            
+            res[i, "r1"] <- j
+            res[i, "ppp"] <- pred
+            break
+          }
+        }
+      }
+      
     }
     
   } else if(length(N) == 1) {
@@ -171,7 +206,7 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
       ystart <- 0
       for (i in n) {
         pred <- 0
-        for(j in i:ystart) {
+        for(j in ystart:i) {
           pred <- calc_predictive(
             y = j,
             n = i,
@@ -183,9 +218,10 @@ calc_decision_rules <- function(n, N, theta, ppp, p0,
             N = N,
             theta = theta
           )
-          if(pred > ppp) break else{
+          if(pred < ppp) {
             res[i == n, 2] <- j
             res[i == n, 3] <- pred
+            break
           }
         }
         ystart <- ifelse(j > 0, j - 1, j)
