@@ -1,3 +1,7 @@
+# ppseq 0.2.4
+
+* fixed issue with `calc_decision_rules()` when `direction="less"` (Closed Issue #26)
+
 # ppseq 0.2.3
 
 * added R Journal citation
