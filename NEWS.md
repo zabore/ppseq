@@ -1,5 +1,7 @@
 # ppseq 0.2.5
 
+* fixed issue with spelling testing
+
 # ppseq 0.2.4
 
 * fixed issue with `calc_decision_rules()` when `direction="less"` (Closed Issue #26)
