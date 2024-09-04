@@ -1,3 +1,5 @@
+# ppseq 0.2.5
+
 # ppseq 0.2.4
 
 * fixed issue with `calc_decision_rules()` when `direction="less"` (Closed Issue #26)

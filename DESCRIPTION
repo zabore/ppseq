@@ -1,6 +1,6 @@
 Package: ppseq
 Title: Design Clinical Trials using Sequential Predictive Probability Monitoring
-Version: 0.2.4
+Version: 0.2.5
 Authors@R: 
   c(person(given = "Emily C.",
           family = "Zabor",
