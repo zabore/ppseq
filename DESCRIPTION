@@ -30,7 +30,6 @@ Suggests:
   gt,
   knitr,
   rmarkdown,
-  spelling,
   testthat (>= 3.0.0),
   vdiffr
 VignetteBuilder: knitr
@@ -45,4 +44,4 @@ Imports:
     tidyr
 Config/testthat/edition: 3
 Language: en-US
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
