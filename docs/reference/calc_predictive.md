@@ -1,0 +1,112 @@
+# Calculate a single posterior predictive probability
+
+This function is meant to be used in the context of a clinical trial
+with a binary endpoint. The goal is to calculate the posterior
+predictive probability of success at the end of a trial, given the data
+available at an interim analysis. For the two-sample case the number of
+events observed at interim analysis, the sample size at interim
+analysis, and the total planned sample size are denoted y0, n0, and N0
+in the standard-of-care arm and y1, n1, and N1 in the experimental arm.
+For the one-sample case, the number of events observed at interim
+analysis, the sample size at interim analysis, and the total planned
+sample size are denoted y, n, and N.
+
+## Usage
+
+``` r
+calc_predictive(
+  y,
+  n,
+  p0,
+  N,
+  direction = "greater",
+  delta = NULL,
+  prior = c(0.5, 0.5),
+  S = 5000,
+  theta = 0.95
+)
+```
+
+## Arguments
+
+- y:
+
+  number of events observed so far. Vector of length two c(y0, y1) for
+  the two-sample case; integer y for the one-sample case.
+
+- n:
+
+  sample size observed so far. Vector of length two c(n0, n1) for the
+  two-sample case; integer n for the one-sample case.
+
+- p0:
+
+  the target value to compare to in the one-sample case. Set to NULL for
+  the two-sample case.
+
+- N:
+
+  the total planned sample size at the end of the trial. Vector of
+  length two c(N0, N1) for the two-sample case; integer N for the
+  one-sample case.
+
+- direction:
+
+  "greater" (default) if interest is in P(p1 \> p0) in the two-sample
+  case or P(p \> p0) in the one-sample case; "less" if interest is in
+  P(p1 \< p0) for the two-sample case or P(p \< p0) for the one-sample
+  case.
+
+- delta:
+
+  clinically meaningful difference between groups. Typically 0 for the
+  two-sample case. NULL for one-sample case (default).
+
+- prior:
+
+  vector of length two containing hyperparameters of the prior beta
+  distribution. c(0.5, 0.5) is default, for the Beta(0.5, 0.5)
+  distribution.
+
+- S:
+
+  number of samples, default is 5000
+
+- theta:
+
+  The target posterior probability. e.g. Efficacy decision if P(p1 \>
+  p0) \> theta for the two-sample case with greater direction. Default
+  is 0.95.
+
+## Value
+
+Returns the numeric posterior predictive probability
+
+## Examples
+
+``` r
+set.seed(123)
+
+# Setting S = 100 for speed, in practice you would want a much larger sample
+
+# One-sample case 
+calc_predictive(
+  y = 14, 
+  n = 50, 
+  p0 = 0.2, 
+  N = 100, 
+  S = 100
+  )
+#> [1] 0.55
+
+# Two-sample case 
+calc_predictive(
+  y = c(7, 12), 
+  n = c(50, 50), 
+  p0 = NULL, 
+  N = c(100, 100),
+  delta = 0,
+  S = 100
+  )
+#> [1] 0.57
+```

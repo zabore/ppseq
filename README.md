@@ -1,5 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 <!-- badges: start -->
 
 [![Codecov test
@@ -38,7 +39,7 @@ install.packages("ppseq")
 Or you can install the development version of ppseq from GitHub with:
 
 ``` r
-remotes::install_github("zabore/ppseq")
+pak::pak("zabore/ppseq")
 ```
 
 ## Basic usage
@@ -83,7 +84,7 @@ power.
 plot(calthresh)
 ```
 
-<img src="man/figures/README-calthresh-plot.png" width="100%" />
+<img src="man/figures/README-calthresh-plot.png" alt="" width="100%" />
 
 The optimal accuracy and optimal efficiency designs can be obtained by
 passing the results to the `optimize_design()` function, with filtering
@@ -93,7 +94,7 @@ applied for the desired range of type 1 error and minimum power.
 optimize_design(calthresh, type1_range = c(0.025, 0.05), minimum_power = 0.8)
 ```
 
-<img src="man/figures/README-opt-acc-table.png" width="100%" /><img src="man/figures/README-opt-eff-table.png" width="100%" />
+<img src="man/figures/README-opt-acc-table.png" alt="" width="100%" /><img src="man/figures/README-opt-eff-table.png" alt="" width="100%" />
 
 After selecting a design, we can obtain a set of decision rules to
 implement the trial, so that no calculations will be needed during the
@@ -125,7 +126,7 @@ the results to `print()`.
 plot(opteffrules, plotly = FALSE)
 ```
 
-<img src="man/figures/README-opteffrules-plot.png" width="100%" />
+<img src="man/figures/README-opteffrules-plot.png" alt="" width="100%" />
 
 See the vignettes for the
 [one-sample](https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html)

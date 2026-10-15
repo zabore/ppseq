@@ -1,0 +1,436 @@
+# Two-sample randomized trial
+
+## Setup
+
+To execute the code in this vignette, you first need to install and load
+the {ppseq} package. You will also need the {future} package to
+parallelize your code to improve speed.
+
+``` r
+
+install.packages("ppseq")
+install.packages("future")
+```
+
+``` r
+
+library(ppseq)
+```
+
+``` r
+
+library(future)
+```
+
+## Introduction
+
+Efforts to develop biomarker-targeted anti-cancer therapies have
+progressed rapidly in recent years. With the aim of expediting
+regulatory reviews of promising therapies, an increasing number of
+targeted cancer therapies are being granted accelerated approval on the
+basis of evidence acquired in single-arm phase II clinical trials. The
+historical control rates used to design and evaluate emerging targeted
+therapies in single-arm trials often arise as population averages,
+lacking specificity to the biomarker-targeted subpopulation of interest.
+Thus, historical trial results are inherently limited for inferring the
+potential “comparative efficacy” of novel targeted therapies.
+Randomization may be the best option in this setting, and is not out of
+the question given the increasingly large sample sizes being used in
+phase II trials. We propose a design for two-arm randomized phase II
+trials based on sequential predictive probability monitoring that allows
+an investigator to identify an optimal clinical trial design within
+constraints of traditional type I error and power, and with futility
+stopping rules that preserve valuable human and financial resources
+(cite two-sample paper once it’s available).
+
+## Case study background
+
+Atezolizumab is a programmed death-ligand 1 (PD-L1) blocking monoclonal
+antibody that was given accelerated approval by the U.S. Food and Drug
+Administration in May 2016 for the treatment of patients with locally
+advanced or metastatic urothelial carcinoma who had disease progression
+following platinum-containing chemotherapy. The approval was based on
+the results of a single-arm phase II study in 310 patients (Rosenberg et
+al. 2016). The phase II study used a hierarchical fixed-sequence testing
+procedure to test increasingly broad subgroups of patients based on
+PD-L1 status, and found overall response rates of 26% (95% CI: 18-36),
+18% (95% CI: 13-24), and 15% (95% CI 11-19) in patients with ≥5%
+PD-L1-positive immune cells (IC2/3 subgroup), in patients with ≥1%
+PD-L1-positive immune cells (IC1/2/3 subgroup), and in all patients,
+respectively (Rosenberg et al. 2016). All three rates exceeded the
+historical control rate of 10%. Then, in March 2021, the approval in
+this indication was voluntarily withdrawn by the sponsor following
+negative results from a randomized phase III study (Powles et al. 2018).
+In the phase III study, 931 patients were randomly assigned to receive
+atezolizumab or chemotherapy in a 1:1 ratio, and the same hierarchical
+fixed-sequence testing procedure as in the phase II study was used. The
+phase III study found that overall survival did not differ significantly
+between the atezolizumab and chemotherapy groups of the IC2/3 subgroup
+(median survival 11.1 months \[95% CI: 8.6-15.5\] versus 10.6 months
+\[95% CI: 8.4-12.2\]), so no further testing was conducted for the
+primary endpoint. Further analyses revealed that while the response
+rates to atezolizumab were comparable to those seen in the phase II
+study, the response rates to chemotherapy were much higher than the
+historical control rate of 10%. The overall response rates to
+chemotherapy were 21.6% (95% CI: 14.5-30.2), 14.7% (95% CI: 10.9-19.2),
+and 13.4% (95% CI: 10.5-16.9) for the IC2/3 subgroup, IC1/2/3 subgroup,
+and all patients, respectively. The overall response rates to
+atezolizumab were 23% (95% CI: 15.6-31.9), 14.1% (95% CI: 10.4-18.5),
+and 13.4% (95% CI: 10.5-16.9) for the IC2/3 subgroup, IC1/2/3 subgroup,
+and all patients, respectively. These results indicate that PD-L1 status
+is a predictive biomarker for both standard of care chemotherapies that
+comprised the control arm as well as atezolizumab in this patient
+population.
+
+## Re-design of case study
+
+We will demonstrate the use of the functions in {ppseq} to re-design the
+phase II trial of atezolizumab using a two-arm randomized design with
+sequential predictive probability monitoring. We focus here on the main
+biomarker subgroup of interest, the IC2/3 subgroup. We design the study
+with a null response rate of 0.1 in both arms, and an alternative
+response rate of 0.25 in the atezolizumab arm. We plan the study with
+100 participants, assuming that the total sample size available is
+similar to the 310 used in the actual single-arm phase II trial, and
+that a third of that patient population fall into our desired biomarker
+subgroup. We will check for futility after every 10 patients are
+enrolled on each arm. To design the study, we need to calibrate the
+design over a range of posterior probability thresholds and predictive
+probability thresholds.
+
+The posterior probability is calculated from the posterior distribution
+based on the specified priors and the data observed so far, and
+represents the probability of success based only on the data accrued so
+far. A posterior probability threshold would be set during the design
+stage and if, at the end of the trial, the posterior probability
+exceeded the pre-specified threshold, the trial would be declared a
+success. The posterior predictive probability is the probability that,
+at a given interim monitoring point, the treatment will be declared
+efficacious at the end of the trial when full enrollment is reached,
+conditional on the currently observed data and the specified priors.
+Predictive probability provides an intuitive monitoring framework that
+tells an investigator what the chances are of declaring the treatment
+efficacious at the end of the trial if we were to continue enrolling to
+the maximum planned sample size, given the data observed so far in the
+trial. If this probability drops below a certain threshold, which is
+pre-specified during the design stage, the trial would be stopped early.
+Predictive probability thresholds closer to 0 lead to less frequent
+stopping for futility, whereas thresholds near 1 lead to frequent
+stopping unless there is almost certain probability of success.
+
+We consider a grid of thresholds so that we have a range of possible
+designs from which to select a design with optimal operating
+characteristics such as type I error, power, and sample size under the
+null and alternative. In this example we will consider posterior
+thresholds of 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, and
+0.99, and predictive thresholds of 0.05, 0.1, 0.15, and 0.2.
+
+## Using `calibrate_thresholds()` to obtain design options
+
+To conduct the case study re-design, we use the
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+function from the {ppseq} package. This function is written using the
+`future` and `furrr` packages, but the user will have to set up a call
+to [`future::plan`](https://future.futureverse.org/reference/plan.html)
+that is appropriate for their operating environment and their simulation
+setup prior to running the function. In this example, we used the
+following code on a Unix server with 192 cores, with the goal of
+utilizing 40 cores since our grid of thresholds to consider was 10
+posterior thresholds by 4 predictive thresholds.
+
+The
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+function will simulate `nsim` datasets under the null hypothesis and
+`nsim` datasets under the alternative hypothesis. For each simulated
+dataset, every combination of posterior and predictive thresholds will
+be considered and the final sample size and whether or not the trial was
+positive will be saved. Then across all simulated datasets,
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+will return the average sample size under the null, the average sample
+size under the alternative, the proportion of positive trials under the
+null (i.e. the type I error), and the proportion of positive trials
+under the alternative (i.e. the power).
+
+Because
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+randomly generates simulated datasets, you will want to set a seed
+before running the function in order to ensure your results are
+reproducible.
+
+The inputs to
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+for our case study re-design include `p_null = c(0.1, 0.1)` as the null
+response rate, `p_alt = c(0.1, 0.25)` as the alternative response rate,
+`n = cbind(seq(10, 50, 10), seq(10, 50, 10))` indicates interim looks
+after every 10 patients up to a total of 50 in each arm, `N = c(50, 50)`
+indicates the final total sample size of 50 in each arm,
+`direction = "greater"` specifies that interest is in whether the
+response rate in the experimental arm exceeds the response rate in the
+control arm, `delta = 0` is the default for the clinically meaningful
+difference in the two-sample case, `prior = c(0.5, 0.5)` specifies that
+both hyperparameters of the prior beta distribution be set to 0.5,
+`S = 5000` specifies that 5000 posterior samples will be drawn to
+calculate the posterior and predictive probabilities, and `nsim = 1000`
+specifies that we will generate 1000 simulated datasets under both the
+null and the alternative. `pp_threshold` is a vector of the posterior
+thresholds of interest and `ppp_threshold` is a vector of predictive
+thresholds of interest. Note that due to the computational time
+involved, the object produced from the below example code
+`two_sample_cal_tbl` is available as a dataset in the {ppseq} package.
+
+``` r
+
+set.seed(123)
+
+future::plan(future::multicore(workers = 40))
+
+two_sample_cal_tbl <- 
+  calibrate_thresholds(p_null = c(0.1, 0.1), 
+                       p_alt = c(0.1, 0.25), 
+                       n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+                       N = c(50, 50), 
+                       pp_threshold = seq(0.9, 0.99, 0.01),
+                       ppp_threshold = seq(0.05, 0.2, 0.05),
+                       direction = "greater", 
+                       delta = 0, 
+                       prior = c(0.5, 0.5), 
+                       S = 5000, 
+                       nsim = 1000
+                       )
+```
+
+## Results
+
+We will limit our consideration to designs with type I error between
+0.05 and 0.1, and a minimum power of 0.7.
+
+### `print()`
+
+When you pass the results of
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+to [`print()`](https://rdrr.io/r/base/print.html) you will get back a
+table of the resulting design options that satisfy the desired range of
+type I error, specified as a vector of minimum and maximum passed to the
+`type1_range` argument, and minimal power, specified as a numeric value
+between 0 and 1 passed to the argument `minimum_power`.
+
+``` r
+
+print(two_sample_cal_tbl, 
+      type1_range = c(0.05, 0.1), 
+      minimum_power = 0.7)
+```
+
+| pp_threshold | ppp_threshold | mean_n0_null | mean_n1_null | prop_pos_null | prop_stopped_null | mean_n0_alt | mean_n1_alt | prop_pos_alt | prop_stopped_alt |
+|----|----|----|----|----|----|----|----|----|----|
+| 0.90 | 0.05 | 29.91 | 29.91 | 0.083 | 0.733 | 46.18 | 46.18 | 0.738 | 0.144 |
+| 0.90 | 0.10 | 27.32 | 27.32 | 0.078 | 0.780 | 43.81 | 43.81 | 0.705 | 0.209 |
+| 0.91 | 0.05 | 29.01 | 29.01 | 0.071 | 0.758 | 45.71 | 45.71 | 0.719 | 0.161 |
+| 0.92 | 0.05 | 28.61 | 28.61 | 0.070 | 0.770 | 45.49 | 45.49 | 0.701 | 0.167 |
+
+We find that 4 of the 40 considered combinations of posterior and
+predictive thresholds result in a design within our acceptable range of
+type I error and minimal power. The column labeled `prop_pos_null`
+contains the proportion of positive trials under the null, which
+represents the type I error rate, and the column labeled `prop_pos_alt`
+contains the proportion of positive trials under the alternative, which
+represents the power. The column labeled `mean_n1_null` contains the
+average sample size under the null whereas the column labeled
+`mean_n1_alt` contains the average sample size under the alternative.
+
+### `optimize_design()`
+
+Finally, we can pass the results from a call to
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+to the
+[`optimize_design()`](https://www.emilyzabor.com/ppseq/reference/optimize_design.md)
+function to list the optimal design with respect to type I error and
+power, termed the “optimal accuracy” design, and the optimal design with
+respect to the average sample sizes under the null and alternative,
+termed the “optimal efficiency” design, within the specified range of
+acceptable type I error and minimum power.
+
+``` r
+
+optimize_design(two_sample_cal_tbl, 
+                type1_range = c(0.05, 0.1), 
+                minimum_power = 0.7)
+#> $`Optimal accuracy design:`
+#> # A tibble: 1 × 6
+#>   pp_threshold ppp_threshold `Type I error` Power `Average N under the null`
+#>          <dbl>         <dbl>          <dbl> <dbl>                      <dbl>
+#> 1          0.9          0.05          0.083 0.738                       29.9
+#>   `Average N under the alternative`
+#>                               <dbl>
+#> 1                              46.2
+#> 
+#> $`Optimal efficiency design:`
+#> # A tibble: 1 × 6
+#>   pp_threshold ppp_threshold `Type I error` Power `Average N under the null`
+#>          <dbl>         <dbl>          <dbl> <dbl>                      <dbl>
+#> 1         0.92          0.05           0.07 0.701                       28.6
+#>   `Average N under the alternative`
+#>                               <dbl>
+#> 1                              45.5
+```
+
+The optimal accuracy design is the one with posterior threshold 0.9 and
+predictive threshold 0.05. It has a type I error of 0.083, power of
+0.738, average sample size under the null of 30 per arm, and average
+sample size under the alternative of 46 per arm.
+
+The optimal efficiency design is the one with posterior threshold of
+0.92 and predictive threshold of 0.05. It has a type I error of 0.07,
+power of 0.7, average sample size under the null of 29 per arm, and
+average sample size under the alternative of 46 per arm.
+
+We find that either the optimal accuracy or the optimal efficiency
+sequential predictive probability design reasonable type I error and
+power to detect the effect of interest, and results in a much lower
+average total sample size under both the null and alternative than the
+310 actually used in the phase II study of atezolizumab. Additionally,
+this randomized design would allow direct estimation of the response
+rate to both the experimental treatment and to the standard of care
+treatment in the biomarker subgroup of interest, thus avoiding the
+issues with historical control rates that arose in the original
+atezolizumab study. While this design would not prevent the problem of
+the targeted biomarker being prognostic rather than predictive, it uses
+fewer patients and avoids continuation to phase III when it is
+unwarranted.
+
+### `calc_decision_rules()`
+
+Once we have selected the design of interest, we need to obtain the
+decision rules at each futility monitoring time for easy implementation
+of our trial. We can do so by passing the parameters of our selected
+design to
+[`calc_decision_rules()`](https://www.emilyzabor.com/ppseq/reference/calc_decision_rules.md).
+The input parameters `n`, `direction`, `p0`, `delta`, `prior`, `S`, and
+`N` are the same as in
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md).
+The input parameter `theta = 0.92` specifies that we are interested in a
+posterior probability threshold of 0.92 and the input parameter
+`ppp = 0.05` specifies that we are interested in a predictive
+probability threshold of 0.05, as determined by the optimal efficiency
+design above. Note that due to the computational time involved, the
+object produced from the below example code `two_sample_decision_tbl` is
+available as a dataset in the {ppseq} package.
+
+``` r
+
+set.seed(123)
+
+two_sample_decision_tbl <- 
+  calc_decision_rules(
+    n = cbind(seq(10, 50, 10), seq(10, 50, 10)),
+    N = c(50, 50),
+    theta = 0.92, 
+    ppp = 0.05, 
+    p0 = NULL, 
+    direction = "greater", 
+    delta = 0, 
+    prior = c(0.5, 0.5), 
+    S = 5000
+    )
+```
+
+``` r
+
+two_sample_decision_tbl
+```
+
+| n0  | n1  | r0  | r1  | ppp    |
+|-----|-----|-----|-----|--------|
+| 10  | 10  | 0   | NA  | NA     |
+| 10  | 10  | 1   | 0   | 0.0394 |
+| 10  | 10  | 2   | 0   | 0.0096 |
+| 10  | 10  | 3   | 1   | 0.0256 |
+| 10  | 10  | 4   | 2   | 0.0382 |
+| 10  | 10  | 5   | 3   | 0.0384 |
+| 10  | 10  | 6   | 4   | 0.0456 |
+| 10  | 10  | 7   | 5   | 0.0440 |
+| 10  | 10  | 8   | 6   | 0.0330 |
+| 10  | 10  | 9   | 7   | 0.0258 |
+| 10  | 10  | 10  | 9   | 0.0350 |
+
+Above are the first 11 rows of the resulting table, which contains all
+possible combinations of number of responses in the control and
+experimental arms that would stop the trial at each interim look. In the
+results table, `n0` indicates the number of enrolled patients in the
+control arm and `n1` indicates the number of enrolled patients in the
+treatment arm at each look for futility; `r0` indicates the number of
+responses in the control arm and `r1` indicates the number of responses
+in the treatment arm for which we would stop the trial at a given
+interim look if the number of observed responses is \<=r1 for a given
+fixed value of r0. At the end of the trial the treatment would be
+considered promising if the number of observed responses is \>r1 for a
+given r0. For example, in this case we see that if we had 4 responses in
+the control arm out of the first 10 control arm patients, we would stop
+the trial if we had 2 or fewer responses in the experimental arm out of
+the first 10 experimental arm patients.
+
+### `plot()`
+
+Passing the results of
+[`calibrate_thresholds()`](https://www.emilyzabor.com/ppseq/reference/calibrate_thresholds.md)
+to [`plot()`](https://rdrr.io/r/graphics/plot.default.html) returns two
+plots, one of type I error by power, and one of average sample size
+under the null by average sample size under the alternative. The
+arguments `type1_range` and `power` are used in the same way as for the
+[`print()`](https://rdrr.io/r/base/print.html) function. The argument
+`plotly` defaults to FALSE, which results in a pair of side-by-side
+plots produced with the {ggplot2} package. If set to TRUE, two
+individual interactive plots produced with the {plotly} package will be
+returned, as demonstrated below.
+
+``` r
+
+plot(two_sample_cal_tbl, 
+     type1_range = c(0.05, 0.1), 
+     minimum_power = 0.7,
+     plotly = TRUE)
+```
+
+Note that when points were tied based on optimization criteria, the
+point with the highest posterior and predictive threshold is selected
+for plotting.
+
+The diamond-shaped point represents the optimal design based on each
+criteria, which is discussed in more detail below. Using the
+`plotly = TRUE` option to
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) we can hover
+over each point to see the x-axis and y-axis values, along with the
+distance to the top left corner on each plot, the posterior and
+predictive thresholds associated with each point, and the average sample
+sizes under the null and alternative for each arm.
+
+Passing the results of
+[`calc_decision_rules()`](https://www.emilyzabor.com/ppseq/reference/calc_decision_rules.md)
+to [`plot()`](https://rdrr.io/r/graphics/plot.default.html) returns a
+faceted plot according to the interim look. One each plot, the x-axis
+indicates the number of responses in the control arm and the y-axis
+indicates the number of responses in the experimental arm. The color
+denotes whether the trial should proceed (green) or stop (red). Hovering
+over each box will indicate the combination of sample size and responses
+and the decision at that time.
+
+``` r
+
+plot(two_sample_decision_tbl)
+```
+
+## References
+
+Powles, T., I. Durán, M. S. van der Heijden, et al. 2018. “Atezolizumab
+Versus Chemotherapy in Patients with Platinum-Treated Locally Advanced
+or Metastatic Urothelial Carcinoma (IMvigor211): A Multicentre,
+Open-Label, Phase 3 Randomised Controlled Trial.” Journal Article.
+*Lancet* 391 (10122): 748–57.
+<https://doi.org/10.1016/s0140-6736(17)33297-x>.
+
+Rosenberg, J. E., J. Hoffman-Censits, T. Powles, et al. 2016.
+“Atezolizumab in Patients with Locally Advanced and Metastatic
+Urothelial Carcinoma Who Have Progressed Following Treatment with
+Platinum-Based Chemotherapy: A Single-Arm, Multicentre, Phase 2 Trial.”
+Journal Article. *Lancet* 387 (10031): 1909–20.
+<https://doi.org/10.1016/s0140-6736(16)00561-4>.

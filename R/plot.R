@@ -44,9 +44,9 @@
 #' plot(cal_tbl1, type1_range = c(0.01, 0.2), minimum_power = 0.7)
 #'
 #' @importFrom dplyr rename mutate filter ungroup slice group_by arrange
-#'                   row_number
+#'     row_number
 #' @importFrom ggplot2 ggplot aes geom_point xlim ylim labs 
-#'                     scale_color_viridis_c theme_bw theme
+#'   scale_color_viridis_c theme_bw theme
 #' @importFrom plotly ggplotly
 #' @import patchwork
 #' @export
@@ -267,13 +267,13 @@ plot.calibrate_thresholds <- function(x,
 #' plot(dec_tbl, plotly = FALSE)
 #' 
 #' @importFrom dplyr mutate filter select rename ungroup group_by 
-#' full_join case_when
+#'   full_join case_when
 #' @importFrom tibble tibble
 #' @importFrom purrr map2 map
 #' @importFrom tidyr fill
 #' @importFrom ggplot2 ggplot aes facet_wrap geom_tile 
-#' scale_x_continuous scale_y_continuous label_both scale_fill_manual
-#' element_rect scale_x_discrete xlab
+#'   scale_x_continuous scale_y_continuous label_both scale_fill_manual
+#'   element_rect scale_x_discrete xlab
 #' @importFrom plotly ggplotly
 #' 
 #' @export

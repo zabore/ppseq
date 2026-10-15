@@ -42,7 +42,7 @@ install.packages("ppseq")
 Or you can install the development version of ppseq from GitHub with:
 
 ```r
-remotes::install_github("zabore/ppseq")
+pak::pak("zabore/ppseq")
 ```
 
 
@@ -113,7 +113,7 @@ plot(opteffrules, plotly = FALSE)
 ```
 
 ```{r echo = FALSE}
-knitr::include_graphics("D:/ppseq/man/figures/README-opteffrules-plot.png")
+knitr::include_graphics("man/figures/README-opteffrules-plot.png")
 ```
 
 See the vignettes for the [one-sample](https://www.emilyzabor.com/ppseq/articles/one_sample_expansion.html) and [two-sample](https://www.emilyzabor.com/ppseq/articles/two_sample_randomized.html) cases for additional details about available features and options.

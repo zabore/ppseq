@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Emily C. Zabor \email{zabore2@ccf.org} (\href{https://orcid.org/0000-0002-1402-4498}{ORCID})
   \item Brian P. Hobbs
   \item Michael J. Kane \email{michael.kane@yale.edu} (\href{https://orcid.org/0000-0003-1899-6662}{ORCID})
 }

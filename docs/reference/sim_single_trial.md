@@ -1,0 +1,125 @@
+# Simulate a single trial with posterior probability monitoring
+
+This function is meant to be used in the context of a clinical trial
+with a binary endpoint. The goal is to simulate event counts from the
+binomial distribution based on the number of patients accrued at each
+interim look, and calculate the posterior predictive probability of
+success (or futility) at the end of a trial, given the data available at
+each interim analysis.
+
+## Usage
+
+``` r
+sim_single_trial(
+  p,
+  n,
+  p0,
+  N,
+  direction = "greater",
+  delta = NULL,
+  prior = c(0.5, 0.5),
+  S = 5000,
+  theta = 0.95
+)
+```
+
+## Arguments
+
+- p:
+
+  vector of length two containing the probability of event in the
+  standard of care and experimental arm c(p0, p1) for the two-sample
+  case; integer of event probability for one-sample case
+
+- n:
+
+  matrix containing the total number of patients accrued so far at each
+  interim look in the standard of care (column 1) and experimental
+  (column 2) arms for two-sample case; vector of sample size accrued so
+  far at each interim look for one-sample case. The last value should be
+  equal to the total sample size at the end of the trial. If only a
+  single look will be done at the end of the trial, this can be a vector
+  specifying the total sample size c(N0, N1) for the two-sample case or
+  an integer specifying the total sample size N for the one-sample case.
+
+- p0:
+
+  The target value to compare to in the one-sample case
+
+- N:
+
+  the total planned sample size at the end of the trial, c(N0, N1) for
+  two-sample case; integer of total planned sample size at end of trial
+  N for one-sample case
+
+- direction:
+
+  "greater" (default) if interest is in P(p1 \> p0) and "less" if
+  interest is in P(p1 \< p0) for two-sample case. For one-sample case,
+  "greater" if interest is in P(p \> p0) and "less" if interest is in
+  P(p \< p0).
+
+- delta:
+
+  clinically meaningful difference between groups. Typically 0 for the
+  two-sample case. NULL for the one-sample case (default).
+
+- prior:
+
+  hyperparameters of prior beta distribution. Beta(0.5, 0.5) is default
+
+- S:
+
+  number of samples, default is 5000
+
+- theta:
+
+  The target posterior probability. e.g. Efficacy decision if P(p1 \>
+  p0) \> theta for the two-sample case with greater direction. Default
+  is 0.95. Can be a vector if interest is in selecting from among a
+  variety of thresholds.
+
+## Value
+
+Returns a tibble with pp_threshold (i.e. theta, the target posterior
+probability), number of responses, sample size, posterior probability,
+and posterior predictive probability at each look
+
+## Examples
+
+``` r
+
+set.seed(123)
+
+# Setting S = 100 for speed, in practice you would want a much larger sample
+
+# One-sample case
+sim_single_trial(
+  p = 0.3, 
+  n = c(5, 10),  
+  p0 = 0.1, 
+  N = 25, 
+  S = 100
+  )
+#> # A tibble: 2 × 5
+#>   pp_threshold    y1    n1    pp   ppp
+#>          <dbl> <int> <dbl> <dbl> <dbl>
+#> 1         0.95     1     5  0.84  0.54
+#> 2         0.95     3    10  0.99  0.8 
+
+# Two-sample case 
+sim_single_trial(
+  p = c(0.1, 0.3), 
+  n = cbind(c(5, 10), c(5, 10)), 
+  p0 = NULL, 
+  N = c(50, 50), 
+  delta = 0, 
+  S = 100
+  )
+#> # A tibble: 2 × 7
+#>   pp_threshold    y0    y1    n0    n1    pp   ppp
+#>          <dbl> <int> <int> <dbl> <dbl> <dbl> <dbl>
+#> 1         0.95     1     1     5     5  0.4   0.26
+#> 2         0.95     1     2    10    10  0.73  0.38
+  
+```
