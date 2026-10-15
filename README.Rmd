@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/ppseq)](https://CRAN.R-project.org/package=ppseq)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![R-CMD-check](https://github.com/zabore/ppseq/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zabore/ppseq/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/zabore/ppseq/graph/badge.svg)](https://app.codecov.io/gh/zabore/ppseq)
 <!-- badges: end -->
 
 <br>
